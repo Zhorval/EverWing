@@ -316,7 +316,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
         
         guard let h_node = higherNode, let l_node = lowerNode else { return }
        
-        print("hihgh \(h_node) left \(l_node)")
         if (h_node.physicsBody?.categoryBitMask == PhysicsCategory.Imune){
             contactType = .Immune
         }

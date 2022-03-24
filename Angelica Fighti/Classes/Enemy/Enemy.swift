@@ -59,8 +59,6 @@ class Enemy: SKSpriteNode{
         
         self.addChild(rootBar)
     }
-    
-    
 }
 
 

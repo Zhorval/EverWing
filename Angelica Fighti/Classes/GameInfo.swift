@@ -70,9 +70,10 @@ class GameInfo: GameInfoDelegate{
         currentGold = 0
         currentHighscore = 0
         account = AccountInfo()
-        fireball_enemy = EnemyModel(type: EnemyModel.EnemyType.allCases.randomElement()!)
+        fireball_enemy = EnemyModel(type: EnemyType.allCases.randomElement()!)
         regular_enemies = EnemyModel(type: .Regular)
-        dragon = [ DragonsModel(type:.dragon_Green),DragonsModel(type:.dragon_Pink) ]
+         dragon = [ DragonsModel(texture: DragonType.dragon_Green.rawValue,type:.dragon_Green),
+                    DragonsModel(texture: DragonType.dragon_Pink.rawValue, type:.dragon_Pink) ]
         boss = EnemyModel(type: .Boss)
 
         gamestate = .NoState
@@ -196,6 +197,7 @@ class GameInfo: GameInfoDelegate{
             // show boss incoming
             }, SKAction.wait(forDuration: 5), SKAction.run {
                 // summon boss
+                
                 self.boss.spawn(scene: self.mainScene!)
             }]))
     }
@@ -310,7 +312,7 @@ class GameInfo: GameInfoDelegate{
             
             let action = SKAction.sequence([SKAction.run({
                 self.regular_enemies.spawn(scene: mainscene)
-            }), SKAction.wait(forDuration: 5)])
+            }), SKAction.wait(forDuration: 1)])
             
             //totalWaves
             //wavesForNextLevel

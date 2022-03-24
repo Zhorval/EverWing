@@ -14,6 +14,7 @@ import GameplayKit
 class RegularEnemy:Enemy{
     
     
+    
     private var currency:Currency = Currency(type: .Coin)
     private var velocity = CGVector.zero
     

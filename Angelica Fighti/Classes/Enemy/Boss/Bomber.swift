@@ -9,10 +9,10 @@
 import SpriteKit
 import GameplayKit
 
-class Bomber<T:BossTypeProtocol>:Enemy{
+class Bomber:Enemy{
     
     private var currency:Currency = Currency(type: .Coin)
-    private var typeBoss:T?
+    private var typeBoss:BossType?
     
     private var actionsStandBy:[SKTexture] {
         
@@ -22,7 +22,7 @@ class Bomber<T:BossTypeProtocol>:Enemy{
    
     private var gameToon = GameInfo()
     
-    convenience init(hp:CGFloat,typeBoss:T){
+    convenience init(hp:CGFloat){
         self.init()
         
         
