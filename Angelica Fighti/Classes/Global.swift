@@ -21,7 +21,22 @@ class Global {
     
     static let sharedInstance = Global()
     
-    enum Animation{
+    enum GUIButtons:String {
+        
+        case PurpleButton
+        case BlueButton
+        case GreenButton
+        case BrownButton
+        case CancelButton
+        case SettingsButton
+        case BookButton       // icon in view Dragons main scene
+        case bgDragonsIcons   // icon in view Dragons main scene
+        case ShieldEggs       // icon in view Dragons main scene
+        case bgDragonsCircle  // icon in view Dragons main scene
+    
+    }
+    
+    enum Animation:String{
         case Boss_1_Dead_Animation
         case Boss_1_Move_Animation
         case Puff_Animation
@@ -34,6 +49,28 @@ class Global {
         case Regular_Grenner_Sprites
         case Regular_Purpler_Sprites
         case Regular_Bluer_Sprites
+        
+        case Amethyst_Animation
+        case Ruby_Animation
+        case Diamond_Animation
+        case Magnet_Animation
+        case Mushroom_Animation
+        case Flower_Animation
+        
+    }
+    
+    enum Background:String,CaseIterable {
+        
+        case Cloud_Peak_Mountains_Background
+        case Darkfire_Volcanos_Background
+        case Mek_Background
+        case The_Neverend_Background
+        case Whispering_Forest_Background
+        case Whisperwind_Desert_Background
+        case Spirit_Forest_Background
+        case Paradise_Background
+        case Desert_Background
+        case Highlands_Background
     }
     
     enum Main:String,CaseIterable{
@@ -41,7 +78,6 @@ class Global {
         
         // Characters
         case Character_Alpha = "character_menu_1"
-        case Character_Alpha_Wing
         case Character_Alpha_Projectile_1
         case Character_Alpha_Projectile_2
         case Character_Alpha_Projectile_3
@@ -194,15 +230,16 @@ class Global {
     }
     
     enum Regular:String,CaseIterable{
-        case Pipo
         case Redder
         case Grenner
         case Bluer
         case Purpler
+       
     }
     enum Boss{
         case Pinky
         case Moster
+        case Ice_Queen
     }
     
     // Temporary variables to hold textures -> Find a better approach
@@ -551,6 +588,18 @@ class Global {
             return self.regularEnemy[.Bluer]!
         case .Regular_Purpler_Sprites:
             return self.regularEnemy[.Purpler]!
+        case .Amethyst_Animation:
+            return SKTextureAtlas().loadAtlas(name: textures.rawValue, prefix: nil)
+        case .Ruby_Animation:
+            return SKTextureAtlas().loadAtlas(name: textures.rawValue, prefix: nil)
+        case .Diamond_Animation:
+            return SKTextureAtlas().loadAtlas(name: textures.rawValue, prefix: nil)
+        case .Magnet_Animation:
+            return SKTextureAtlas().loadAtlas(name: textures.rawValue, prefix: nil)
+        case .Mushroom_Animation:
+                return SKTextureAtlas().loadAtlas(name: textures.rawValue, prefix: nil)
+        case .Flower_Animation:
+                return SKTextureAtlas().loadAtlas(name: textures.rawValue, prefix: nil)
         }
         
     }
@@ -594,8 +643,7 @@ class Global {
         // Characters
         case .Character_Alpha:
             return self.character_sprite[0].0
-        case .Character_Alpha_Wing:
-            return self.character_sprite[0].1
+       
         case .Character_Alpha_Bullet_Level_1:
             return bullet
         case .Character_Alpha_Projectile_1:

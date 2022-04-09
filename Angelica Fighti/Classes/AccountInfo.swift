@@ -14,7 +14,6 @@ class AccountInfo{
     deinit{
         print("AccountInfo Deinitiated")
     }
-  
     
     private struct Data{
         let fullPath:String
@@ -31,6 +30,7 @@ class AccountInfo{
             guard let plist = NSMutableDictionary(contentsOfFile: fullPath) else {
                 fatalError("plist is nil - Check AccountInfo.swift")
             }
+            
             self.plist = plist
         }
     }
@@ -49,9 +49,11 @@ class AccountInfo{
         currentToonIndex = 0
         gold = 0
         experience = 0.0
-        characters = [Toon(char: .Alpha), Toon(char: .Beta), Toon(char: .Celta), Toon(char: .Delta)]
+        characters = [Toon(char: .Alpha), Toon(char: .Beta), Toon(char: .Celta), Toon(char: .Delta),Toon(char: .Jade),Toon(char: .Arcana),Toon(char: .Alice)]
+      //  characters =  Toon.Character.allCases.map { Toon(char: $0)}
         highscore = 0
         data = Data()
+        
     }
     
     func load() -> Bool{
@@ -63,57 +65,49 @@ class AccountInfo{
             highscore = data.plist.value(forKey: "Highscore") as! Int
             currentToonIndex = data.plist.value(forKey: "CurrentToon") as! Int
         
+        
+        
         let toondDict = data.plist.value(forKey: "Toons") as! NSDictionary
         
             characters[0].load(infoDict: toondDict.value(forKey: "Alpha") as! NSDictionary)
             characters[1].load(infoDict: toondDict.value(forKey: "Beta") as! NSDictionary)
             characters[2].load(infoDict: toondDict.value(forKey: "Celta") as! NSDictionary)
             characters[3].load(infoDict: toondDict.value(forKey: "Delta") as! NSDictionary)
+            characters[4].load(infoDict: toondDict.value(forKey: "Jade") as! NSDictionary)
+            characters[5].load(infoDict: toondDict.value(forKey: "Arcana") as! NSDictionary)
+            characters[6].load(infoDict: toondDict.value(forKey: "Alice") as! NSDictionary)
         
         return true
     }
     
-    internal func getGoldBalance() -> Int{
+     func getGoldBalance() -> Int{
         return self.gold
     }
     
-    internal func getCurrentToon() -> Toon{
+     func getCurrentToon() -> Toon{
         return characters[currentToonIndex]
     }
     
-    internal func getCurrentToonIndex() -> Int{
+     func getCurrentToonIndex() -> Int{
         return currentToonIndex
     }
     
-    
-    /// Generate
-    
-    func animatableEscudoToon() {
-        
-        let atlas = SKTextureAtlas().loadAtlas(name: "Effect1", prefix: nil)
-        
-        print("total \(atlas.count)")
-        
-        getCurrentToon().getNode().run(.repeatForever(.sequence([
-            .animate(with: atlas, timePerFrame: 0.5),
-            
-            ])))
-    }
-    
-    internal func selectToonIndex(index: Int){
+     func selectToonIndex(index: Int){
             currentToonIndex = index
             data.plist.setValue(index, forKey: "CurrentToon")
+        
         if !data.plist.write(toFile: data.fullPath, atomically: false){
             print("Saving Error - AccountInfo.selectToonIndex")
         }
     }
     
-    internal func upgradeBullet() -> (Bool, String){
+     func upgradeBullet() -> (Bool, String){
         let level = characters[currentToonIndex].getBulletLevel()
         let cost = (level + 1) * 100
-        
+         
+
         if gold < cost {
-            return (false, "Not enough gold")
+            return (false, "Not enough gold balance: \(getGoldBalance())")
         }
         
         gold -= cost
@@ -141,19 +135,66 @@ class AccountInfo{
         
         return (true, "Success")
     }
-    internal func getToonDescriptionByIndex(index: Int) -> [String]{
+    
+    // Update settings userinfo.plist
+    func updateSettings(key:String) ->(Bool,String){
+        
+        guard let toondDict = data.plist.value(forKey: "Settings") as? NSMutableDictionary,
+              let value = toondDict.value(forKey: key) as? Bool else {
+            return (false,"Saving Error Guard")
+        }
+        
+        let rootPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+        
+        let fullPath = rootPath.appending("/userinfo.plist")
+
+        let fileManager = FileManager.default
+        
+        if !fileManager.fileExists(atPath: fullPath) {
+            return (false,"File userinfo.plist not found")
+        }
+        
+        toondDict.setValue(!value, forKey: key)
+      
+        if !data.plist.write(toFile: fullPath, atomically: true) {
+            return (false,"Saving Error")
+        }
+        return (true, "Success")
+        
+    }
+    
+    /// Get key value settings inside userinfo.plist    
+    func getValueKeyUserInfo(key:String) -> Bool {
+        
+        guard let toondDict = data.plist.value(forKey: "Settings") as? NSMutableDictionary,
+              let value = toondDict.value(forKey: key) as? Bool else {
+            return false
+        }
+       
+        return value
+    }
+    
+    func upgradeLevel() -> Int {
+        level += 1
+        return level
+    }
+    func getLevel() -> Int {
+        return level
+    }
+    
+     func getToonDescriptionByIndex(index: Int) -> [String]{
         return characters[index].getToonDescription()
     }
-    internal func getNameOfToonByIndex(index: Int) -> String{
+     func getNameOfToonByIndex(index: Int) -> String{
         return characters[index].getToonName()
     }
-    internal func getTitleOfToonByIndex(index: Int) -> String{
+     func getTitleOfToonByIndex(index: Int) -> String{
         return characters[index].getToonTitle()
     }
-    internal func getBulletLevelOfToonByIndex(index: Int) -> Int{
+     func getBulletLevelOfToonByIndex(index: Int) -> Int{
         return characters[index].getBulletLevel()
     }
-    internal func prepareToChangeScene(){
+     func prepareToChangeScene(){
         characters.removeAll()
     }
     

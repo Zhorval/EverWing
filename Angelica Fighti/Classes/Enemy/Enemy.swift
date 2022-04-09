@@ -16,20 +16,17 @@ import GameplayKit
 
 class Enemy: SKSpriteNode{
     
+    
     var hp:CGFloat = 0
     var maxHp:CGFloat = 0
-
     
-    convenience init(hp: CGFloat){
+     convenience required init(hp: CGFloat){
         self.init()
         self.hp = hp
         self.maxHp = hp
-      
     }
     
-    
-    
-    func addHealthBar(){
+    func addHealthBar(isHidden:Bool = true){
         let w:CGFloat = size.width * 0.9
         let h:CGFloat = 10.0
         
@@ -48,7 +45,7 @@ class Enemy: SKSpriteNode{
         bar.zPosition = -0.1
         bar.position.x = -(bar.size.width/2)
         bar.position.y = -size.height/2 - 10
-        bar.isHidden = true
+        bar.isHidden = isHidden
         bar.addChild(border)
         
         let rootBar = SKSpriteNode()
@@ -59,6 +56,21 @@ class Enemy: SKSpriteNode{
         
         self.addChild(rootBar)
     }
+    
+    func Physics(speed:CGVector) {
+       
+   
+       self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
+        self.physicsBody!.isDynamic = true
+        self.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
+        self.physicsBody!.affectedByGravity = false
+        self.physicsBody!.collisionBitMask = 0
+        self.physicsBody?.allowsRotation = false
+        self.physicsBody!.velocity =  speed
+        self.physicsBody!.fieldBitMask = GravityCategory.None // Not affect by magnetic
+       
+   }
+
 }
 
 
@@ -66,14 +78,9 @@ extension Enemy {
     
     func move(dir:MoveStyle,node:SKSpriteNode) {
         
-        
-        let leftVec = CGVector(dx: random(min: -10, max: 10), dy: 0)
         let rightVec = CGVector(dx: random(min: -100, max: 100), dy: 0)
-            
         
-        let toon =  
-            print(dir)
-            switch dir {
+        switch dir {
             case .Left:
                 let force = CGVector(dx: randomInt(min: -500, max: -100), dy: -100)
                             node.run(.applyImpulse(force, duration: 1))
@@ -88,8 +95,7 @@ extension Enemy {
                 node.run(SKAction.moveBy(x: 0, y: -100, duration: 1))
             case .Up:
                     node.run(SKAction.moveTo(y: screenSize.maxY - node.size.height/2, duration: 2))
-            }
-            
+        }  
             
             // whenever it moves, it has chance to attack after 2.5 sec
         node.run(SKAction.sequence([SKAction.wait(forDuration: 2.5), SKAction.repeatForever(SKAction.sequence([SKAction.run {
@@ -105,13 +111,14 @@ extension Enemy {
     
     func attack(){
        
+        print("Atack \(self.name)")
         self.run(SKAction.repeatForever(SKAction.sequence([SKAction.wait(forDuration: 0.5), SKAction.run {
             let random = randomInt(min: 0, max: 100)
             if (random > 80){
               
                 let att = SKSpriteNode(texture: global.getAttackTexture(attack: .Boss1_type_1))
                 att.size = CGSize(width: 30, height: 30)
-                att.name = "Enemy_Moster_Attack"
+                att.name = "\(String(describing: self.name))_Attack"
                 att.physicsBody = SKPhysicsBody(circleOfRadius: 15)
                 att.physicsBody!.isDynamic = true
                 att.physicsBody!.affectedByGravity = true
@@ -127,7 +134,6 @@ extension Enemy {
                 let force = CGVector(dx: 0, dy: randomInt(min: -100, max: 0))
                 att.run(SKAction.applyForce(force, duration: 1))
                 
-                self.rayTrack()
               
             }
         }])))
@@ -135,55 +141,12 @@ extension Enemy {
     
     func defeated(actionsDead:[SKTexture]){
         self.physicsBody?.categoryBitMask = PhysicsCategory.None
-        self.run( SKAction.sequence([SKAction.animate(with: SKTextureAtlas().loadAtlas(name: "default_regular_dead", prefix: "puff"), timePerFrame: 0.11),SKAction.run {
+        self.run( SKAction.sequence([SKAction.animate(with: SKTextureAtlas().loadAtlas(name: "default_regular_dead", prefix: nil), timePerFrame: 0.11),SKAction.run {
+            self.removeAllActions()
             self.removeFromParent()
             
+            
             }]))
-    }
-    
-    func rayTrack() {
-        
-        let auratextures = global.getTextures(textures: .Fireball_Aura)
-        let facetextures = global.getTextures(textures: .Fireball_Face)
-        let smoketextures = global.getTextures(textures: .Fireball_Smoke)
-        let trackerTexture = global.getMainTexture(main: .Fireball_Tracker)
-        
-        let fadeout = SKAction.fadeIn(withDuration: 0.25)
-        let fadein = SKAction.fadeOut(withDuration: 0.25)
-        let sfadeout = SKAction.fadeIn(withDuration: 0.15)
-        let sfadein = SKAction.fadeOut(withDuration: 0.15)
-        let blink = SKAction.repeat(SKAction.sequence([fadeout, fadein]), count: 2)
-        let sblink = SKAction.repeat(SKAction.sequence([sfadeout, sfadein]), count: 2)
-        
-        let scaleNormal = SKAction.scale(to: 1.0, duration: 0.1)
-        let scaleBig = SKAction.scale(to: 1.1, duration: 0.1)
-        let scaleLarge = SKAction.scale(to: 1.6, duration: 0.1)
-        let scaleAction = SKAction.sequence([scaleLarge, scaleNormal, scaleBig, scaleNormal])
-        
-        let track = SKSpriteNode()
-        track.size = CGSize(width: 45, height: 54)
-        track.anchorPoint = CGPoint(x: 0.5, y: 0)
-        track.position.y = -self.size.height/3
-        track.texture = auratextures[0]
-        track.run(SKAction.sequence([scaleAction, blink, sblink]))
-        self.addChild(track)
-        
-        let hide = SKAction.hide()//SKAction.fadeOut(withDuration: 0)
-        let show = SKAction.unhide() //SKAction.fadeIn(withDuration: 0.1)
-        let scaleline = SKAction.scaleX(to: 5, duration: 1.5)
-        let lineaction = SKAction.sequence([hide, SKAction.wait(forDuration: 0.3), show, scaleline])
-        let line = SKSpriteNode()
-        
-        line.position.y = 3
-        line.size = CGSize(width: 1, height: screenSize.height)
-        line.anchorPoint = CGPoint(x: 0.5, y: 1)
-        line.color = UIColor().randomColor()
-        line.shader = SKShader(fileNamed: "gradient")
-        line.colorBlendFactor = 3
-        line.run(lineaction)
-        
-        track.addChild(line)
-        
     }
     
     func parametricPath(in rect: CGRect, count: Int? = nil, function: (CGFloat) -> (CGPoint)) -> UIBezierPath {
@@ -244,9 +207,8 @@ extension Enemy {
            )
        }
    }
- 
-   
-   func verticalSinePath(in rect: CGRect, count: Int? = nil) -> UIBezierPath {
+    
+    func verticalSinePath(in rect: CGRect, count: Int? = nil) -> UIBezierPath {
        // note, since sine returns values between -1 and 1, let's add 1 and divide by two to get it between 0 and 1
        return parametricPath(in: rect, count: count) { CGPoint(
            x: (sin($0 * .pi * 2.0) + 1.0) / 2.0,
@@ -267,19 +229,18 @@ extension Enemy {
     //    velocity = CGVector(dx: CGFloat(normal.x) * movePointsPerSecond, dy: CGFloat(normal.y) * movePointsPerSecond)
     }
     
-    
     //MARK: INITIAL SETUP ENEMY
     
-     func initialSetup(){
+    func initialSetup(category:UInt32){
         
         let delay:Double = (self.name == "Pinky_Clone") ? 1.0 : 0.5
         
         self.run(SKAction.fadeIn(withDuration: delay))
-        self.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
-        self.physicsBody!.contactTestBitMask =  PhysicsCategory.Wall
-        self.physicsBody!.linearDamping =  1
+        self.physicsBody?.categoryBitMask =  category //PhysicsCategory.Enemy
+        self.physicsBody?.contactTestBitMask =  PhysicsCategory.Wall
+        self.physicsBody?.linearDamping =  1
   
-         self.run(.applyForce(CGVector(dx: Bool.random() ? 100 : -100, dy: -100), duration: 1))
+     //    self.run(.applyForce(CGVector(dx: Bool.random() ? 100 : -100, dy: -100), duration: 1))
         
     }
 }

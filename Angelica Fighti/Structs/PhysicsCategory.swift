@@ -17,7 +17,7 @@ struct PhysicsCategory {
     static let Currency : UInt32    = 1 << 4
     static let Wall: UInt32         = 1 << 5
     static let Imune: UInt32        = 1 << 7
-    static let Gif: UInt32           = 1 << 8
+    static let Gif: UInt32          = 1 << 8
 }
 
 struct GravityCategory{

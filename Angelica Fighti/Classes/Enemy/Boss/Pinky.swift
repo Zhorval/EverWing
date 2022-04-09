@@ -24,7 +24,7 @@ enum MoveStyle:MovementNodes,CaseIterable{
         case Down
         case Up
     
-    func move(dir: MoveStyle,node:Enemy) {}
+    func move(dir: MoveStyle,node:T) {}
     
 }
 
@@ -73,13 +73,11 @@ class Pinky:Enemy{
         life = lives
         size = CGSize(width: 157, height: 170)
         
-        
         setUp()
     }
     
     private func setUp(){
         
-       // root.userData = NSMutableDictionary()
         root.alpha = 0
         root.zPosition = 2
         root.size = CGSize(width: 157, height: 170)

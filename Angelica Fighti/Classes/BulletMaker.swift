@@ -201,6 +201,35 @@ class BulletMaker:NSObject{
                 let h = screenSize.height * 0.068
                 return (sprite, CGSize(width: w, height: h))
             }
+        case .Alice:
+            switch type {
+            case .Type_1:
+                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_1)
+                let w = screenSize.width * 0.036
+                let h = screenSize.height * 0.035
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_2:
+                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_2)
+                let w = screenSize.width * 0.075
+                let h = screenSize.height * 0.0475
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_3:
+                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_3)
+                let w = screenSize.width * 0.0845
+                let h = screenSize.height * 0.068
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_4:
+                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_4)
+                let w = screenSize.width * 0.094
+                let h = screenSize.height * 0.065
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_5:
+                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_5)
+                let w = screenSize.width * 0.125
+                let h = screenSize.height * 0.068
+                return (sprite, CGSize(width: w, height: h))
+            }
+            
         default:
             print("Shold not reach here - BulletMaker Default Choice")
             switch type {

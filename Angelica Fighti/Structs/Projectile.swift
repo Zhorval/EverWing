@@ -25,11 +25,12 @@ struct Projectile {
         self.bulletLevel = bulletLevel
         
         if let blevel = BulletMaker.Level(rawValue: bulletLevel){
-           bulletnode = bulletMaker.make(level: blevel, char: char)
+            bulletnode = bulletMaker.make(level: blevel, char: char)
         }
         else{
             print("Invalid bullet level. Returning 1")
             bulletnode = bulletMaker.make(level: .Level_1, char: char)
+
         }
         addPhysics()
        
@@ -52,10 +53,10 @@ struct Projectile {
         
         originX = posX
         originY = posY + 35
-        bulletLevel = 0
+        bulletLevel = 0        
         
-        self.bulletnode = SKSpriteNode(texture: texture,size:  CGSize(width: texture.size().width*4, height: texture.size().height*4))
-        
+        self.bulletnode = SKSpriteNode(texture: texture,size:  CGSize(width: 35, height: 35))
+        self.bulletnode.blendMode = .add
         addPhysics()
     }
     
@@ -79,7 +80,7 @@ struct Projectile {
         let bullet = bulletnode.copy() as! SKSpriteNode
         bullet.power = getPowerValue()
         bullet.position = CGPoint(x: originX, y: originY)
-         bullet.run(SKAction.scale(to: 1.0, duration: 0.2))
+        bullet.run(SKAction.scale(to: 1.0, duration: 0.2))
               bullet.run(SKAction.sequence([SKAction.wait(forDuration: 0.38), SKAction.removeFromParent()]))
         return bullet
     }
@@ -99,6 +100,7 @@ struct Projectile {
         effect!.run(SKAction.sequence([SKAction.wait(forDuration: Double(effect!.particleLifetime)), SKAction.removeFromParent()]))
         return effect!
     }
+    
     
     mutating func setPosX(x:CGFloat){
         originX = x
@@ -126,9 +128,11 @@ struct Projectile {
     
     mutating func setBulletLevel(level: Int){
         self.bulletLevel = level
+        print("Level Bullet \(bulletLevel)")
     }
     
     mutating func upgrade() -> Bool{
+        print("Level bullet \(bulletLevel)")
         if bulletLevel >= 50 {
             return false
         }

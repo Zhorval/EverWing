@@ -11,6 +11,8 @@ import SpriteKit
 
 let screenSize: CGRect = UIScreen.main.bounds
 
+
+
 class ViewController: UIViewController {
     
     enum LoadStatus{
@@ -56,6 +58,20 @@ class ViewController: UIViewController {
         let view = UIImageView(image: UIImage(named: "initial_main_bg"))
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+    let logo:UIView = {
+        let logo = UIImageView(image: UIImage(named: "Logo"))
+        logo.layer.cornerRadius = 20
+        logo.translatesAutoresizingMaskIntoConstraints = false
+        return logo
+    }()
+   
+    let character:UIView = {
+        let character = UIImageView(image: UIImage(named: "character_menu_2"))
+        character.layer.cornerRadius = 20
+        character.translatesAutoresizingMaskIntoConstraints = false
+        return character
     }()
     
     let bview:UIView = {
@@ -175,6 +191,31 @@ class ViewController: UIViewController {
         return true
     }
     
+    // Redirect When cause error or success
+    private func redirect(status st:ViewController.LoadStatus, message msg:String){
+        
+        switch st {
+        case .Normal:
+            print("Load Status: Normal \(msg)")
+            mainmenu()
+        case .Warning:
+            print("Load Status: Warning \(msg)")
+            mainmenu()
+        case .Critical:
+            print("Load Status: Critical \(msg)")
+        case .Backup:
+            print("Load Status: Backup \(msg)")
+            backup(filepath: documentDir.appendingPathComponent("userinfo.plist"))
+            mainmenu()
+        case .Reset:
+            print("Load Status: Reset") //Virtual List exists, but needs update
+            hardReset(filepath: documentDir.appendingPathComponent("userinfo.plist"))
+            mainmenu()
+        }
+        
+    }
+
+    
     private func buildPlistChecker(){
         for key in defaultPlist.allKeys{
             // root
@@ -266,32 +307,6 @@ class ViewController: UIViewController {
         return (true, isBackupPossible, "Successfully Checked with no errors")
     }
     
-    private func redirect(status st:LoadStatus, message msg:String){
-        
-        switch st {
-        case .Normal:
-            print("Load Status: Normal")
-            print(msg)
-            mainmenu()
-        case .Warning:
-            print("Load Status: Warning")
-            print(msg)
-            mainmenu()
-        case .Critical:
-            print("Load Status: Critical")
-            print(msg)
-        case .Backup:
-            print("Load Status: Backup")
-            print(msg)
-            backup(filepath: documentDir.appendingPathComponent("userinfo.plist"))
-            mainmenu()
-        case .Reset:
-            print("Load Status: Reset") //Virtual List exists, but needs update
-            hardReset(filepath: documentDir.appendingPathComponent("userinfo.plist"))
-            mainmenu()
-        }
-        
-    }
     
    private func mainmenu(){
        // print ("Client Plist Data: ", clientData)
@@ -345,6 +360,8 @@ class ViewController: UIViewController {
         // x, y, width, height
         
         view.addSubview(rootview)
+        view.addSubview(logo)
+        view.addSubview(character)
         view.addSubview(bview)
         bview.addSubview(imgView)
         bview.addSubview(loadLabel)
@@ -354,6 +371,13 @@ class ViewController: UIViewController {
         rootview.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         rootview.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         rootview.heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
+        
+        logo.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        logo.topAnchor.constraint(equalTo: view.topAnchor, constant: 30).isActive = true
+        logo.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -10).isActive = true
+        logo.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        
+       
         
         bview.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         bview.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -5).isActive = true
@@ -365,8 +389,14 @@ class ViewController: UIViewController {
         imgView.widthAnchor.constraint(equalTo: bview.widthAnchor).isActive = true
         imgView.heightAnchor.constraint(equalToConstant: screenSize.height/2.5).isActive = true
         
-        loadLabel.centerXAnchor.constraint(equalTo: bview.centerXAnchor, constant: -50).isActive = true
-        loadLabel.topAnchor.constraint(equalTo: imgView.bottomAnchor, constant: 50).isActive = true
+        character.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        character.centerYAnchor.constraint(equalTo: imgView.topAnchor,constant: -100).isActive = true
+        character.widthAnchor.constraint(equalTo:  imgView.widthAnchor).isActive = true
+        character.heightAnchor.constraint(equalToConstant: screenSize.height/2.5).isActive = true
+     
+        
+        loadLabel.centerXAnchor.constraint(equalTo: bview.centerXAnchor, constant: -25).isActive = true
+        loadLabel.topAnchor.constraint(equalTo: imgView.bottomAnchor, constant: 10).isActive = true
         loadLabel.widthAnchor.constraint(equalToConstant: 100).isActive = true
         loadLabel.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
@@ -385,6 +415,7 @@ class ViewController: UIViewController {
             self.labelNumber.text =  String(percentage as! Int) + "%"
         }
     }
+    
 
 
     

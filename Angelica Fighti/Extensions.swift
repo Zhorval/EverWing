@@ -27,9 +27,10 @@ enum GameState{
 
 enum ContactType{
     case HitByEnemy
+    case ToonByClover
+    case ToonByMagnet
     case EnemyGotHit
     case PlayerGetCoin
-    case HitByCofre
     case HitByDragon
     case Immune
     case None
@@ -89,7 +90,6 @@ extension SKNode{
     
 }
 
-
 extension SKScene{
     func removeUIViews(){
             for view in (view?.subviews)! {
@@ -109,9 +109,17 @@ extension SKScene{
         }
         
     }
+    
+    func createUIButton(bname: String, offsetPosX dx:CGFloat, offsetPosY dy:CGFloat,typeButtom:Global.GUIButtons) -> SKSpriteNode{
+        let button = SKSpriteNode()
+            button.anchorPoint = CGPoint(x: 0.5, y: 1)
+            button.texture = SKTexture(imageNamed: typeButtom.rawValue)
+            button.position = CGPoint(x: dx, y: dy)
+            button.size = CGSize(width: screenSize.width/4, height: screenSize.height/16)
+            button.name = bname
+        return button
+    }
 }
-
-
 
 extension SKLabelNode{
     func shadowNode(nodeName:String) -> SKEffectNode{
@@ -127,10 +135,18 @@ extension SKLabelNode{
     }
 }
 
+extension SKAction {
+    
+    static let blink = SKAction.repeatForever(sequence([.fadeOut(withDuration: 1),
+                                                        .fadeIn(withDuration: 1),
+                                                        .fadeAlpha(by: 0, duration: 1)]))
+    
+}
+
 /*RANDOM FUNCTIONS */
 
 func random() -> CGFloat {
-    return CGFloat(Float(arc4random()) / 0xFFFFFFFF)
+    return CGFloat(CGFloat(Float(arc4random()) / Float(0xFFFFFFFF)))
 }
 
 func random( min: CGFloat, max: CGFloat) -> CGFloat {

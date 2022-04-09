@@ -9,26 +9,29 @@
 import SpriteKit
 import GameplayKit
 
-class Bomber:Enemy{
+class Bomber:Enemy {
+    
     
     private var currency:Currency = Currency(type: .Coin)
+    
     private var typeBoss:BossType?
     
     private var actionsStandBy:[SKTexture] {
-        
-        return  typeBoss!.getTextures(type: typeBoss!.getType(),prefix: "Idle_")
+    
+        return  typeBoss!.getTextures(type:  typeBoss!, prefix: nil)
 
     }
    
     private var gameToon = GameInfo()
     
-    convenience init(hp:CGFloat){
+    convenience init(hp:CGFloat,typeBoss:BossType){
         self.init()
         
         
-        self.typeBoss = typeBoss
+        self.typeBoss =  typeBoss  // typeBoss.getType()
+        
         name = "Enemy_Boss"
-        texture =  actionsStandBy.first // global.getMainTexture(main: .Boss_1)
+        texture =  actionsStandBy.first ??  global.getMainTexture(main: .Boss_1)
         size = CGSize(width: 180, height: 130)
         position = CGPoint(x: screenSize.size.width/2, y: screenSize.size.height - size.height/2)
         alpha = 0
@@ -55,12 +58,9 @@ class Bomber:Enemy{
        
         // adding healthbar
         self.addHealthBar()
-        self.initialSetup()
-        self.attack()
+        self.initialSetup(category: PhysicsCategory.Enemy)
         setAnimation()
     }
-    
-  
     
     private func setAnimation(){
         

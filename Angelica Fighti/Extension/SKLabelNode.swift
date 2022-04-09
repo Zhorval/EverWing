@@ -11,18 +11,20 @@ import SpriteKit
 
 
 extension SKLabelNode {
-    convenience init?(fontNamed font: String, andText text: String, andSize size: CGFloat, withShadow shadow: UIColor) {
+    
+    convenience init?(fontNamed font: String,andText text: String, andSize size: CGFloat,withShadow shadow: UIColor,name:String? = "") {
         self.init(fontNamed: font)
         self.text = text
         self.fontSize = size
         
         
         let shadowNode = SKLabelNode(fontNamed: font)
+        shadowNode.name = name
         shadowNode.text =  self.text
         shadowNode.zPosition = self.zPosition - 1
-        shadowNode.fontColor = shadow
+        shadowNode.fontColor = .black
         // Just create a little offset from the main text label
-        shadowNode.position = CGPoint(x: 2, y: -5)
+        shadowNode.position = CGPoint(x: 2, y: -1)
         shadowNode.fontSize = self.fontSize
         shadowNode.alpha = 0.5
         

@@ -31,7 +31,6 @@ class Fireball:Enemy {
         
         let auratextures = global.getTextures(textures: .Fireball_Aura)
         let facetextures = global.getTextures(textures: .Fireball_Face)
-        let smoketextures = global.getTextures(textures: .Fireball_Smoke)
         let trackerTexture = global.getMainTexture(main: .Fireball_Tracker)
         
         func getAura() -> SKSpriteNode{
@@ -121,7 +120,7 @@ class Fireball:Enemy {
         auranode.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
         auranode.physicsBody!.contactTestBitMask = PhysicsCategory.Player
         auranode.physicsBody!.collisionBitMask = 0
-        auranode.physicsBody!.fieldBitMask = GravityCategory.None // Not affect by magnetic
+        auranode.physicsBody!.fieldBitMask = GravityCategory.None 
         auranode.physicsBody!.velocity.dy = 0
 
         

@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "Mek_Background_0.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "Mek_Background_0.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

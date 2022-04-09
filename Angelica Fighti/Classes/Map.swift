@@ -22,6 +22,7 @@ class Map: NSObject{
     private var topTexture:SKTexture
     private var currIndex:Int
     
+    private var velocityMap:CGFloat = 0.01
     
     let top:SKSpriteNode
     let mid:SKSpriteNode
@@ -74,22 +75,28 @@ class Map: NSObject{
     }
     
     private func getNextTexture() -> SKTexture{
+       
         if currIndex + 1 >= maptextures.count {
             currIndex = 0
             return maptextures[0]
         }
-        else{
-            currIndex = currIndex + 1
-            return maptextures[currIndex]
-        }
-        
+       
+        currIndex = currIndex + 1
+        return maptextures[currIndex]
     }
     
+    /// Update velocity map
+    func updateVelocityMap(velocity:CGFloat) {
+        prepareToChangeScene()
+        velocityMap = velocity
+        run()
+        
+    }
     
     func run(){
         
         // Timer 
-        timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(self.update), userInfo: nil, repeats: true);
+        timer = Timer.scheduledTimer(timeInterval: velocityMap, target: self, selector: #selector(self.update), userInfo: nil, repeats: true);
         
         // fade in
         let fin = SKAction.fadeAlpha(to: 1, duration: 0.5)
@@ -98,7 +105,7 @@ class Map: NSObject{
         bottom.run(fin)
         
         // Action
-        let moveDown = SKAction.moveBy(x: 0, y: -2, duration: 0.01)
+        let moveDown = SKAction.moveBy(x: 0, y: -2, duration: velocityMap)
         mid.run(SKAction.repeatForever(moveDown))
         bottom.run(SKAction.repeatForever(moveDown))
         top.run(SKAction.repeatForever(moveDown))

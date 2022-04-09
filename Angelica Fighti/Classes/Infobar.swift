@@ -30,18 +30,22 @@ class Infobar:SKSpriteNode{
     private var fourthTemplate:SKSpriteNode!
     private var fifthTemplate:SKSpriteNode!
     private var sixTemplate:SKSpriteNode!
+    private var infoGetClover:SKSpriteNode!
     
     // MARK: LABEL TIMER
-    fileprivate var timer:Timer?                            // Timer count screen
-    fileprivate var timerCount:TimeInterval = 0             // Count timer screen
+    private var timer:Timer?                            // Timer count screen
+    private var timerCount:TimeInterval = 0             // Count timer screen
     private var labelTimer:SKLabelNode = SKLabelNode()      // Label timer screen
     
     
     // MARK: LABEL TIMER PROJECTILE TEMP
-    fileprivate var timerProjectile:Timer?                            // Timer count screen
-    fileprivate var timerCountProjectile:TimeInterval = 10            // Count timer screen
+    private var timerProjectile:Timer?                            // Timer count screen
+    private var timerCountProjectile:TimeInterval = 10            // Count timer screen
     private var labelTimerProjectile:SKLabelNode = SKLabelNode()      // Label timer screen
     private var iconProjectile:SKSpriteNode = SKSpriteNode()
+    
+    // MARK: DELEGATE
+    var gameInfo = AccountInfo()
     
     convenience init(name n:String){
         self.init()
@@ -51,9 +55,9 @@ class Infobar:SKSpriteNode{
         name = n
         color = .clear
         
-        size = CGSize(width: mainRootWidth, height: mainRootHeight)
+        size = CGSize(width: screenSize.width, height: screenSize.height)
         anchorPoint = CGPoint(x: 0, y: 0)
-        position = CGPoint(x: 0, y: screenSize.height - mainRootHeight)
+        position = CGPoint(x: 0, y: 5)
        // Main_Menu_Currency_Bar
         firstTemplate = generateTemplate(templateStyle: .First, itemSize: rootItemSize, name: "topbar_first_item", barSprite:.Main_Menu_Level_Bar, iconSprite: .Main_Menu_Level_Badge, previousPos: nil)
         
@@ -64,7 +68,8 @@ class Infobar:SKSpriteNode{
         fourthTemplate = generateTemplate(templateStyle: .Fourth, itemSize: rootItemSize, name: "topbar_fourth_item", barSprite: nil, iconSprite: .Main_Menu_Trophy, previousPos: thirdTemplate.position)
         
         fifthTemplate = customFifthLabel(itemSize: rootItemSize, prevNodePosition: thirdTemplate.position)
-       
+        
+        infoGetClover = panelInfoGetClover()
        
         
         addChild(firstTemplate)
@@ -72,16 +77,71 @@ class Infobar:SKSpriteNode{
         addChild(thirdTemplate)
         addChild(fourthTemplate)
         addChild(fifthTemplate)
+        addChild(infoGetClover)
         
         // Note: It will show debug view only if debug is enabled.
         debug()
+    }
+    
+    /// Create panel info get clover
+    func panelInfoGetClover() -> SKSpriteNode {
         
+        let node = SKSpriteNode(color: .black.withAlphaComponent(0.5), size: CGSize(width: 120, height: 60))
+        node.position = CGPoint(x: screenSize.maxX - node.frame.width/2 - 10, y: screenSize.height - screenSize.height/3)
+        node.name = "DMG"
         
+        let iconClover = SKSpriteNode(texture: SKTexture(imageNamed: "Clover"), size: CGSize(width: 30, height: 30))
+        iconClover.position = CGPoint(x: -40, y: 10)
+        node.addChild(iconClover)
+        
+    /*    let labelLevel = SKLabelNode(fontNamed: "Cartwheel", andText: "", andSize: 20, withShadow: .red,name: "infoLevelShadow")
+        labelLevel?.name = "infoLevel"
+        labelLevel?.fontColor = .white
+        labelLevel?.position = CGPoint(x: 15, y: 0)
+        node.addChild(labelLevel!)
+        
+        let labelDMG = SKLabelNode(fontNamed: "Cartwheel", andText: "25 DMG", andSize: 20, withShadow: .red)
+        labelDMG?.fontColor = .orange
+        labelDMG?.text = "25 DMG"
+        labelDMG?.position = CGPoint(x: 0, y: -25)
+        
+        node.addChild(labelDMG!)*/
+        return node
     }
     /// Add timer screen
       func addTime() {
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(running), userInfo: nil, repeats: true)
-
+    }
+    
+    func updatePanelDMG(level:Int) {
+        
+        guard let node = self.childNode(withName: "DMG") as? SKSpriteNode else { return  }
+            
+       
+        
+        let labelLevel = SKLabelNode(fontNamed: "Cartwheel", andText: "", andSize: 20, withShadow: .red,name: "infoLevelShadow")
+        labelLevel?.name = "infoLevel"
+        labelLevel?.text = "LV \(level)"
+        labelLevel?.fontColor = .white
+        labelLevel?.position = CGPoint(x: 15, y: 0)
+        node.addChild(labelLevel!)
+        
+        let labelDMG = SKLabelNode(fontNamed: "Cartwheel", andText: "25 DMG", andSize: 20, withShadow: .red)
+        labelDMG?.fontColor = .orange
+        labelDMG?.text = "LV \(level)"
+        labelDMG?.text = "25 DMG"
+        labelDMG?.position = CGPoint(x: 0, y: -25)
+        node.addChild(labelDMG!)
+        
+        node.run(.sequence([
+            .wait(forDuration: 2),
+            SKAction.run {labelDMG?.removeFromParent()},
+            SKAction.run {labelLevel?.removeFromParent()}
+            
+        ]))
+        
+       
+       
     }
  
     /// Print label time
@@ -103,10 +163,9 @@ class Infobar:SKSpriteNode{
         
     }
     // Add timer  by projectile temp
-      func addTimeProjectileTemp() {
-          timerProjectile = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ProjectileTemp), userInfo: nil, repeats: true)
-
-    }
+    func addTimeProjectileTemp() {
+        timerProjectile = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ProjectileTemp), userInfo: nil, repeats: true)
+   }
     
     @objc func ProjectileTemp() {
         timerCountProjectile -= 1
@@ -164,8 +223,7 @@ class Infobar:SKSpriteNode{
         node.position = CGPoint(x: dx, y: self.size.height - h)
         
         return node
-    }
-    
+    }    
 
     private func generateTemplate(templateStyle:Template, itemSize: CGSize, name n:String, barSprite: Global.Main?, iconSprite: Global.Main, previousPos prev:CGPoint?) -> SKSpriteNode{
         
@@ -266,7 +324,7 @@ class Infobar:SKSpriteNode{
         node.position.y += 100 // decrease 100 to show to user
         
         // gold
-        let curr = Currency(type: .Coin)
+        var curr = Currency(type: .Coin)
         let coinWidth:CGFloat = height*0.9
         let coinHeight:CGFloat = height*0.9
         let coinXpos:CGFloat = width - coinWidth/2
@@ -297,7 +355,8 @@ class Infobar:SKSpriteNode{
     }
     
     
-    internal func updateGoldLabel(coinCount:Int){
+    /// Update label number coin topnav
+     func updateGoldLabel(coinCount:Int){
         
         guard let coinShadowLabel = fifthTemplate.childNode(withName: "coinLabelName") as? SKEffectNode else{
             print ("ERROR A01: Check updateGoldLabel method from Class Infobar")
@@ -308,10 +367,12 @@ class Infobar:SKSpriteNode{
             return
         }
         
+        
         coinLabel.text = String(coinCount)
     }
     
-    internal func updateGoldBalnceLabel(balance:Int){
+     
+     func updateGoldBalanceLabel(balance:Int){
 
         
         guard let coinBarLabel = secondTemplate.childNode(withName: "bar") else{
@@ -327,7 +388,21 @@ class Infobar:SKSpriteNode{
             return
         }
 
-        coinLabel.text = String(balance)
+        let userPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
+       
+        let fullPath = userPath.appendingPathComponent("userinfo.plist")
+        
+        guard let virtualPlist = NSDictionary(contentsOfFile: fullPath) else{
+            print ("ERROR000: EndGame failed to load virtualPlist")
+            return
+        }
+        
+        guard let dataCoin:Int = virtualPlist.value(forKey: "Coin") as? Int else{
+            print ("ERROR001: EndGame error")
+            return
+        }
+        
+        coinLabel.text = String(dataCoin)
     }
     
     
@@ -360,4 +435,6 @@ class Infobar:SKSpriteNode{
         
         return
     }
+    
+    
 }

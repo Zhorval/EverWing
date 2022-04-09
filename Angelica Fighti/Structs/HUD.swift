@@ -20,7 +20,6 @@ struct HUD{
     private var width:CGFloat
     private var height:CGFloat
     private var pos:CGPoint
-   // private var anchorPoint:CGPoint
     private var textType:TextType
     private var validChar:Array = Array(0..<10).map { (i) -> Character in
         return Character(String(i))
@@ -31,7 +30,6 @@ struct HUD{
         width = w*0.9
         height = h*0.9
         pos = p
-      //  anchorPoint = acp
         textType = type
         validChar.append(Character(String(",")))
     }

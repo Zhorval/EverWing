@@ -12,11 +12,20 @@ import AVFoundation
 
 struct AVAudio {
     
-    enum SoundType{
-        case Coin
-        case Puff
-        case TicTack
+    enum SoundType:String {
+        case Coin           = "getcoin.m4a"
+        case Result_Coin    = "result_coin.m4a"
+        case Puff           = "puff.m4a"
+        case TicTack        = "tictack.m4a"
+        case ChangeOption   = "changeOptions.m4a"
+        case Boss_Alarm     = "boss_alarm.m4a"
+        case Jade_Attack    = "vfx_jade_attack_4.m4a"
+        case GameIntro      = "gameIntro.m4a"
+        case Player_Death   = "player_death.m4a"
+        case Clover         = "getClover.m4a"
+        case Owl            = "owl.m4a"
     }
+    
     
     enum BgroundSoundType{
         case Background_Start
@@ -50,23 +59,8 @@ struct AVAudio {
         }
     }
     
-    
-    
     func getAction(type: SoundType) -> SKAction{
-        switch type{
-            case .Coin:
-                
-                let skCoinAction = SKAction.playSoundFileNamed("getcoin.m4a", waitForCompletion: true)
-                return skCoinAction
-            case .Puff:
-                
-                let skPuffAction = SKAction.playSoundFileNamed("puff.m4a", waitForCompletion: true)
-                return skPuffAction
-                
-            case .TicTack:
-                let skCoinAction = SKAction.playSoundFileNamed("tictack.m4a", waitForCompletion: true)
-                return skCoinAction
-        }
+        return SKAction.playSoundFileNamed(type.rawValue, waitForCompletion: true)
     }
     
     func load() -> Bool{

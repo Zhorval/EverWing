@@ -9,7 +9,15 @@
 import Foundation
 import SpriteKit
 
-class CharacterMenuScene:SKScene{
+
+
+protocol ProtocolTaskScenes {
+    func doTask(gb:Global.Main)
+}
+
+
+class CharacterMenuScene:SKScene,ProtocolTaskScenes{
+    
     
     deinit{
         print("CharacterMenuScene deinitiated")
@@ -17,9 +25,12 @@ class CharacterMenuScene:SKScene{
     
     private enum CurrToon:Int{
         case Alpha = 0
-        case Beta = 1
-        case Celta = 2
-        case Delta = 3
+        case Beta
+        case Celta
+        case Delta
+        case Jade
+        case Arcana
+        case Alice
         
         var string:String{
             let name = String(describing: self)
@@ -332,7 +343,6 @@ class CharacterMenuScene:SKScene{
                 }
                 else if c.name == Global.Main.Character_Menu_BlueButton.rawValue{
                     doTask(gb: .Character_Menu_BlueButton)
-                   // self.customPause(timeInterval: 2.0)
                     let delay = SKSpriteNode()
                     delay.size = self.size
                     delay.color = .black
@@ -362,7 +372,7 @@ class CharacterMenuScene:SKScene{
     
     }
     
-    private func doTask(gb:Global.Main){
+    internal func doTask(gb:Global.Main){
         switch gb {
         case .Character_Menu_BackArrow:
             
@@ -383,11 +393,11 @@ class CharacterMenuScene:SKScene{
         case .Character_Menu_UpgradeCloseButton:
             closeUpgrade()
         case .Character_Menu_UpgradeGreenButton:
-            let (success, msg) = gameinfo.requestUpgradeBullet()
+           /* let (success, msg) = gameinfo.requestUpgradeBullet()
             if !success{
-                print(msg)
+                print("ERROR001:",msg)
                 break
-            }
+            }*/
             self.update(Case: .UpgradedBullet)
             if gameinfo.requestToonBulletLevel(index: currToonIndex) >= 50{
                 closeUpgrade()
@@ -400,6 +410,7 @@ class CharacterMenuScene:SKScene{
     
     private func update(Case: Update){
     
+        print("El indice \(currToonIndex)")
         let toon = CurrToon(rawValue: currToonIndex)
         let msgbox = self.childNode(withName: Global.Main.Character_Menu_MessageBox.rawValue)!
         let msgboxRightRoot = msgbox.childNode(withName: "character_menu_rightRoot")!
@@ -472,6 +483,12 @@ class CharacterMenuScene:SKScene{
             charNode.texture! = global.getMainTexture(main: .Character_Menu_Celta)
         case .Delta:
             charNode.texture! = global.getMainTexture(main: .Character_Menu_Delta)
+        case .Jade:
+            charNode.texture! = SKTexture(imageNamed: toon.string.capitalized)
+        case .Arcana:
+            charNode.texture! = global.getMainTexture(main: .Character_Menu_Delta) // SKTexture(imageNamed: toon.string.capitalized)
+        case .Alice:
+            charNode.texture! =  SKTexture(imageNamed: toon.string.capitalized)
         }
         
         // Update Description
@@ -772,6 +789,7 @@ class CharacterMenuScene:SKScene{
         
         
     }
+    
     private func closeUpgrade(){
         let upgradeSceneRoot = self.childNode(withName: "upgrade_rootView")!
         let bground = upgradeSceneRoot.childNode(withName: "upgrade_background")!
