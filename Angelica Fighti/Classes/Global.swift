@@ -71,6 +71,7 @@ class Global {
         case Paradise_Background
         case Desert_Background
         case Highlands_Background
+        case Anniversary_Background
     }
     
     enum Main:String,CaseIterable{

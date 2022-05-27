@@ -31,6 +31,7 @@ class Infobar:SKSpriteNode{
     private var fifthTemplate:SKSpriteNode!
     private var sixTemplate:SKSpriteNode!
     private var infoGetClover:SKSpriteNode!
+    private var infoEggsClaim:SKSpriteNode!
     
     // MARK: LABEL TIMER
     private var timer:Timer?                            // Timer count screen
@@ -44,9 +45,11 @@ class Infobar:SKSpriteNode{
     private var labelTimerProjectile:SKLabelNode = SKLabelNode()      // Label timer screen
     private var iconProjectile:SKSpriteNode = SKSpriteNode()
     
-    // MARK: DELEGATE
-    var gameInfo = AccountInfo()
     
+    // MARK: BUTTON SETTINGS
+    private var btnSettings:SKSpriteNode = SKSpriteNode()
+    
+
     convenience init(name n:String){
         self.init()
         
@@ -69,80 +72,67 @@ class Infobar:SKSpriteNode{
         
         fifthTemplate = customFifthLabel(itemSize: rootItemSize, prevNodePosition: thirdTemplate.position)
         
-        infoGetClover = panelInfoGetClover()
-       
+        
+        // BUTTON SETTINGS MAIN SCREEN
+        btnSettings =  SKScene().createUIButton(bname: "icon_settings", offsetPosX: screenSize.maxX-50, offsetPosY: screenSize.maxY-50,typeButtom: .SettingsButton)
+            btnSettings.size = CGSize(width: 50, height: 50)
+        
+        
+        // PANEL MAIN EGGS CLAIM
+        infoEggsClaim = showEggsClaim()
+        
         
         addChild(firstTemplate)
         addChild(secondTemplate)
         addChild(thirdTemplate)
         addChild(fourthTemplate)
         addChild(fifthTemplate)
-        addChild(infoGetClover)
+        addChild(infoEggsClaim)
+        addChild(btnSettings)
         
         // Note: It will show debug view only if debug is enabled.
         debug()
     }
     
     /// Create panel info get clover
-    func panelInfoGetClover() -> SKSpriteNode {
+    func panelInfoGetClover(level:Int) -> SKSpriteNode {
         
-        let node = SKSpriteNode(color: .black.withAlphaComponent(0.5), size: CGSize(width: 120, height: 60))
-        node.position = CGPoint(x: screenSize.maxX - node.frame.width/2 - 10, y: screenSize.height - screenSize.height/3)
-        node.name = "DMG"
+        let infoGetClover = SKSpriteNode(color: .black.withAlphaComponent(0.5), size: CGSize(width: 120, height: 60))
+        infoGetClover.position = CGPoint(x: screenSize.maxX - infoGetClover.frame.width/2 - 10, y: screenSize.height - screenSize.height/3)
+        infoGetClover.name = "DMG"
         
         let iconClover = SKSpriteNode(texture: SKTexture(imageNamed: "Clover"), size: CGSize(width: 30, height: 30))
         iconClover.position = CGPoint(x: -40, y: 10)
-        node.addChild(iconClover)
-        
-    /*    let labelLevel = SKLabelNode(fontNamed: "Cartwheel", andText: "", andSize: 20, withShadow: .red,name: "infoLevelShadow")
-        labelLevel?.name = "infoLevel"
-        labelLevel?.fontColor = .white
-        labelLevel?.position = CGPoint(x: 15, y: 0)
-        node.addChild(labelLevel!)
-        
-        let labelDMG = SKLabelNode(fontNamed: "Cartwheel", andText: "25 DMG", andSize: 20, withShadow: .red)
-        labelDMG?.fontColor = .orange
-        labelDMG?.text = "25 DMG"
-        labelDMG?.position = CGPoint(x: 0, y: -25)
-        
-        node.addChild(labelDMG!)*/
-        return node
-    }
-    /// Add timer screen
-      func addTime() {
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(running), userInfo: nil, repeats: true)
-    }
-    
-    func updatePanelDMG(level:Int) {
-        
-        guard let node = self.childNode(withName: "DMG") as? SKSpriteNode else { return  }
-            
-       
+        infoGetClover.addChild(iconClover)
         
         let labelLevel = SKLabelNode(fontNamed: "Cartwheel", andText: "", andSize: 20, withShadow: .red,name: "infoLevelShadow")
         labelLevel?.name = "infoLevel"
         labelLevel?.text = "LV \(level)"
         labelLevel?.fontColor = .white
         labelLevel?.position = CGPoint(x: 15, y: 0)
-        node.addChild(labelLevel!)
+        infoGetClover.addChild(labelLevel!)
         
         let labelDMG = SKLabelNode(fontNamed: "Cartwheel", andText: "25 DMG", andSize: 20, withShadow: .red)
         labelDMG?.fontColor = .orange
         labelDMG?.text = "LV \(level)"
-        labelDMG?.text = "25 DMG"
+        labelDMG?.text = "\(10 +  level * 10) DMG"
         labelDMG?.position = CGPoint(x: 0, y: -25)
-        node.addChild(labelDMG!)
+        infoGetClover.addChild(labelDMG!)
         
-        node.run(.sequence([
+        infoGetClover.run(.sequence([
             .wait(forDuration: 2),
-            SKAction.run {labelDMG?.removeFromParent()},
-            SKAction.run {labelLevel?.removeFromParent()}
+            SKAction.run {infoGetClover.removeFromParent()},
             
         ]))
         
-       
-       
+   
+       return infoGetClover
     }
+    /// Add timer screen
+      func addTime() {
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(running), userInfo: nil, repeats: true)
+    }
+    
  
     /// Print label time
     @objc func running() {
@@ -162,6 +152,7 @@ class Infobar:SKSpriteNode{
         addChild(labelTimer)
         
     }
+    
     // Add timer  by projectile temp
     func addTimeProjectileTemp() {
         timerProjectile = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ProjectileTemp), userInfo: nil, repeats: true)
@@ -371,6 +362,59 @@ class Infobar:SKSpriteNode{
         coinLabel.text = String(coinCount)
     }
     
+    // MARK: CREATE PANEL EGGSCLAIM DOWN SCREEN
+    private func showEggsClaim() -> SKSpriteNode{
+        
+        let panelEggs = SKSpriteNode(texture: SKTexture(imageNamed: "eggsClaim"), size: CGSize(width: screenSize.width-50, height: 150))
+        panelEggs.size = CGSize(width: screenSize.width-50, height: 150)
+        panelEggs.anchorPoint = CGPoint(x: 0, y:0)
+        panelEggs.position = CGPoint(x: 25, y: 0)
+        
+        for x in 0..<4 {
+           
+            
+            let shape = SKShapeNode()
+            shape.name = "slot\(x)"
+            shape.path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: (panelEggs.frame.width-70)/4, height: 120), cornerRadius: 10).cgPath
+            
+            shape.position = CGPoint(x: (Int((panelEggs.frame.width-70)/4) * x) + ((x+1) * 14), y: 15)
+            shape.strokeColor = UIColor.brown
+            shape.lineWidth = 2
+            panelEggs.addChild(shape)
+
+            
+            let text =  SKLabelNode(fontNamed: "Cartwheel", andText: "EGG\nSLOT", andSize: 20, withShadow: .clear)
+            text?.fontColor = .brown
+            text?.numberOfLines = 0
+            text!.position = CGPoint(x: shape.frame.midX, y: shape.frame.midY)
+            panelEggs.addChild(text!)
+            
+            let buttonTap = SKSpriteNode(imageNamed: "tap_To_hach")
+            buttonTap.size.width = (panelEggs.frame.width-70)/4
+            buttonTap.xScale = 0.9
+            buttonTap.position = CGPoint(x: shape.frame.midX, y: panelEggs.frame.height - buttonTap.frame.height/2)
+            panelEggs.addChild(buttonTap)
+            buttonTap.run(.upDown(3,0.5))
+            
+            let eggs = SKSpriteNode(imageNamed: "Common")
+            eggs.position = CGPoint(x: shape.frame.midX, y: shape.frame.midY - 10)
+            eggs.size  = CGSize(width: 40, height: 50)
+            panelEggs.addChild(eggs)
+            
+            let buttonClaim = SKSpriteNode(texture: SKTexture(imageNamed: "BlueButton"), color: .clear, size: CGSize(width: shape.frame.width, height: shape.frame.width * 0.3))
+            buttonClaim.position = CGPoint(x: shape.frame.midX, y: 20)
+           
+            let textClaim =  SKLabelNode(fontNamed: "Cartwheel", andText: "Claim", andSize: 15, withShadow: .clear)
+            textClaim?.fontColor = .yellow
+            textClaim?.position.y = -5
+            buttonClaim.addChild(textClaim!)
+            
+            panelEggs.addChild(buttonClaim)
+        }
+        
+        return panelEggs
+    }
+    
      
      func updateGoldBalanceLabel(balance:Int){
 
@@ -392,6 +436,7 @@ class Infobar:SKSpriteNode{
        
         let fullPath = userPath.appendingPathComponent("userinfo.plist")
         
+         print("El full path \(fullPath)")
         guard let virtualPlist = NSDictionary(contentsOfFile: fullPath) else{
             print ("ERROR000: EndGame failed to load virtualPlist")
             return
@@ -407,7 +452,7 @@ class Infobar:SKSpriteNode{
     
     
     
-    internal func fadeAway(){
+     func fadeAway(){
         
         let fadeAwayAction = SKAction.fadeAlpha(to: 0, duration: 0.2)
         
@@ -418,6 +463,8 @@ class Infobar:SKSpriteNode{
         thirdTemplate.run(fadeAwayAction)
         fourthTemplate.run(fadeAwayAction)
         fifthTemplate.run(showCoinLabelAction)
+        btnSettings.run(fadeAwayAction)
+        infoEggsClaim.run(fadeAwayAction)
     }
     
    

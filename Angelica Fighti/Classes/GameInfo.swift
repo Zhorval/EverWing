@@ -16,8 +16,6 @@ protocol GameInfoDelegate{
     func getCurrentToonNode() -> SKSpriteNode
     func createCloud()
     func loadBackground(scene:SKScene?)
-    func addDMG() -> Int
-    
     
 }
 
@@ -38,7 +36,7 @@ class GameInfo: GameInfoDelegate{
     private var currentHighscore:Int
     private var timer:Timer?
     static var infobar:Infobar?
-    static var DMG = 15
+    static var DMG = 10
     
     // Secondary Variables
     private var wavesForNextLevel:Int = 1
@@ -58,6 +56,7 @@ class GameInfo: GameInfoDelegate{
     var goblin:EnemyModel
     var cofre:EnemyModel
     var map:Map?
+    static var currentPlayerPosition:CGPoint = .zero
     
     
     
@@ -81,7 +80,7 @@ class GameInfo: GameInfoDelegate{
 
         gamestate = .NoState
         timePerWave = 3.0 // 3.0 is default
-         GameInfo.infobar = Infobar(name: "infobar")
+        GameInfo.infobar = Infobar(name: "infobar")
          
         // delegates
         regular_enemies.delegate = self
@@ -92,9 +91,6 @@ class GameInfo: GameInfoDelegate{
     }
     
     
-    func loadTimerProjectileTemp() {
-        GameInfo.infobar?.addTimeProjectileTemp()
-    }
     
     func load(scene: SKScene) -> (Bool, String){
         
@@ -109,32 +105,141 @@ class GameInfo: GameInfoDelegate{
         }
         
         guard let infobar =  GameInfo.infobar else { return  (false,"Account error")}
-        // update infobar
         addChild(infobar)
         
         loadStatus = self.createWalls()
         
         return loadStatus
     }
+   
+   
     
-    /// Add level DMG when contact clover
-    func addDMG() -> Int {
-        GameInfo.DMG +=   account.getLevel() + 1
-        GameInfo.infobar?.updatePanelDMG(level: GameInfo.DMG)
-        return GameInfo.DMG
-    }
     
     /// This function update background when player destroy Boss
-    
     internal func loadBackground(scene:SKScene?) {
         
         guard let mainScene = scene else {
             return
         }
 
-        map = Map(maps: SKTextureAtlas().loadAtlas(name: Global.Background.allCases.randomElement()!.rawValue, prefix: nil), scene: mainScene)
-       
+        
+        map = Map(maps: SKTextureAtlas().loadAtlas(name: Global.Background.Desert_Background.rawValue, prefix: nil), scene: mainScene)
+         //Map(maps: SKTextureAtlas().loadAtlas(name: Global.Background.allCases.randomElement()!.rawValue, prefix: nil), scene: mainScene)
         map?.run()
+    }
+    
+    // MARK: CREATE PANEL SETTINGS
+    func showMenuSettings(scene:SKScene) {
+        
+        let label = { (text:String,name:String,point:CGPoint)  -> SKLabelNode in
+            
+             let label = SKLabelNode()
+                 label.fontName = "Cartwheel"
+                 label.text = text
+                 label.name = name
+                 label.fontSize = 30
+                 label.position = point
+                 label.zPosition = 10
+            
+            return label
+        }
+        
+        
+        let bg = SKSpriteNode(imageNamed: "bgSettings")
+            bg.position = CGPoint(x: screenSize.midX, y: screenSize.midY)
+            bg.size = CGSize(width: screenSize.width * 0.75, height: screenSize.height * 0.5)
+            bg.zPosition = +10
+            self.addChild(bg)
+        
+        let labelHeader = SKLabelNode(fontNamed: "Cartwheel", andText: "Settings", andSize: 30,withShadow: .black)
+            labelHeader?.fontColor = .yellow
+            labelHeader?.position = CGPoint(x: 0, y: (bg.frame.height/2)-45)
+            labelHeader?.zPosition = 1
+            bg.addChild(labelHeader!)
+        
+        /// Button icon cancel
+        let iconCancel = scene.createUIButton(bname: "icon_cancel", offsetPosX: bg.frame.width/2, offsetPosY: (bg.frame.height/2),typeButtom: .CancelButton)
+            iconCancel.size = CGSize(width: 35, height: 35)
+            iconCancel.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            bg.addChild(iconCancel)
+       
+        
+        /// Begin Label SFX
+        let labelSFX = SKLabelNode(fontNamed: "Cartwheel", andText: "SFX", andSize: 40,withShadow: .white)
+            labelSFX?.fontColor = .brown
+            labelSFX?.position = CGPoint(x: -100, y:  bg.frame.height/2 - bg.frame.height/5)
+            labelSFX?.zPosition = 10
+            bg.addChild(labelSFX!)
+        
+        let buttonSFX = scene.createUIButton(bname: "BtnSfx", offsetPosX: 50, offsetPosY:  bg.frame.height/5*2,typeButtom: account.getValueKeyUserInfo(key: "Sfx") ? .BlueButton : .BrownButton)
+            bg.addChild(buttonSFX)
+        
+        let labelSfxOff = label(account.getValueKeyUserInfo(key: "Sfx") ? "On":"Off","Sfx",CGPoint(x: 0, y: -40))
+            buttonSFX.addChild(labelSfxOff)
+        /// --- End label SFX
+        
+        /// Begin  label music
+        let labelMusic = SKLabelNode(fontNamed: "Cartwheel", andText: "MUSIC", andSize: 40,withShadow: .white)
+            labelMusic?.fontColor = .brown
+            labelMusic?.position = CGPoint(x: -80, y:  bg.frame.height/5-25 )
+            labelMusic?.zPosition = 10
+            bg.addChild(labelMusic!)
+        
+        let buttonMusic = scene.createUIButton(bname: "BtnMusic", offsetPosX: 50, offsetPosY: bg.frame.height/5+25,typeButtom: account.getValueKeyUserInfo(key: "Music") ? .BlueButton : .BrownButton)
+            bg.addChild(buttonMusic)
+        
+        let labelMusicOff =   label(account.getValueKeyUserInfo(key: "Music") ? "On":"Off","Music",CGPoint(x: 0, y: -buttonMusic.frame.height/2-10))
+            buttonMusic.addChild(labelMusicOff)
+        /// End label music
+        
+        
+        /// Begin label voice
+        let labelVoice = SKLabelNode(fontNamed: "Cartwheel", andText: "VOICE", andSize: 40,withShadow: .white)
+            labelVoice?.fontColor = .brown
+            labelVoice?.position = CGPoint(x: -80, y: 0)
+            labelVoice?.zPosition = 3
+            bg.addChild(labelVoice!)
+        
+        let buttonlabelVoice = scene.createUIButton(bname: "BtnVoice", offsetPosX: 50, offsetPosY: 50,typeButtom: account.getValueKeyUserInfo(key: "Voice") ? .BlueButton : .BrownButton)
+            bg.addChild(buttonlabelVoice)
+        
+        let labelVoiceOff = label(account.getValueKeyUserInfo(key: "Voice") ? "On":"Off","Voice",CGPoint(x: 0, y: -buttonMusic.frame.height/2-10))
+            buttonlabelVoice.addChild(labelVoiceOff)
+        /// End label voice
+        
+        /// Label Player movement
+        let labelPlayerMovement = SKLabelNode(fontNamed: "Cartwheel", andText: "PLAYER MOVEMENT", andSize: 20,withShadow: .white)
+            labelPlayerMovement?.fontColor = .brown
+            labelPlayerMovement?.position = CGPoint(x: 0, y: -bg.frame.height/5*2+100)
+            labelPlayerMovement?.zPosition = 1
+            bg.addChild(labelPlayerMovement!)
+        
+        // Buttons slow/fast player movement
+        let slowBtn = scene.createUIButton(bname: "BtnMovement", offsetPosX: -60, offsetPosY: -bg.frame.height/5*2+50, typeButtom: account.getValueKeyUserInfo(key: "Movement") ? .BlueButton : .BrownButton)
+            slowBtn.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            bg.addChild(slowBtn)
+        
+        let labelSlowBtn = SKLabelNode(fontNamed: "Cartwheel", andText: "Slow", andSize: 25, withShadow: .black)
+            labelSlowBtn?.position = CGPoint(x: 0, y: -10)
+            slowBtn.addChild(labelSlowBtn!)
+        
+        // Button fast player movement
+        let btnFast = scene.createUIButton(bname: "BtnMovement", offsetPosX: 60, offsetPosY: -bg.frame.height/5*2+50, typeButtom: account.getValueKeyUserInfo(key: "Movement") ? .BrownButton : .BlueButton)
+            btnFast.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            bg.addChild(btnFast)
+        
+        let labelFastBtn = SKLabelNode(fontNamed: "Cartwheel", andText: "Fast", andSize: 25, withShadow: .black)
+            labelFastBtn?.position = CGPoint(x: 0, y: -10)
+            btnFast.addChild(labelFastBtn!)
+        
+        /// Label version
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+        let labelVersion = SKLabelNode(fontNamed: "Cartwheel", andText: "V\(version)", andSize: 15,withShadow: .white)
+            labelVersion?.fontColor = .brown
+            labelVersion?.position = CGPoint(x: 0, y: -bg.frame.height/2+10)
+            bg.addChild(labelVersion!)
+
+        
     }
     
     
@@ -142,7 +247,6 @@ class GameInfo: GameInfoDelegate{
     func createCloud() {
         
         guard let mainscene = mainScene else {
-            print("Escena falsa")
             return
         }
 
@@ -255,8 +359,7 @@ class GameInfo: GameInfoDelegate{
             
             // Load Map
             map = Map(maps: textures, scene: mainscene)
-            // Load Map
-           // map = Map(maps: global.getTextures(textures: .Map_Ragnarok), scene: mainscene)
+           
 
             // Cloud action
             let moveDownCloud = SKAction.moveTo(y: -screenSize.height*1.5, duration: 1)
@@ -305,17 +408,18 @@ class GameInfo: GameInfoDelegate{
                 SKAction.wait(forDuration: 3),
                 SKAction.run{
                     self.changeGameState(.Spawning)
-                                       
                 },
-                    SKAction.wait(forDuration: 0.2), SKAction.run {
-                        self.account.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
-                        SKAction.run { [self] in
-                            
-                                self.addChild(self.account.getCurrentToon().getBullet().shoot())
-                                self.addChild(self.dragon[0].shoot())
-                                self.addChild(self.dragon[1].shoot())
-                        },
-                        SKAction.wait(forDuration: 0.06)])))
+                
+                SKAction.wait(forDuration: 0.2),
+                SKAction.run {
+                    self.account.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
+                    SKAction.run { [self] in
+                        
+                        self.addChild(self.account.getCurrentToon().getBullet()!.shoot())
+                        self.addChild(self.dragon[0].shoot())
+                        self.addChild(self.dragon[1].shoot())
+                    },
+                    SKAction.wait(forDuration: 0.06)])))
                 }
             ]))
             
@@ -325,6 +429,7 @@ class GameInfo: GameInfoDelegate{
             fireball_enemy.increaseDifficulty()
             boss.increaseDifficulty()
             self.changeGameState(.Spawning)
+            getCurrentToon().addLevel()
             
         case .Spawning:
             
@@ -375,7 +480,7 @@ class GameInfo: GameInfoDelegate{
         textDMG.position = CGPoint(x: icon.position.x - icon.frame.width/2, y: screenSize.height*0.8)
         self.addChild(textDMG)
         
-        let levelBullet = account.getBulletLevelOfToonByIndex(index: account.getCurrentToonIndex())
+        let levelBullet = account.getLevel() + 1
         let iconBuller = BulletMaker().make(level: BulletMaker.Level(rawValue: levelBullet)!, char: account.getCurrentToon().getCharacter())
        
         if levelBullet > 30 {
@@ -384,7 +489,7 @@ class GameInfo: GameInfoDelegate{
             icon.addChild(iconBuller)
         
         
-        let level = SKLabelNode(fontNamed: "Cartwheel", andText: "Level \(account.getCurrentToon().getLevel())", andSize: 18, withShadow: .black,name:"ScreenLevelBulletShadow")
+        let level = SKLabelNode(fontNamed: "Cartwheel", andText: "Level \(account.getLevel()+1)", andSize: 18, withShadow: .black,name:"ScreenLevelBulletShadow")
             level?.name = "ScreenLevelBullet"
             level?.position.y = -icon.frame.height/2
         icon.addChild(level!)
@@ -413,6 +518,8 @@ class GameInfo: GameInfoDelegate{
                 return
             }
             mainScene.run(.wait(forDuration: 10))
+        } else {
+            
         }
         
     }
@@ -506,6 +613,7 @@ class GameInfo: GameInfoDelegate{
                     }}})
         
     }
+   
     
     //Show message lateral boss appears
     private func showMessageLateralBossAppear()  {
@@ -589,15 +697,12 @@ class GameInfo: GameInfoDelegate{
     }    
     
      func getCurrentToonBullet() -> Projectile{
-        return account.getCurrentToon().getBullet()
+         return account.getCurrentToon().getBullet()!
     }
     
-     func duplicateToonBullet() {
-          account.getCurrentToon().addLevel()
-    }
     
      func getToonBulletEmmiterNode(x px:CGFloat, y py:CGFloat) -> SKEmitterNode{
-        return account.getCurrentToon().getBullet().generateTouchedEnemyEmmiterNode(x: px, y: py)
+         return account.getCurrentToon().getBullet()!.generateTouchedEnemyEmmiterNode(x: px, y: py)
     }
      func requestChangeToon(index: Int){
         self.account.selectToonIndex(index: index)

@@ -33,7 +33,7 @@ class GoblinEnemy:Enemy {
             .moveTo(x: screenSize.minX, duration: 2),
             .moveTo(x: screenSize.maxX, duration: 2),
             .moveTo(y: self.position.y-50, duration: 0.1),
-            .run { self.attack() }
+            .run { self.attack(node: self, texture: nil) }
             ]))
         
         self.run(action)

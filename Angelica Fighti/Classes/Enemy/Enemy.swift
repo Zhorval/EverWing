@@ -101,7 +101,7 @@ extension Enemy {
         node.run(SKAction.sequence([SKAction.wait(forDuration: 2.5), SKAction.repeatForever(SKAction.sequence([SKAction.run {
                 let r = randomInt(min: 0, max: 15)
                 if r <= 5{
-                    self.attack()
+                    self.attack(node: nil, texture: nil)
                 }
                 else if node.position.y > screenSize.height{
                    
@@ -109,15 +109,15 @@ extension Enemy {
                 }, SKAction.wait(forDuration: 2)]))]))
         }
     
-    func attack(){
-       
-        print("Atack \(self.name)")
+    func attack(node:SKNode?,texture:SKTexture?,size:CGSize = CGSize(width: 30, height: 30)){
+    
         self.run(SKAction.repeatForever(SKAction.sequence([SKAction.wait(forDuration: 0.5), SKAction.run {
             let random = randomInt(min: 0, max: 100)
             if (random > 80){
               
-                let att = SKSpriteNode(texture: global.getAttackTexture(attack: .Boss1_type_1))
-                att.size = CGSize(width: 30, height: 30)
+                let att = SKSpriteNode(texture: texture ?? global.getAttackTexture(attack: .Boss1_type_1))
+                att.position = node?.position ?? self.position
+                att.size = size
                 att.name = "\(String(describing: self.name))_Attack"
                 att.physicsBody = SKPhysicsBody(circleOfRadius: 15)
                 att.physicsBody!.isDynamic = true
@@ -133,11 +133,11 @@ extension Enemy {
                 
                 let force = CGVector(dx: 0, dy: randomInt(min: -100, max: 0))
                 att.run(SKAction.applyForce(force, duration: 1))
-                
-              
             }
         }])))
     }
+    
+  
     
     func defeated(actionsDead:[SKTexture]){
         self.physicsBody?.categoryBitMask = PhysicsCategory.None
@@ -185,7 +185,6 @@ extension Enemy {
     }
     
     //MARK: One sine curve as it progresses across the width of the of the rect:
-        
     func sinePath(in rect: CGRect, count: Int? = nil) -> UIBezierPath {
         // note, since sine returns values between -1 and 1, let's add 1 and divide by two to get it between 0 and 1
        
@@ -197,7 +196,6 @@ extension Enemy {
     }
     
     //MARK: One sine curve as it progresses across the width of the of the rect:
-
     func spiralPath(in rect: CGRect, count: Int? = nil) -> UIBezierPath {
        return parametricPath(in: rect, count: count) { t in
            let r = 1.0 - sin(t * .pi / 2.0)
@@ -230,7 +228,6 @@ extension Enemy {
     }
     
     //MARK: INITIAL SETUP ENEMY
-    
     func initialSetup(category:UInt32){
         
         let delay:Double = (self.name == "Pinky_Clone") ? 1.0 : 0.5

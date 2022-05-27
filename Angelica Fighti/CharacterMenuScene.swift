@@ -69,6 +69,7 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
     private func loadBackground(){
         let bg = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_Background))
         bg.zPosition = -10
+        bg.size = CGSize(width: screenSize.width, height: screenSize.height)
         self.addChild(bg)
     }
     
@@ -81,7 +82,8 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
             return
         }else{
             // Fix Inforbar Position
-            let infobar = self.childNode(withName: "infobar")!
+            guard let infobar = self.childNode(withName: "infobar") else { return }
+            infobar.isHidden = true
             infobar.position.y -= screenSize.size.height/2
             infobar.position.x -= screenSize.size.width/2
         }
@@ -91,8 +93,9 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
 
         // Title
         let title = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_TitleMenu))
-            title.position.y = screenSize.width/2*1.3
+            title.position.y = screenSize.height/2-50
             title.size = CGSize(width: screenSize.width*0.6, height: screenSize.height*0.1)
+        
         
         let titleLabel = SKLabelNode(fontNamed: "Family Guy")
             titleLabel.text = "EVERWING ACADEMY"

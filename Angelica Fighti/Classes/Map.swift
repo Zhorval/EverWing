@@ -41,7 +41,6 @@ class Map: NSObject{
         topTexture = maptextures[currIndex + 2]
         currIndex = currIndex + 2
         
-        // CGSize(width: screenSize.width, height: screenSize.height)
         let tsize = CGSize(width: screenSize.width, height: screenSize.width)
         
         mid = SKSpriteNode()
@@ -67,7 +66,7 @@ class Map: NSObject{
         top.zPosition = -5
         // create function to start actrion for moving map
         
-        (top.alpha, bottom.alpha, mid.alpha) = (0.0, 0.0, 0.0)
+        (top.alpha, bottom.alpha, mid.alpha) = (1.0, 1.0, 1.0)
         
         scene.addChild(mid)
         scene.addChild(bottom)
@@ -86,12 +85,15 @@ class Map: NSObject{
     }
     
     /// Update velocity map
-    func updateVelocityMap(velocity:CGFloat) {
-        prepareToChangeScene()
-        velocityMap = velocity
-        run()
+    func updateVelocityMap() {
         
+        velocityMap = 0.005
+        
+        run()
+      
     }
+    
+   
     
     func run(){
         

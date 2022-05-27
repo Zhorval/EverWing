@@ -28,6 +28,9 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
     var isPlayerMoved:Bool = false
     var shield:Shield?
     var delegateGameInfo:GameInfoDelegate?
+    private var lastUpdateTime: TimeInterval = 0
+    private var deltaTime:CGFloat?
+    var velocity:CGFloat = 1
     
 
     override func didMove(to view: SKView) {
@@ -48,9 +51,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
         
         loadBackground()
         loadgameinfo()
-        
-        
-        
     }
     
     func loadBackground(){
@@ -127,10 +127,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
         let bd_three_button = createUIButton(bname: "building_3_button", offsetPosX: bd_three.position.x, offsetPosY: bd_three.position.y - bd_three.size.height/2 - 50, typeButtom: .PurpleButton)
             root.addChild(bd_three_button)
         
-        let iconSettings = createUIButton(bname: "icon_settings", offsetPosX: screenSize.maxX-50, offsetPosY: screenSize.maxY-50,typeButtom: .SettingsButton)
-            iconSettings.size = CGSize(width: 50, height: 50)
-            self.addChild(iconSettings)
-        
+     
         let LONGESTSTRCOUNT:CGFloat = 11
         
         // Button Labels
@@ -183,8 +180,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
             arrowRight.name = "main_menu_arrow_right"
             root.addChild(arrowRight)
         
-        let panelEggs = SKSpriteNode()
-        
         // Actions to sprites
         let buildMove = SKAction.repeatForever(SKAction.sequence([SKAction.moveBy(x: 0, y: -5, duration: 2.3), SKAction.moveBy(x: 0, y: 5, duration: 1.8)]))
             bd_one.run(buildMove)
@@ -210,126 +205,14 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
             return
         }
     
+        let player = gameinfo.getCurrentToonNode()
+        player.position = CGPoint(x: screenSize.midX, y: 200)
         // Add Character Player
-        self.addChild(gameinfo.getCurrentToonNode())
+        self.addChild(player)
        
-    }
-    
-    // MARK: Create panel settings
-    private func showMenuSettings() {
-        
-        let label = { (text:String,name:String,point:CGPoint)  -> SKLabelNode in
-            
-             let label = SKLabelNode()
-                 label.fontName = "Cartwheel"
-                 label.text = text
-                 label.name = name
-                 label.fontSize = 30
-                 label.position = point
-                 label.zPosition = 10
-            
-            return label
-        }
-        
-        
-        let bg = SKSpriteNode(imageNamed: "bgSettings")
-            bg.position = CGPoint(x: screenSize.midX, y: screenSize.midY)
-            bg.size = CGSize(width: screenSize.width * 0.75, height: screenSize.height * 0.5)
-            bg.zPosition = +10
-            self.addChild(bg)
-        
-        let labelHeader = SKLabelNode(fontNamed: "Cartwheel", andText: "Settings", andSize: 30,withShadow: .black)
-            labelHeader?.fontColor = .yellow
-            labelHeader?.position = CGPoint(x: 0, y: (bg.frame.height/2)-45)
-            labelHeader?.zPosition = 1
-            bg.addChild(labelHeader!)
-        
-        /// Button icon cancel
-        let iconCancel = createUIButton(bname: "icon_cancel", offsetPosX: bg.frame.width/2, offsetPosY: (bg.frame.height/2),typeButtom: .CancelButton)
-            iconCancel.size = CGSize(width: 35, height: 35)
-            iconCancel.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            bg.addChild(iconCancel)
-       
-        
-        /// Begin Label SFX
-        let labelSFX = SKLabelNode(fontNamed: "Cartwheel", andText: "SFX", andSize: 40,withShadow: .white)
-            labelSFX?.fontColor = .brown
-            labelSFX?.position = CGPoint(x: -100, y:  bg.frame.height/2 - bg.frame.height/5)
-            labelSFX?.zPosition = 10
-            bg.addChild(labelSFX!)
-        
-        let buttonSFX = createUIButton(bname: "BtnSfx", offsetPosX: 50, offsetPosY:  bg.frame.height/5*2,typeButtom: accountInfo.getValueKeyUserInfo(key: "Sfx") ? .BlueButton : .BrownButton)
-            bg.addChild(buttonSFX)
-        
-        let labelSfxOff = label(accountInfo.getValueKeyUserInfo(key: "Sfx") ? "On":"Off","Sfx",CGPoint(x: 0, y: -40))
-            buttonSFX.addChild(labelSfxOff)
-        /// --- End label SFX
-        
-        /// Begin  label music
-        let labelMusic = SKLabelNode(fontNamed: "Cartwheel", andText: "MUSIC", andSize: 40,withShadow: .white)
-            labelMusic?.fontColor = .brown
-            labelMusic?.position = CGPoint(x: -80, y:  bg.frame.height/5-25 )
-            labelMusic?.zPosition = 10
-            bg.addChild(labelMusic!)
-        
-        let buttonMusic = createUIButton(bname: "BtnMusic", offsetPosX: 50, offsetPosY: bg.frame.height/5+25,typeButtom: accountInfo.getValueKeyUserInfo(key: "Music") ? .BlueButton : .BrownButton)
-            bg.addChild(buttonMusic)
-        
-        let labelMusicOff =   label(accountInfo.getValueKeyUserInfo(key: "Music") ? "On":"Off","Music",CGPoint(x: 0, y: -buttonMusic.frame.height/2-10))
-            buttonMusic.addChild(labelMusicOff)
-        /// End label music
-        
-        
-        /// Begin label voice
-        let labelVoice = SKLabelNode(fontNamed: "Cartwheel", andText: "VOICE", andSize: 40,withShadow: .white)
-            labelVoice?.fontColor = .brown
-            labelVoice?.position = CGPoint(x: -80, y: 0)
-            labelVoice?.zPosition = 3
-            bg.addChild(labelVoice!)
-        
-        let buttonlabelVoice = createUIButton(bname: "BtnVoice", offsetPosX: 50, offsetPosY: 50,typeButtom: accountInfo.getValueKeyUserInfo(key: "Voice") ? .BlueButton : .BrownButton)
-            bg.addChild(buttonlabelVoice)
-        
-        let labelVoiceOff = label(accountInfo.getValueKeyUserInfo(key: "Voice") ? "On":"Off","Voice",CGPoint(x: 0, y: -buttonMusic.frame.height/2-10))
-            buttonlabelVoice.addChild(labelVoiceOff)
-        /// End label voice
-        
-        /// Label Player movement
-        let labelPlayerMovement = SKLabelNode(fontNamed: "Cartwheel", andText: "PLAYER MOVEMENT", andSize: 20,withShadow: .white)
-            labelPlayerMovement?.fontColor = .brown
-            labelPlayerMovement?.position = CGPoint(x: 0, y: -bg.frame.height/5*2+100)
-            labelPlayerMovement?.zPosition = 1
-            bg.addChild(labelPlayerMovement!)
-        
-        // Buttons slow/fast player movement
-        let slowBtn = createUIButton(bname: "BtnMovement", offsetPosX: -60, offsetPosY: -bg.frame.height/5*2+50, typeButtom: accountInfo.getValueKeyUserInfo(key: "Movement") ? .BlueButton : .BrownButton)
-            slowBtn.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            bg.addChild(slowBtn)
-        
-        let labelSlowBtn = SKLabelNode(fontNamed: "Cartwheel", andText: "Slow", andSize: 25, withShadow: .black)
-            labelSlowBtn?.position = CGPoint(x: 0, y: -10)
-            slowBtn.addChild(labelSlowBtn!)
-        
-        // Button fast player movement
-        let btnFast = createUIButton(bname: "BtnMovement", offsetPosX: 60, offsetPosY: -bg.frame.height/5*2+50, typeButtom: accountInfo.getValueKeyUserInfo(key: "Movement") ? .BrownButton : .BlueButton)
-            btnFast.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            bg.addChild(btnFast)
-        
-        let labelFastBtn = SKLabelNode(fontNamed: "Cartwheel", andText: "Fast", andSize: 25, withShadow: .black)
-            labelFastBtn?.position = CGPoint(x: 0, y: -10)
-            btnFast.addChild(labelFastBtn!)
-        
-        /// Label version
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-        let labelVersion = SKLabelNode(fontNamed: "Cartwheel", andText: "V\(version)", andSize: 15,withShadow: .white)
-            labelVersion?.fontColor = .brown
-            labelVersion?.position = CGPoint(x: 0, y: -bg.frame.height/2+10)
-            bg.addChild(labelVersion!)
-
-        
     }
    
-    // Setter dictionary plist
+    //MARK: SETTER DICTIONARY PLIST
     private func setInfoUser(key:String,node:SKSpriteNode){
        
         if accountInfo.updateSettings(key: key).0 {
@@ -363,7 +246,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
                 prepareToChangeScene(scene: .Dragons)
             }
             else if c.name == "icon_settings"{
-                 showMenuSettings()
+                gameinfo.showMenuSettings(scene: self)
             }
             else if c.name == "icon_cancel"{
                 c.parent?.removeFromParent()
@@ -398,7 +281,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
         }
         
         if recognizer.state == .began {
-            
         } else if recognizer.state == .changed {
             let locomotion = recognizer.translation(in: recognizer.view)
             
@@ -428,6 +310,8 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
                 player.run(SKAction.rotate(toAngle: 0, duration: 0.1))
             }
             
+            GameInfo.currentPlayerPosition =  player.position
+
             self.gameinfo.dragon[0].dragon.position = CGPoint(x: player.position.x-75, y: player.position.y-50)
             self.gameinfo.dragon[1].dragon.position = CGPoint(x: player.position.x+75, y: player.position.y-50)
             
@@ -447,12 +331,23 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
             print ("FAILED")
         }
     }
-
+    
+    override func update(_ currentTime: TimeInterval) {
+        
+        if lastUpdateTime <= 0 {
+            lastUpdateTime = currentTime
+        } else {
+            deltaTime = currentTime - lastUpdateTime
+            lastUpdateTime = currentTime
+        }
+    }
+    
     func didBegin(_ contact: SKPhysicsContact) {
         var contactType:ContactType = .None
         var higherNode:SKSpriteNode?
         var lowerNode:SKSpriteNode?
         
+        guard ((contact.bodyA.node as? SKSpriteNode) != nil) && ((contact.bodyB.node as? SKSpriteNode) != nil) else { return }
         
         if contact.bodyA.categoryBitMask > contact.bodyB.categoryBitMask{
             higherNode = contact.bodyA.node as! SKSpriteNode?
@@ -487,11 +382,9 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
         
         else if l_node.name! == "toon" && h_node.name! == "clover" {
             contactType = .ToonByClover
-            
         }
         else if l_node.name! == "toon" && h_node.name! == "magnet" {
             contactType = .ToonByMagnet
-            
         }
         
         else if l_node.name!.contains("Enemy") && l_node.name!.contains("Attack") && h_node.name == "bullet"{
@@ -507,39 +400,39 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
         var boss = gameinfo.boss
         var goblin = gameinfo.goblin
         var cofre = gameinfo.cofre
-        let toon = accountInfo.getCurrentToon()
+        let toon = gameinfo.getCurrentToon()
 
         switch contactType{
             
         case .ToonByMagnet:
-        //    gameinfo.map?.updateVelocityMap(velocity: 0.005)
-         //   lowNode.addChild(toon.showAuraFire())
-            lowNode.addChild(toon.showAuraShield())
-       //     lowNode.run(toon.attack() {  lowNode.physicsBody?.categoryBitMask = PhysicsCategory.Player})
-           
             
+           
+            self.gameinfo.map?.updateVelocityMap()
+            let action = SKAction.sequence([
+                SKAction.wait(forDuration: 5),
+                SKAction.run { [self] in
+                    gameinfo.map?.prepareToChangeScene()
+                    gameinfo.map?.defeated()
+                    gameinfo.loadBackground(scene: self)
+                }
+                ])
+            self.run(action)
+                 
         case .ToonByClover:
 
-            GameInfo.infobar?.updatePanelDMG(level: accountInfo.upgradeLevel())
-            self.run(gameinfo.mainAudio.getAction(type: .Clover))
-           //  activeShieldLR(simetry: true)
-            // Show the shield Player
-             lowNode.addChild(toon.showAuraShield()) 
-              let emiter = SKEmitterNode(fileNamed: "MyParticle")
-              emiter?.position = CGPoint(x: screenSize.maxX, y: screenSize.midY)
+            addChild((GameInfo.infobar?.panelInfoGetClover(level:gameinfo.getCurrentToon().getBulletLevel()))!)
+                self.run(gameinfo.mainAudio.getAction(type: .Clover))
+          
+            self.run(.sequence([
+                .run {
+                    self.gameinfo.getCurrentToon().changeTextureProjectile(restore: false)
+                },
+                .wait(forDuration: 5),
+                .run {
+                    self.gameinfo.getCurrentToon().changeTextureProjectile(restore: true)
+                }
+            ]))
             
-              let copy  = emiter?.copy() as? SKEmitterNode
-              copy?.position = CGPoint(x: screenSize.minX, y: screenSize.midY)
-                copy?.run(.sequence([.wait(forDuration: 5),.run {
-                    self.shield?.defeated(actionsDead: [])
-                    emiter?.removeFromParent()
-                    copy?.removeFromParent()
-                }]))
-            
-              addChild(emiter!)
-              addChild(copy!)
-              
-              
         case .EnemyGotHit:
            
             // Generate FX Effect
@@ -592,7 +485,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
             
             
         case .Immune:
-            gameinfo.duplicateToonBullet()
+           break
 
            // lowNode.destroy()
             
@@ -608,8 +501,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate{
             }
             highNode.destroy()
             
-        case .None:
-            break
+        case .None: break
         case .HitByDragon:
             
             print("contacto con dragon")

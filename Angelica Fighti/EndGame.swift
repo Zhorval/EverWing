@@ -17,24 +17,28 @@ class EndGame: SKScene {
     
     override func didMove(to view: SKView) {
         
-        let userPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
-        let fullPath = userPath.appendingPathComponent("userinfo.plist")
         
-        guard let virtualPlist = NSDictionary(contentsOfFile: fullPath) else{
-            print ("ERROR000: EndGame failed to load virtualPlist")
-            return
+        guard let path = Bundle.main.path(forResource: "userinfo", ofType: "plist") else {
+            fatalError("plist is nil - Check AccountInfo.swift")
         }
+
         
+        guard let virtualPlist = NSMutableDictionary(contentsOfFile: path) else {
+            fatalError("plist is nil - Check AccountInfo.swift")
+        }
+      
+     
         guard let dataCoin:Int = virtualPlist.value(forKey: "Coin") as? Int else{
             print ("ERROR001: EndGame error")
             return
         }
         
+        
         let newCoinAmount = collectedCoins + dataCoin
         
         virtualPlist.setValue(newCoinAmount, forKey: "Coin")
         
-        if !virtualPlist.write(toFile: fullPath, atomically: false){
+        if !virtualPlist.write(toFile: path, atomically: true){
             print("Error002: FILE FAILED TO SAVE THE CHANGES ---- PLEASE FIX IT IN EndGame")
         }
         let bg = SKSpriteNode()

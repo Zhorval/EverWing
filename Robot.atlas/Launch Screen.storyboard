@@ -16,28 +16,36 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="main_menu_background_1.png" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cyc-BO-71C">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="clouds" highlightedImage="clouds" highlighted="YES" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YB1-tQ-aAb">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="main_menu_background_3.png" translatesAutoresizingMaskIntoConstraints="NO" id="xSf-pq-FeD">
-                                <rect key="frame" x="0.0" y="767" width="414" height="129"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Logo1" translatesAutoresizingMaskIntoConstraints="NO" id="2Yz-7f-Ftw">
+                                <rect key="frame" x="20" y="279" width="374" height="338"/>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Logo1" translatesAutoresizingMaskIntoConstraints="NO" id="2Yz-7f-Ftw">
-                                <rect key="frame" x="87" y="384" width="240" height="128"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.55000000000000004" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="main_menu_background_2" highlightedImage="main_menu_background_2" highlighted="YES" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ICu-8h-qkI">
+                                <rect key="frame" x="0.0" y="734" width="414" height="162"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="162" id="Z7t-WS-GW5"/>
+                                </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="cyc-BO-71C" secondAttribute="trailing" id="042-Oe-Bzm"/>
-                            <constraint firstItem="cyc-BO-71C" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="7J2-Eo-BBD"/>
-                            <constraint firstItem="cyc-BO-71C" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="82F-a0-seG"/>
-                            <constraint firstItem="cyc-BO-71C" firstAttribute="bottom" secondItem="xSf-pq-FeD" secondAttribute="bottom" id="LCL-Hq-Mhc"/>
-                            <constraint firstAttribute="bottom" secondItem="cyc-BO-71C" secondAttribute="bottom" id="WtZ-gs-rcA"/>
-                            <constraint firstItem="cyc-BO-71C" firstAttribute="leading" secondItem="xSf-pq-FeD" secondAttribute="leading" id="ZaT-vQ-5X6"/>
-                            <constraint firstItem="cyc-BO-71C" firstAttribute="trailing" secondItem="xSf-pq-FeD" secondAttribute="trailing" id="aqd-Y8-aYE"/>
-                            <constraint firstItem="cyc-BO-71C" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="o7g-XU-aM4"/>
+                            <constraint firstItem="YB1-tQ-aAb" firstAttribute="trailing" secondItem="Bcu-3y-fUS" secondAttribute="trailing" id="1Z7-1u-g4h"/>
+                            <constraint firstItem="YB1-tQ-aAb" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="topMargin" constant="-44" id="38J-oa-lPS"/>
+                            <constraint firstItem="2Yz-7f-Ftw" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="20" id="3BS-lW-yyP"/>
+                            <constraint firstItem="YB1-tQ-aAb" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="A7V-Yf-4uL"/>
+                            <constraint firstItem="ICu-8h-qkI" firstAttribute="bottom" secondItem="YB1-tQ-aAb" secondAttribute="bottom" id="B0a-Nf-a2I"/>
+                            <constraint firstItem="YB1-tQ-aAb" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="Ily-dh-ckp"/>
+                            <constraint firstItem="ICu-8h-qkI" firstAttribute="leading" secondItem="YB1-tQ-aAb" secondAttribute="leading" id="NaH-bi-Usz"/>
+                            <constraint firstItem="YB1-tQ-aAb" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="QbD-fs-5xw"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="2Yz-7f-Ftw" secondAttribute="trailing" constant="20" id="TDh-5i-D4Q"/>
+                            <constraint firstItem="2Yz-7f-Ftw" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="g3y-qZ-7Ef"/>
+                            <constraint firstItem="YB1-tQ-aAb" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="gtT-rf-LMy"/>
+                            <constraint firstAttribute="bottom" secondItem="YB1-tQ-aAb" secondAttribute="bottom" id="oaG-KI-bDj"/>
+                            <constraint firstItem="ICu-8h-qkI" firstAttribute="trailing" secondItem="YB1-tQ-aAb" secondAttribute="trailing" id="rcL-jF-VGA"/>
+                            <constraint firstItem="2Yz-7f-Ftw" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="wd3-Ea-o0n"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -48,7 +56,7 @@
     </scenes>
     <resources>
         <image name="Logo1" width="576.5" height="337.5"/>
-        <image name="main_menu_background_1.png" width="382" height="382"/>
-        <image name="main_menu_background_3.png" width="194" height="129"/>
+        <image name="clouds" width="253.5" height="450.5"/>
+        <image name="main_menu_background_2" width="97.5" height="95"/>
     </resources>
 </document>

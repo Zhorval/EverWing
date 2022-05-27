@@ -125,7 +125,7 @@ class Toon{
         let bulletLevel = infoDict.value(forKey: "BulletLevel") as! Int
         
          // REVISAR EL BULLETEVEL  EN EL CONSTRUCTOR PROJECTILE 
-        bullet = Projectile(posX: node.position.x, posY: node.position.y, char: self.charType, bulletLevel: 50)
+        bullet = Projectile(posX: node.position.x, posY: node.position.y, char: self.charType, bulletLevel: bulletLevel)
         node.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: node.size.width/4, height: node.size.height/2))
         node.physicsBody!.isDynamic = true // allow physic simulation to move it
         node.physicsBody!.affectedByGravity = false
@@ -141,6 +141,9 @@ class Toon{
         mfield.strength =  120.0
         mfield.categoryBitMask = GravityCategory.Player
         node.addChild(mfield)
+         if bullet == nil {
+             fatalError("Error bullet")
+         }
         
     }
     
@@ -158,7 +161,7 @@ class Toon{
     }
     
     // MARK: ANIMATE TEXTURE ATTACK
-    func attack(_ completion:@escaping()->Void) ->SKAction {
+    func attack() ->SKAction {
         
        
         let action = SKAction.sequence([
@@ -166,11 +169,10 @@ class Toon{
             SKAction.animate(with: SKTextureAtlas().loadAtlas(name: "Alice_Attack", prefix: nil), timePerFrame: 0.2),
             SKAction.wait(forDuration: 4),
             SKAction.animate(with: SKTextureAtlas().loadAtlas(name: "Alice_Idle", prefix: nil), timePerFrame: 0.5),
-            SKAction.run {
-                completion()
-            }
+           
             
             ])
+        
         return action
     }
     
@@ -222,14 +224,19 @@ class Toon{
     func changeTextureProjectile(restore:Bool) {
         
         if !restore {
-            bullet = Projectile(posX: 0, posY: 0, char: getCharacter(), bulletLevel: 0, texture: SKTexture(imageNamed: "FireRed"))
-        } else {        
-            bullet = Projectile(posX: 0, posY: 0, char: getCharacter(), bulletLevel: getLevel())
+            addLevel()
+            
+            bullet = Projectile(posX: 0, posY: 0, char: getCharacter(), bulletLevel: level)
+            
+        } else {
+            lessLevel()
+            bullet = Projectile(posX: 0, posY: 0, char: getCharacter(), bulletLevel: level)
         }
     }
  
-     func getBullet() -> Projectile{
-        return bullet!
+     func getBullet() -> Projectile?{
+         
+        return bullet ?? nil
     }
     
      func getToonDescription() -> [String]{
@@ -245,8 +252,15 @@ class Toon{
     }
     
      func getBulletLevel() -> Int{
-
+        
          return bullet!.getBulletLevel()
+    }
+    
+    func lessLevel()  {
+        if level - 1 > 0 {
+            level -= 1
+        }
+        level =  1
     }
     
      func getLevel() -> Int{
@@ -258,7 +272,9 @@ class Toon{
     }
     
      func advanceBulletLevel() -> Bool{
-        return bullet!.upgrade()
+         guard bullet != nil else { return false}
+
+         return self.bullet!.upgrade()
     }
     // Remove below function later on. Combine it with getToonName
      func getCharacter() -> Character{

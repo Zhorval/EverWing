@@ -28,7 +28,7 @@ struct Projectile {
             bulletnode = bulletMaker.make(level: blevel, char: char)
         }
         else{
-            print("Invalid bullet level. Returning 1")
+            fatalError("Invalid bullet level. Returning 1")
             bulletnode = bulletMaker.make(level: .Level_1, char: char)
 
         }
@@ -55,7 +55,7 @@ struct Projectile {
         originY = posY + 35
         bulletLevel = 0        
         
-        self.bulletnode = SKSpriteNode(texture: texture,size:  CGSize(width: 35, height: 35))
+        self.bulletnode = SKSpriteNode(texture: texture,size:  CGSize(width: 30, height: 30))
         self.bulletnode.blendMode = .add
         addPhysics()
     }
@@ -64,7 +64,7 @@ struct Projectile {
         
         bulletnode.userData = NSMutableDictionary()
         bulletnode.name = name
-        bulletnode.setScale(0.25)
+      //  bulletnode.setScale(0.25)
         bulletnode.physicsBody = SKPhysicsBody(circleOfRadius: 3)
         bulletnode.physicsBody!.affectedByGravity = false
         bulletnode.physicsBody!.collisionBitMask = 0

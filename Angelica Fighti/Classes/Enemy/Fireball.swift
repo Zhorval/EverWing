@@ -24,7 +24,9 @@ class Fireball:Enemy {
         
         currency  = Currency(type: .None)
         initialSetupFireball()
+        self.run(GameInfo().mainAudio.getAction(type: .Meteor_Warn))
         applyAI()
+        self.run(GameInfo().mainAudio.getAction(type: .Meteor_Flames))
     }
     
     private func initialSetupFireball(){
@@ -144,13 +146,15 @@ class Fireball:Enemy {
             }
         }
         
+        let scale = SKAction.scale(to: 2, duration: 3)
+        
         let repeatAI = SKAction.repeat(SKAction.sequence([AIMove, SKAction.wait(forDuration: 0.01)]), count: 80)
         
         let AIAction = SKAction.sequence([SKAction.wait(forDuration: 0.2), AIMove, repeatAI, SKAction.wait(forDuration: 0.5)])
         
         position.x = target.position.x
         
-        self.run(SKAction.sequence([AIAction, setVelocity, SKAction.wait(forDuration: 5), SKAction.removeFromParent()]))
+        self.run(SKAction.sequence([AIAction, setVelocity,scale, SKAction.wait(forDuration: 5), SKAction.removeFromParent()]))
     }
     
      func setTarget(target:SKSpriteNode){

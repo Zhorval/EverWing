@@ -152,6 +152,7 @@ extension ProcotolHP {
                
             if let mainBoss = enemyModel {
                    mainBoss.defeated(actionsDead: actionsDead)
+                
                    sknode.run(.sequence([
                        (delegate?.mainAudio.getAction(type: .Puff))!,
                        
@@ -176,7 +177,7 @@ extension ProcotolHP {
     
         case .Goblin:
             guard let mainReg = enemyModel  else { sknode.removeFromParent(); return}
-            mainReg.defeated(actionsDead: [])
+            mainReg.defeated(actionsDead: [SKTexture(imageNamed: "fx_5_smoke")])
             sknode.run((delegate?.mainAudio.getAction(type: .Puff))!)
 
             
@@ -187,10 +188,20 @@ extension ProcotolHP {
                 sknode.removeFromParent()
                 return
             }
+            velocity = CGVector(dx: 0, dy: -300)
+            let emiter = SKEmitterNode(fileNamed: "trail")!
+            mainReg.addChild(emiter)
+            sknode.run(.sequence([
+                .run { [self] in
+                    
+                    sknode.run((delegate?.mainAudio.getAction(type: .Puff))!)
+                    SKAction.wait(forDuration: 5)
+                    mainReg.defeated(actionsDead: [])
+                    sknode.removeFromParent()
+                }
+                ]))
             
-            mainReg.defeated(actionsDead: [])
-            sknode.run((delegate?.mainAudio.getAction(type: .Puff))!)
-            velocity = CGVector(dx: 0, dy: -100)
+            
            /* for child in scene.children {
                 if child.name?.contains("Enemy") == true  && ((child as? Enemy) != nil){
                     
@@ -204,7 +215,7 @@ extension ProcotolHP {
                     sknode.run((delegate?.mainAudio.getAction(type: .Puff))!)
                 }
             }*/
-            sknode.removeFromParent()
+           // sknode.removeFromParent()
             
 
        default:
@@ -233,10 +244,10 @@ extension ProcotolHP {
                     else{
                         bossType = BossType.Pinky as! Self.B
                         enemyModel = Pinky(hp: BossBaseHP, lives: 4, isClone: true)
+                        
                     }
             case .Fireball:
                     enemyModel = Fireball(target: (delegate?.getCurrentToonNode())!, speed: velocity)
-
             case .Goblin:
                 if scene.childNode(withName: "Enemy_Goblin") != nil {
                      enemyModel = nil
@@ -246,9 +257,9 @@ extension ProcotolHP {
             
             case .Cofre:
            
-            if random(min: 100, max: 200) > 150 {
-                enemyModel = CofreEnemy(hp: RegularBaseHP,speed: velocity)
-            }
+                if random(min: 100, max: 200) > 150 {
+                    enemyModel = CofreEnemy(hp: RegularBaseHP,speed: velocity)
+                }
            
             default:  break
         }
@@ -364,7 +375,7 @@ enum BossType:String,CaseIterable,BossTypeProtocol{
         case .Spike:
             return SKTexture(imageNamed: "Blue_Weakness")
         }
-    } 
+    }
 }
 
 enum DragonType:String,ProtocolEnemyType {
@@ -438,7 +449,8 @@ class EnemyModel: NSObject,ProcotolHP {
         bossType = B.allCases.randomElement()!
         super.init()
     }
-    
+        
+   
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

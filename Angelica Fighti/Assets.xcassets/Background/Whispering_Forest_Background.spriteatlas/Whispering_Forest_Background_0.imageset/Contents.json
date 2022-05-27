@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "Whispering_Forest_Background_0.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "map_forest_5.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
