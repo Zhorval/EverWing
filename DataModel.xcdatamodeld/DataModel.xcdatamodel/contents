@@ -10,13 +10,14 @@
         <attribute name="type" optional="YES" attributeType="String"/>
     </entity>
     <entity name="EggsDB" representedClassName=".EggsDB" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="type" optional="YES" attributeType="String"/>
-        <relationship name="count" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="EggsDB"/>
     </entity>
     <entity name="Score" representedClassName=".Score" syncable="YES">
         <attribute name="coin" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="gem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="highscore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="totalscore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Settings" representedClassName=".Settings" syncable="YES">
         <attribute name="fast" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>

@@ -20,5 +20,6 @@ extension Score {
     @NSManaged public var coin: Int16
     @NSManaged public var gem: Int16
     @NSManaged public var highscore: Int16
+    @NSManaged public var totalscore: Int16
 
 }

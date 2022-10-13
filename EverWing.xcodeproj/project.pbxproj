@@ -41,17 +41,19 @@
 		0C363DDE1EF4AA7800CAE82F /* trail.sks in Resources */ = {isa = PBXBuildFile; fileRef = 0C363DDC1EF4AA7800CAE82F /* trail.sks */; };
 		0CB6F24C1F15EBCC00BE6AFD /* Enemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB6F24B1F15EBCC00BE6AFD /* Enemy.swift */; };
 		0CD399A11F185C9700B7AC4C /* EnemyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD399A01F185C9000B7AC4C /* EnemyModel.swift */; };
+		6E13E78C28ED903300C4844B /* Score+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E78428ED902A00C4844B /* Score+CoreDataClass.swift */; };
+		6E13E78F28ED903300C4844B /* Settings+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E78728ED902E00C4844B /* Settings+CoreDataClass.swift */; };
+		6E13E79128ED903300C4844B /* Score+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E78928ED903000C4844B /* Score+CoreDataProperties.swift */; };
+		6E13E79328ED903300C4844B /* Settings+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E78628ED902C00C4844B /* Settings+CoreDataProperties.swift */; };
+		6E13E79628ED9DE300C4844B /* EggsDB+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E79428ED9DE300C4844B /* EggsDB+CoreDataClass.swift */; };
+		6E13E79728ED9DE300C4844B /* EggsDB+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E79528ED9DE300C4844B /* EggsDB+CoreDataProperties.swift */; };
+		6E13E7A928EDDF3C00C4844B /* BuyDragon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E7A828EDDF3C00C4844B /* BuyDragon.swift */; };
 		6E18F67B27D94AB600354BC1 /* SKEmitterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E18F67A27D94AB600354BC1 /* SKEmitterNode.swift */; };
 		6E2B71ED284D4C750090FF19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E2B71EC284D4C750090FF19 /* Assets.xcassets */; };
 		6E3ADF8727FC8B980007C2C4 /* getClover.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8627FC8B8E0007C2C4 /* getClover.m4a */; };
 		6E3ADF8927FC8FDC0007C2C4 /* player_death.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8827FC8FD20007C2C4 /* player_death.m4a */; };
 		6E3ADF8B27FC93B50007C2C4 /* result_coin.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8A27FC93AE0007C2C4 /* result_coin.m4a */; };
 		6E3B3A5427E5044100D21BED /* userinfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6E3B3A5327E5044100D21BED /* userinfo.plist */; };
-		6E3C772628ECF924000A7006 /* EggsDB+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3C771E28ECF924000A7006 /* EggsDB+CoreDataClass.swift */; };
-		6E3C772728ECF924000A7006 /* EggsDB+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3C771F28ECF924000A7006 /* EggsDB+CoreDataProperties.swift */; };
-		6E3C772A28ECF924000A7006 /* Score+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3C772228ECF924000A7006 /* Score+CoreDataClass.swift */; };
-		6E3C772B28ECF924000A7006 /* Score+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3C772328ECF924000A7006 /* Score+CoreDataProperties.swift */; };
-		6E3C772F28ECF9E9000A7006 /* Settings+CoreDataClass.swift 01-31-07-211.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3C772E28ECF9E9000A7006 /* Settings+CoreDataClass.swift 01-31-07-211.swift */; };
 		6E4E870927DA22FB00CF0D38 /* getcoin.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E18F67927D9439F00354BC1 /* getcoin.m4a */; };
 		6E4E870A27DA22FB00CF0D38 /* puff.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E18F67827D9439F00354BC1 /* puff.m4a */; };
 		6E4E870E27DA26AD00CF0D38 /* tictack.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E4E870D27DA269B00CF0D38 /* tictack.m4a */; };
@@ -73,15 +75,18 @@
 		6EA174FE27E6BAEC000DA2C9 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */; };
 		6EA9DF5628590B51003E5A9E /* flameSword.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EA9DF5528590B51003E5A9E /* flameSword.sks */; };
 		6EA9DF5A285913C0003E5A9E /* AuraFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EA9DF59285913C0003E5A9E /* AuraFire.sks */; };
+		6EAB087528EED3DA006AB933 /* egg_hatch_end_common.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */; };
+		6EAB087628EED3DA006AB933 /* egg_hatch_start.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */; };
+		6EAB087928EED6F3006AB933 /* SKScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAB087828EED6F3006AB933 /* SKScene.swift */; };
 		6EAEDA6D27F46C09004BCBE2 /* gameIntro.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAEDA6C27F46BF8004BCBE2 /* gameIntro.m4a */; };
 		6EAF669828E78D630009D11B /* PersistentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAF669728E78D630009D11B /* PersistentContainer.swift */; };
 		6EAF669C28E792F00009D11B /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6EAF669A28E792F00009D11B /* DataModel.xcdatamodeld */; };
-		6EAF66A428E7A3E40009D11B /* Settings+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAF66A228E7A3E40009D11B /* Settings+CoreDataProperties.swift */; };
 		6EAFE8CF27F35A0D001ACBB5 /* boss_alarm.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAFE8CE27F3572F001ACBB5 /* boss_alarm.m4a */; };
 		6EB0E3B927F0B47B0013C15E /* changeOptions.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EB0E3B827F0B4430013C15E /* changeOptions.m4a */; };
 		6EB0E3BF27F1DC560013C15E /* DragonsMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB0E3BE27F1DC560013C15E /* DragonsMenuScene.swift */; };
 		6EC2F9F127F8AC20003F906A /* CustomTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC2F9F027F8AC20003F906A /* CustomTableView.swift */; };
 		6EC4483E28E0B5F20042589D /* halcon.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EC4483D28E0B5DE0042589D /* halcon.m4a */; };
+		6ECFF8D328F58D580023907A /* buy_dragonfruit.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */; };
 		6ED7611028A578F900C1CD66 /* vfx_jade_attack_4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAFE8D027F3A309001ACBB5 /* vfx_jade_attack_4.m4a */; };
 		6ED7611228A596D300C1CD66 /* CustomCollectionViewEggs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7611128A596D300C1CD66 /* CustomCollectionViewEggs.swift */; };
 		6ED7BA2527D263DC0084361E /* SKTextureAtlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7BA2427D263DC0084361E /* SKTextureAtlas.swift */; };
@@ -140,6 +145,13 @@
 		0C363DDC1EF4AA7800CAE82F /* trail.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = trail.sks; sourceTree = "<group>"; };
 		0CB6F24B1F15EBCC00BE6AFD /* Enemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enemy.swift; sourceTree = "<group>"; };
 		0CD399A01F185C9000B7AC4C /* EnemyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyModel.swift; sourceTree = "<group>"; };
+		6E13E78428ED902A00C4844B /* Score+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Score+CoreDataClass.swift"; sourceTree = "<group>"; };
+		6E13E78628ED902C00C4844B /* Settings+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		6E13E78728ED902E00C4844B /* Settings+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataClass.swift"; sourceTree = "<group>"; };
+		6E13E78928ED903000C4844B /* Score+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Score+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		6E13E79428ED9DE300C4844B /* EggsDB+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EggsDB+CoreDataClass.swift"; sourceTree = "<group>"; };
+		6E13E79528ED9DE300C4844B /* EggsDB+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EggsDB+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		6E13E7A828EDDF3C00C4844B /* BuyDragon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyDragon.swift; sourceTree = "<group>"; };
 		6E18F67827D9439F00354BC1 /* puff.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = puff.m4a; sourceTree = "<group>"; };
 		6E18F67927D9439F00354BC1 /* getcoin.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = getcoin.m4a; sourceTree = "<group>"; };
 		6E18F67A27D94AB600354BC1 /* SKEmitterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKEmitterNode.swift; sourceTree = "<group>"; };
@@ -148,11 +160,6 @@
 		6E3ADF8827FC8FD20007C2C4 /* player_death.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = player_death.m4a; sourceTree = "<group>"; };
 		6E3ADF8A27FC93AE0007C2C4 /* result_coin.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = result_coin.m4a; sourceTree = "<group>"; };
 		6E3B3A5327E5044100D21BED /* userinfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = userinfo.plist; sourceTree = "<group>"; };
-		6E3C771E28ECF924000A7006 /* EggsDB+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EggsDB+CoreDataClass.swift"; sourceTree = "<group>"; };
-		6E3C771F28ECF924000A7006 /* EggsDB+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EggsDB+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		6E3C772228ECF924000A7006 /* Score+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Score+CoreDataClass.swift"; sourceTree = "<group>"; };
-		6E3C772328ECF924000A7006 /* Score+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Score+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		6E3C772E28ECF9E9000A7006 /* Settings+CoreDataClass.swift 01-31-07-211.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataClass.swift 01-31-07-211.swift"; sourceTree = "<group>"; };
 		6E4E870D27DA269B00CF0D38 /* tictack.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = tictack.m4a; sourceTree = "<group>"; };
 		6E4E872727DAA5EC00CF0D38 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		6E4E872927DAAD3C00CF0D38 /* gradient.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = gradient.fsh; sourceTree = "<group>"; };
@@ -173,16 +180,19 @@
 		6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		6EA9DF5528590B51003E5A9E /* flameSword.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = flameSword.sks; sourceTree = "<group>"; };
 		6EA9DF59285913C0003E5A9E /* AuraFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AuraFire.sks; sourceTree = "<group>"; };
+		6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = egg_hatch_start.m4a; sourceTree = "<group>"; };
+		6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = egg_hatch_end_common.m4a; sourceTree = "<group>"; };
+		6EAB087828EED6F3006AB933 /* SKScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKScene.swift; sourceTree = "<group>"; };
 		6EAEDA6C27F46BF8004BCBE2 /* gameIntro.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gameIntro.m4a; sourceTree = "<group>"; };
 		6EAF669728E78D630009D11B /* PersistentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentContainer.swift; sourceTree = "<group>"; };
 		6EAF669B28E792F00009D11B /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
-		6EAF66A228E7A3E40009D11B /* Settings+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Settings+CoreDataProperties.swift"; path = "EverWing/Classes/Model/Settings+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		6EAFE8CE27F3572F001ACBB5 /* boss_alarm.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = boss_alarm.m4a; sourceTree = "<group>"; };
 		6EAFE8D027F3A309001ACBB5 /* vfx_jade_attack_4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = vfx_jade_attack_4.m4a; sourceTree = "<group>"; };
 		6EB0E3B827F0B4430013C15E /* changeOptions.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = changeOptions.m4a; sourceTree = "<group>"; };
 		6EB0E3BE27F1DC560013C15E /* DragonsMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragonsMenuScene.swift; sourceTree = "<group>"; };
 		6EC2F9F027F8AC20003F906A /* CustomTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableView.swift; sourceTree = "<group>"; };
 		6EC4483D28E0B5DE0042589D /* halcon.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = halcon.m4a; sourceTree = "<group>"; };
+		6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = buy_dragonfruit.m4a; sourceTree = "<group>"; };
 		6ED7611128A596D300C1CD66 /* CustomCollectionViewEggs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomCollectionViewEggs.swift; path = ../../../../../../../Applications/CustomCollectionViewEggs.swift; sourceTree = "<group>"; };
 		6ED7BA2427D263DC0084361E /* SKTextureAtlas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKTextureAtlas.swift; sourceTree = "<group>"; };
 		6ED7BA2627D263FF0084361E /* SKLabelNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKLabelNode.swift; sourceTree = "<group>"; };
@@ -220,7 +230,6 @@
 		0C12CD471F0293B9008BA78C /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				6EAF669928E7913B0009D11B /* Model */,
 				0C12CD661F029433008BA78C /* Enemy */,
 				0C12CD4E1F0293B9008BA78C /* GameInfo.swift */,
 				0C12CD481F0293B9008BA78C /* AccountInfo.swift */,
@@ -242,7 +251,6 @@
 				0C12CD5E1F0293C4008BA78C /* HUD.swift */,
 				0C12CD5F1F0293C4008BA78C /* PhysicsCategory.swift */,
 				0C12CD601F0293C4008BA78C /* Projectile.swift */,
-				6EB0E3BE27F1DC560013C15E /* DragonsMenuScene.swift */,
 				6EAF669728E78D630009D11B /* PersistentContainer.swift */,
 			);
 			path = Structs;
@@ -338,6 +346,9 @@
 		6E18F67727D942B800354BC1 /* SoundEffects */ = {
 			isa = PBXGroup;
 			children = (
+				6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */,
+				6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */,
+				6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */,
 				6EC4483D28E0B5DE0042589D /* halcon.m4a */,
 				6E5ED168284801BE00D5855D /* icicle_fall_1.m4a */,
 				6E6C83B028461F2F00C29A3A /* item_collect_magnet.m4a */,
@@ -365,13 +376,6 @@
 			path = SoundEffects;
 			sourceTree = "<group>";
 		};
-		6EAF669928E7913B0009D11B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		6ED7BA2127D2636A0084361E /* Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -381,6 +385,7 @@
 				6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */,
 				6ED7D34E2844D400004FBE77 /* CGFloat.swift */,
 				6ED7D3502844D418004FBE77 /* CGPoint.swift */,
+				6EAB087828EED6F3006AB933 /* SKScene.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -388,12 +393,12 @@
 		F16A64531E0C969F00BC8255 = {
 			isa = PBXGroup;
 			children = (
-				6E3C772E28ECF9E9000A7006 /* Settings+CoreDataClass.swift 01-31-07-211.swift */,
-				6E3C771E28ECF924000A7006 /* EggsDB+CoreDataClass.swift */,
-				6E3C771F28ECF924000A7006 /* EggsDB+CoreDataProperties.swift */,
-				6E3C772228ECF924000A7006 /* Score+CoreDataClass.swift */,
-				6E3C772328ECF924000A7006 /* Score+CoreDataProperties.swift */,
-				6EAF66A228E7A3E40009D11B /* Settings+CoreDataProperties.swift */,
+				6E13E79428ED9DE300C4844B /* EggsDB+CoreDataClass.swift */,
+				6E13E79528ED9DE300C4844B /* EggsDB+CoreDataProperties.swift */,
+				6E13E78728ED902E00C4844B /* Settings+CoreDataClass.swift */,
+				6E13E78428ED902A00C4844B /* Score+CoreDataClass.swift */,
+				6E13E78928ED903000C4844B /* Score+CoreDataProperties.swift */,
+				6E13E78628ED902C00C4844B /* Settings+CoreDataProperties.swift */,
 				6EAF669A28E792F00009D11B /* DataModel.xcdatamodeld */,
 				6ED7D34C2844B84F004FBE77 /* Launch Screen.storyboard */,
 				6ED7D34A2844B04C004FBE77 /* README.md */,
@@ -420,12 +425,14 @@
 				0C12CD471F0293B9008BA78C /* Classes */,
 				0C12CD5B1F0293C4008BA78C /* Structs */,
 				F16A645F1E0C96A000BC8255 /* AppDelegate.swift */,
+				6E13E7A828EDDF3C00C4844B /* BuyDragon.swift */,
 				0C2520C41EC6AC0A00A03400 /* MainScene.swift */,
 				0C0655D31EE1681D00D38DA3 /* CharacterMenuScene.swift */,
 				F112A6F71E0EA2B000A5DEE9 /* EndGame.swift */,
 				F16A64611E0C96A000BC8255 /* ViewController.swift */,
 				F112A7091E16705300A5DEE9 /* Extensions.swift */,
 				6ED7BA2427D263DC0084361E /* SKTextureAtlas.swift */,
+				6EB0E3BE27F1DC560013C15E /* DragonsMenuScene.swift */,
 				F16A64661E0C96A000BC8255 /* Assets.xcassets */,
 				F16A646B1E0C96A000BC8255 /* Info.plist */,
 				6E3B3A5327E5044100D21BED /* userinfo.plist */,
@@ -494,6 +501,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6ECFF8D328F58D580023907A /* buy_dragonfruit.m4a in Resources */,
+				6EAB087528EED3DA006AB933 /* egg_hatch_end_common.m4a in Resources */,
+				6EAB087628EED3DA006AB933 /* egg_hatch_start.m4a in Resources */,
 				6EC4483E28E0B5F20042589D /* halcon.m4a in Resources */,
 				6ED7611028A578F900C1CD66 /* vfx_jade_attack_4.m4a in Resources */,
 				6E5ED169284801EA00D5855D /* icicle_fall_1.m4a in Resources */,
@@ -558,12 +568,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E3C772B28ECF924000A7006 /* Score+CoreDataProperties.swift in Sources */,
+				6EAB087928EED6F3006AB933 /* SKScene.swift in Sources */,
+				6E13E79128ED903300C4844B /* Score+CoreDataProperties.swift in Sources */,
 				0C12CD621F0293C4008BA78C /* Currency.swift in Sources */,
+				6E13E79328ED903300C4844B /* Settings+CoreDataProperties.swift in Sources */,
 				6E4E872827DAA5EC00CF0D38 /* UIColor.swift in Sources */,
 				0C12CD6E1F029433008BA78C /* Pinky.swift in Sources */,
 				6ED7611228A596D300C1CD66 /* CustomCollectionViewEggs.swift in Sources */,
-				6EAF66A428E7A3E40009D11B /* Settings+CoreDataProperties.swift in Sources */,
+				6E13E78C28ED903300C4844B /* Score+CoreDataClass.swift in Sources */,
+				6E13E78F28ED903300C4844B /* Settings+CoreDataClass.swift in Sources */,
 				0CD399A11F185C9700B7AC4C /* EnemyModel.swift in Sources */,
 				0C2520C51EC6AC0A00A03400 /* MainScene.swift in Sources */,
 				6E18F67B27D94AB600354BC1 /* SKEmitterNode.swift in Sources */,
@@ -572,6 +585,7 @@
 				0C12CD631F0293C4008BA78C /* HUD.swift in Sources */,
 				0C0655D41EE1681D00D38DA3 /* CharacterMenuScene.swift in Sources */,
 				F16A64601E0C96A000BC8255 /* AppDelegate.swift in Sources */,
+				6E13E79628ED9DE300C4844B /* EggsDB+CoreDataClass.swift in Sources */,
 				6ED7BA2527D263DC0084361E /* SKTextureAtlas.swift in Sources */,
 				0C12CD611F0293C4008BA78C /* AVAudio.swift in Sources */,
 				0C12CD961F0C4CB5008BA78C /* BulletMaker.swift in Sources */,
@@ -583,21 +597,19 @@
 				0C12CD711F029479008BA78C /* Fireball.swift in Sources */,
 				0C12CD521F0293B9008BA78C /* AccountInfo.swift in Sources */,
 				6EA174FE27E6BAEC000DA2C9 /* UIImage.swift in Sources */,
-				6E3C772F28ECF9E9000A7006 /* Settings+CoreDataClass.swift 01-31-07-211.swift in Sources */,
-				6E3C772A28ECF924000A7006 /* Score+CoreDataClass.swift in Sources */,
 				0C12CD591F0293B9008BA78C /* Map.swift in Sources */,
 				0C12CD641F0293C4008BA78C /* PhysicsCategory.swift in Sources */,
 				6EC2F9F127F8AC20003F906A /* CustomTableView.swift in Sources */,
 				6ED7D34F2844D400004FBE77 /* CGFloat.swift in Sources */,
+				6E13E7A928EDDF3C00C4844B /* BuyDragon.swift in Sources */,
 				0C12CD651F0293C4008BA78C /* Projectile.swift in Sources */,
 				6E5B246C27F5B19000D7023F /* GoblinModel.swift in Sources */,
 				F112A70A1E16705300A5DEE9 /* Extensions.swift in Sources */,
 				0CB6F24C1F15EBCC00BE6AFD /* Enemy.swift in Sources */,
-				6E3C772728ECF924000A7006 /* EggsDB+CoreDataProperties.swift in Sources */,
 				6ED7D3512844D418004FBE77 /* CGPoint.swift in Sources */,
 				0C12CD6C1F029433008BA78C /* Bomber.swift in Sources */,
-				6E3C772628ECF924000A7006 /* EggsDB+CoreDataClass.swift in Sources */,
 				6EAF669C28E792F00009D11B /* DataModel.xcdatamodeld in Sources */,
+				6E13E79728ED9DE300C4844B /* EggsDB+CoreDataProperties.swift in Sources */,
 				0C12CD571F0293B9008BA78C /* GameInfo.swift in Sources */,
 				6ED7BA2727D263FF0084361E /* SKLabelNode.swift in Sources */,
 			);
