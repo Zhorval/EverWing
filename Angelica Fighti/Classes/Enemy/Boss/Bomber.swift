@@ -23,6 +23,9 @@ class Bomber:Enemy {
     
     private var emitter:SKEmitterNode?
     
+   
+    private var mainScene:SKScene?
+    
     // Main type ball fire BossType
     private var mainBallBoster:SKSpriteNode?
     
@@ -37,38 +40,22 @@ class Bomber:Enemy {
    
     private var gameToon = GameInfo()
     
-    convenience init(hp:CGFloat,typeBoss:BossType){
+    convenience init(hp:CGFloat,typeBoss:BossType,scene:SKScene){
 
         self.init()
         
-      //  timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(Attack), userInfo: self, repeats: true)
+        self.mainScene = scene
+        
+        self.typeBoss =   .Spike
+        gameToon.showEffectFxBossAppears(typeBoss:self.typeBoss!,scene:scene)
 
-        self.typeBoss =   .Monster_Queen
         self.hp = 10000
         name = "Enemy_Boss"
-        
+       
         getAllBallHand()
-        
-        if self.typeBoss == .Monster_King {
-            self.addChild(MonsterKingParts())
-        
-        } else if self.typeBoss == .Mildred {
-            self.addChild(MildredParts())
-            
-        } else if self.typeBoss == .Ice_Queen {
-            self.addChild(IceQueenParts())
-            
-        }  else if self.typeBoss == .Spike {
-            self.addChild(SpikeParts())
-            
-        } else if self.typeBoss == .Monster_Queen {
-            self.addChild(MonsterQueenParts())
-            
-        } else {
-            texture =  actionsStandBy.first ??  global.getMainTexture(main: .Boss_1)
-        }
-        
-        size = CGSize(width: 180, height: 130)
+
+        self.addChild(getBossParts())
+        size = CGSize(width: 180, height: 180)
         position = CGPoint(x: screenSize.size.width/2, y: screenSize.size.height - size.height)
         alpha = 0
         userData = NSMutableDictionary()
@@ -102,8 +89,8 @@ class Bomber:Enemy {
         guard let timer = timer else {
             return
         }
-
         timer.invalidate()
+       
     }
     
     
@@ -122,6 +109,30 @@ class Bomber:Enemy {
                 self.handBallBoster = SKSpriteNode(imageNamed: self.typeBoss!.rawValue + "_Projectile_Hand")
             default:
                 self.handBallBoster =  SKSpriteNode(imageNamed: "Bubbles")
+        }
+    }
+    
+    
+    //MARK: ADD BOSS TO NODE SCREEN
+    private func getBossParts() -> SKNode {
+        
+        if self.typeBoss == .Monster_King {
+            return MonsterKingParts()
+        
+        } else if self.typeBoss == .Mildred {
+            return MildredParts()
+            
+        } else if self.typeBoss == .Ice_Queen {
+            return IceQueenParts()
+            
+        }  else if self.typeBoss == .Spike {
+            return SpikeParts()
+            
+        } else if self.typeBoss == .Monster_Queen {
+            return IceQueenParts()
+            
+        } else {
+            return SKSpriteNode(texture: actionsStandBy.first ??  global.getMainTexture(main: .Boss_1))
         }
     }
     
@@ -168,6 +179,8 @@ class Bomber:Enemy {
             case .Monster_King:
                 emitter =  SKEmitterNode().addBallMosterKing(node: nodePosition! as! SKSpriteNode)
             case .Spike:
+                emitter =  SKEmitterNode(fileNamed: "SpikeArm")!
+            case .Monster_Queen:
                 emitter =  SKEmitterNode(fileNamed: "SpikeArm")!
             
             default: break
@@ -234,50 +247,17 @@ class Bomber:Enemy {
         return path
     }
     
-    //MARK: ANIMATION FOR MONSTER_QUEEN JOIN PART
-    private func MonsterQueenParts()->SKNode {
-        let node = SKNode()
-        node.name = "Node"
-        
-        let head = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Head")
-            node.addChild(head)
-       
-        let body = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Body")
-            body.zPosition = -1
-        body.position.y = head.position.y - head.frame.height/1.5
-            node.addChild(body)
-
-        
-        let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Wing")
-            wingsL.anchorPoint = CGPoint(x: 1, y: 0.5)
-            wingsL.name = typeBoss!.rawValue + "_WingL"
-        wingsL.position = CGPoint(x: -head.frame.width * 0.25, y: head.frame.height*0.4)
-            wingsL.zPosition = -1
-            wingsL.run(.moveWings)
-            node.addChild(wingsL)
-        
-        let wingsR = wingsL.copy() as! SKSpriteNode
-            wingsR.name = typeBoss!.rawValue + "_WingR"
-            wingsR.xScale = -1
-        wingsR.position = CGPoint(x: head.frame.width*0.25, y: head.frame.height*0.4)
-            wingsR.zPosition = -1
-            node.addChild(wingsR)
-      
-        
-        return node
-    }
-    
-    
- 
     // MARK: ANIMATION FOR MONSTER_KING JOIN PART
     private func SpikeParts() ->SKNode {
         
         let node = SKNode()
         node.name = "Node"
         
+        let atlasIdle = SKTextureAtlas().loadAtlas(name: typeBoss!.rawValue + "_Body_Animation", prefix: nil)
+        let atlasHead = SKTextureAtlas().loadAtlas(name: self.typeBoss!.rawValue + "_Head_Animation", prefix: nil)
         
-        let body = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Body")
-        body.run(.repeatForever(.animate(with: SKTextureAtlas().loadAtlas(name: typeBoss!.rawValue + "_Body_Animation", prefix: nil), timePerFrame: 0.5)))
+        let body = SKSpriteNode(texture: atlasIdle.first!)
+            body.run(.repeatForever(.animate(with: atlasIdle, timePerFrame: 0.8)))
             node.addChild(body)
         
         let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Wing")
@@ -295,23 +275,19 @@ class Bomber:Enemy {
             wingsL.run(.moveWings)
             node.addChild(wingsR)
         
-        
         let armR = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Arm")
-        armR.anchorPoint = CGPoint(x: 0, y: 1)
+            armR.anchorPoint = CGPoint(x: 0, y: 1)
             armR.xScale = -1
             armR.zPosition = -1
             armR.name = typeBoss!.rawValue + "_ArmR"
             armR.position = CGPoint(x: -40, y: 50)
             node.addChild(armR)
-
        
         let armL = armR.copy() as! SKSpriteNode
             armL.xScale = 1
             armL.position = CGPoint(x: 40, y: 50)
             armL.name = typeBoss!.rawValue + "_ArmL"
             node.addChild(armL)
-
-        
         
         let head = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Head")
             head.position = CGPoint(x: 0, y: head.frame.height/2.2)
@@ -332,7 +308,7 @@ class Bomber:Enemy {
                 .wait(forDuration: 1),
                 .rotate(toAngle: isArmR! ? -CGFloat.random(in: 0...30).toRadians() : CGFloat.random(in: 0...30).toRadians(), duration: 0.05, shortestUnitArc: true),
                 .run {
-                    head.run(.animate(with: SKTextureAtlas().loadAtlas(name: self.typeBoss!.rawValue + "_Head_Animation", prefix: nil), timePerFrame: 0.3))
+                    head.run(.animate(with: atlasHead, timePerFrame: 0.3))
 
                     node.run(SKAction.repeat(.sequence([
                         .run {
@@ -361,17 +337,48 @@ class Bomber:Enemy {
             return action
         }
         
+        // First cry animation
         
+        armR.run(.sequence([
+            .wait(forDuration: 3),
+            .run {
+                node.run(.sequence([
+                    .scale(to: 1.3, duration: 0.3)
+                ]))
+            },
+            .rotate(toAngle: CGFloat(-90).toRadians(), duration: 0.1),
+            .run {
+                head.run(.animate(with: atlasHead, timePerFrame: 0.3))
+                body.removeAllActions()
+                body.run(.setTexture(SKTexture(imageNamed: self.typeBoss!.rawValue + "_Body_Crazy")))
+                armL.run(.sequence([
+                    .rotate(toAngle: CGFloat(90).toRadians(), duration: 0.1),
+                    .wait(forDuration: 5),
+                    .rotate(toAngle: CGFloat(-10).toRadians(), duration: 0.5)
+                ]))
+                node.run(.sequence([
+                    .scale(to: 1, duration: 0.3)
+                ]))
+                
+            },
+            .wait(forDuration: 5),
+            .rotate(toAngle: CGFloat(10).toRadians(), duration: 0.5),
+            .run {
+                body.run(.repeatForever(.animate(with: atlasIdle, timePerFrame: 0.8)))
+                self.effectFxBossSpike()
+            }
+        ]))
        
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { time in
             switch Int.random(in: 0..<3) {
-                case 0:
-                    armR.run(actionRotateArm(armR))
+             case 0:
+                  armR.run(actionRotateArm(armR))
                 case 1:
                     armL.run(actionRotateArm(armL))
                 default  :
-                    armR.run(actionRotateArm(armR))
-                    armL.run(actionRotateArm(armL))
+                armR.run(actionRotateArm(armR))
+                armL.run(actionRotateArm(armL))
+                
             }
         }
         return node
@@ -663,49 +670,44 @@ class Bomber:Enemy {
     // MARK: ANIMATION FOR ICE_QUEEN JOIN PARTS
     private func IceQueenParts()->SKNode {
        
-        func line()->SKSpriteNode {
-            
-            let lineaction = SKAction.sequence([
-                .wait(forDuration: 2),
-                .sequence([
-                    .scale(to: 1, duration: 1),
-                    .repeat(.sequence([
-                        .scaleY(to: 0.5, duration: 0.5),
-                        .scaleY(to: 1, duration: 0.5),
-                    ]), count: 3),
-                    .wait(forDuration: 2),
-                    .setTexture(SKTexture(imageNamed: "Ice_Queen_Projectile")),
-                    GameInfo().mainAudio.getAction(type: .Boss_Tree_Attack),
-                    .move(by: CGVector(dx: CGFloat.random(in: -200...200), dy: -screenSize.height), duration: 2),
-                    .removeFromParent()
-                ]),
-                .wait(forDuration: 3)
-                ])
-            
-            let line = SKSpriteNode(imageNamed: "Sprite_Projectile")
-                line.name = "Enemy_Ball_Ice_Queen"
-                line.blendMode = .add
-                line.position.y = -10
-                line.setScale(0.75)
-                line.zPosition = +1
-                line.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-                line.run(lineaction)
-                return line
-            }
-
-        
       
         let node = SKNode()
         node.name = "Node"
         
         
         let head = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Head")
-        let wing = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Wing")
-            wing.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Wing"
-            wing.position = CGPoint(x: 0, y: 20)
-            wing.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            wing.zPosition = -1
-            wing.run(.moveWings)
+        node.addChild(head)
+        let eyeAtlas = SKTextureAtlas().loadAtlas(name: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Eye_Animation", prefix: nil)
+        
+        let eyeL = SKSpriteNode(texture: eyeAtlas.first!)
+            eyeL.name = typeBoss!.rawValue + "_EyeL"
+            eyeL.position =  CGPoint(x: -13, y: -20)
+            eyeL.run(.repeatForever(.animate(with: eyeAtlas, timePerFrame: 0.3)))
+            head.addChild(eyeL)
+            
+        let eyeR = eyeL.copy() as! SKSpriteNode
+            eyeR.name = typeBoss!.rawValue + "_EyeR"
+            eyeR.position =  CGPoint(x: 13, y: -20)
+            eyeR.xScale = -1
+            head.addChild(eyeR)
+        
+        let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Wing")
+            wingsL.anchorPoint = CGPoint(x: 1, y: 0.5)
+            wingsL.name = typeBoss!.rawValue + "_WingL"
+            wingsL.position = CGPoint(x: -head.frame.width * 0.25, y: head.frame.height*0.4)
+            wingsL.zPosition = -3
+            wingsL.run(.repeatForever(.sequence([
+                .resize(toWidth: wingsL.frame.width * 0.85, duration: 0.8),
+                .resize(toWidth: wingsL.frame.width, duration: 0.8),
+            ])))
+            node.addChild(wingsL)
+        
+        let wingsR = wingsL.copy() as! SKSpriteNode
+            wingsR.name = typeBoss!.rawValue + "_WingR"
+            wingsR.xScale = -1
+            wingsR.position = CGPoint(x: head.frame.width*0.25, y: head.frame.height*0.4)
+            wingsR.zPosition = -1
+            node.addChild(wingsR)
       
         
         let body = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Body")
@@ -729,18 +731,8 @@ class Bomber:Enemy {
             hand.position.y = -armR.frame.height+10
             hand.position.x = -armR.frame.width
             armR.addChild(hand)
-    
+            node.addChild(armR)
         
-        let armL = armR.copy() as! SKSpriteNode
-            armL.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_ArmL"
-            armL.xScale = -1
-            armL.constraints = [limitLookAt]
-        
-        let skrit = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt")
-            skrit.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt"
-            skrit.position = CGPoint(x: 0, y: -body.frame.height-35)
-            skrit.zPosition = +1
-
         let actionRotateArm = { (node:SKSpriteNode) -> (SKAction) in
             
             let isArmR =  node.name?.contains("_ArmR")
@@ -779,6 +771,88 @@ class Bomber:Enemy {
             
             return action
         }
+        
+        let armL = armR.copy() as! SKSpriteNode
+            armL.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_ArmL"
+            armL.xScale = -1
+            armL.constraints = [limitLookAt]
+            
+        
+      
+        
+        let move = SKAction.repeatForever(.sequence([.resize(byWidth: 0, height: 4, duration: 0.5),
+                                                     .rotate(byAngle: 0.05, duration: 0.5),
+                                                     .resize(byWidth: 0, height: -4, duration: 0.5),
+                                                     .rotate(byAngle: -0.05, duration: 0.5)]))
+        
+        let skirt0 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_0")
+            skirt0.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_0"
+            skirt0.position = CGPoint(x: -body.frame.width*0.45, y: -18)
+            skirt0.zPosition = -1
+            skirt0.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt0.run(move)
+            body.addChild(skirt0)
+        
+        let skirt1 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_1")
+            skirt1.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_1"
+            skirt1.position = CGPoint(x: -body.frame.width*0.30, y: -22)
+            skirt1.zPosition = -2
+            skirt1.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt1.run(move)
+            body.addChild(skirt1)
+        
+        let skirt2 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_2")
+            skirt2.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_2"
+            skirt2.position = CGPoint(x: -body.frame.width*0.28, y: -25)
+            skirt2.zPosition = -1
+            skirt2.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt2.run(move)
+            body.addChild(skirt2)
+        
+        let skirt3 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_3")
+            skirt3.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_3"
+            skirt3.position = CGPoint(x: -body.frame.width*0.15, y: -25)
+            skirt3.zPosition = -1
+            skirt3.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt3.run(move)
+            body.addChild(skirt3)
+        
+        let skirt4 = skirt3.copy() as! SKSpriteNode
+            skirt4.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_4"
+            skirt4.xScale = -1
+            skirt4.position = CGPoint(x: 0, y: -25)
+            skirt4.zPosition = -1
+            skirt4.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt4.run(move)
+            body.addChild(skirt4)
+        
+        let skirt5 = skirt1.copy() as! SKSpriteNode
+            skirt5.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_5"
+            skirt5.xScale = -1
+            skirt5.position = CGPoint(x: body.frame.width*0.28, y: -25)
+            skirt5.zPosition = -1
+            skirt5.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt5.run(move)
+            body.addChild(skirt5)
+        
+        let skirt6 = skirt2.copy() as! SKSpriteNode
+            skirt6.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_6"
+            skirt6.xScale = -1
+            skirt6.position = CGPoint(x: body.frame.width*0.30, y: -22)
+            skirt6.zPosition = -1
+            skirt6.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt6.run(move)
+            body.addChild(skirt6)
+        
+        let skirt7 = skirt0.copy() as! SKSpriteNode
+            skirt7.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_7"
+            skirt7.xScale = -1
+            skirt7.position = CGPoint(x: body.frame.width*0.40, y: -15)
+            skirt7.zPosition = -1
+            skirt7.anchorPoint = CGPoint(x: 0.5, y: 1)
+            skirt7.run(move)
+            body.addChild(skirt7)
+
        
         Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { time in
             switch Int.random(in: 0..<3) {
@@ -789,38 +863,75 @@ class Bomber:Enemy {
                 default  :
                     armR.run(actionRotateArm(armR))
                     armL.run(actionRotateArm(armL))
-                    skrit.addChild(line())
             }
         }
         
-        node.addChild(head)
-        node.addChild(wing)
         node.addChild(body)
         node.addChild(armR)
         node.addChild(armL)
-        node.addChild(skrit)
 
+        
         
         return node
     }
     
+    //MARK: ANIMATION FX BOSS
+    private func effectFxBossSpike() {
 
+        guard let mainScene = mainScene else {
+            return
+        }
+
+        let glaciars:[Enemy] =  [ Enemy(imageNamed: "glaciar"),Enemy(imageNamed: "glaciar1")]
+        
+        let unitX = Int(round(CGFloat(Float(screenSize.width - 50)) / 20))
+        
+        for x in 0...20 {
+            
+            guard let copyGlaciar = cloneEnemy(elements: glaciars, anchor: CGPoint(x: 0.5, y: 1), position: CGPoint(x: CGFloat(x * unitX), y: screenSize.height) ,emitter: "trail") else { return }
+         
+        
+            if x %  Int.random(in: 6...9)  == 0 {
+                copyGlaciar.run(.repeatForever(.sequence([
+                    .rotate(byAngle: CGFloat(10).toRadians(), duration: 0.5),
+                    .rotate(byAngle: CGFloat(-10).toRadians(), duration: 0.4),
+                    .run {
+                        SKAction.wait(forDuration: 2)
+                        copyGlaciar.removeAllActions()
+                        SKAction.wait(forDuration: 3)
+                        
+                        let emitter = SKEmitterNode(fileNamed: "trail")!
+                        emitter.targetNode = copyGlaciar
+                        copyGlaciar.Physics(speed: CGVector(dx: 0, dy: -700))
+                        copyGlaciar.addChild(emitter)
+                    }
+                ])))
+            }
+
+            mainScene.addChild(copyGlaciar)
+         }
+      }
 }
 
-
-extension CGFloat {
+extension Enemy {
     
-    func toRadians() -> CGFloat {
-        return self * .pi / 180
+    /// Clone element array SpriteNode and add effect SKEmitter
+    ///
+    func cloneEnemy(elements:[Enemy],anchor:CGPoint,position:CGPoint,emitter:String) -> Enemy? {
+        
+        guard let copy = elements.randomElement()?.copy() as? Enemy else {
+            fatalError()
+            return nil
+            
+        }
+        
+        copy.name = "Enemy_Glaciar_\(UUID().uuidString)"
+        copy.anchorPoint = anchor
+        copy.position = position
+      
+        return copy
     }
 }
-
-extension CGPoint {
-    func distance(to point: CGPoint) -> CGFloat {
-        return sqrt(pow((point.x - x), 2) + pow((point.y - y), 2))
-    }
-}
-
 
 extension UIBezierPath {
     

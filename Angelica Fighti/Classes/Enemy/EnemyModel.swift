@@ -239,7 +239,7 @@ extension ProcotolHP {
                         var all = BossType.allCases
                         let _ = all.remove(at: BossType.allCases.firstIndex(of: .Pinky)!)
                         bossType =   all.randomElement()! as! Self.B
-                        enemyModel = Bomber(hp: BossBaseHP,typeBoss: bossType as! BossType)
+                        enemyModel = Bomber(hp: BossBaseHP,typeBoss: bossType as! BossType,scene:scene)
                     }
                     else{
                         bossType = BossType.Pinky as! Self.B
@@ -255,7 +255,7 @@ extension ProcotolHP {
                     enemyModel = GoblinEnemy(hp: 1000)
                 }
             
-            case .Cofre:
+            case .Cofre: break
            
                 if random(min: 100, max: 200) > 150 {
                     enemyModel = CofreEnemy(hp: RegularBaseHP,speed: velocity)
@@ -264,8 +264,7 @@ extension ProcotolHP {
             default:  break
         }
             
-        guard let enemyModel = enemyModel,
-        (scene.childNode(withName: enemyModel.name!) == nil) else { return }
+        guard let enemyModel = enemyModel else { return }
         scene.addChild(enemyModel)
        
     }

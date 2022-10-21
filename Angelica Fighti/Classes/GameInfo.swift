@@ -16,6 +16,7 @@ protocol GameInfoDelegate{
     func getCurrentToonNode() -> SKSpriteNode
     func createCloud()
     func loadBackground(scene:SKScene?)
+    func showEffectFxBossAppears(typeBoss:BossType,scene:SKScene?)
     
 }
 
@@ -510,7 +511,7 @@ class GameInfo: GameInfoDelegate{
         addChild(shadow)
         
        addMessageBossAppear(type: boss)
-    //   showMessageLateralBossAppear()
+    /*   showMessageLateralBossAppear()
         if boss.bossType == .Spike || boss.bossType == .Mildred {
             
             showEffectFxBossAppears(typeBoss:boss,typeAudio: boss.bossType)
@@ -520,17 +521,21 @@ class GameInfo: GameInfoDelegate{
             mainScene.run(.wait(forDuration: 10))
         } else {
             
-        }
+        }*/
         
     }
     
     // Show effect Fx when appear Boss    
-    private func showEffectFxBossAppears(typeBoss:EnemyModel,typeAudio:BossType) {
-        
+    func showEffectFxBossAppears(typeBoss:BossType,scene:SKScene?) {
+         guard let mainScene = scene else {
+             return
+         }
+         
         var texture:String?
         var glaciar:Enemy?
-        
-        switch typeBoss.bossType {
+         
+
+        switch typeBoss {
             case .Mildred:
                  texture = "plants"
             case .Spike:
@@ -538,13 +543,13 @@ class GameInfo: GameInfoDelegate{
             case .Pinky,.Ice_Queen,.Monster_King,.Monster_Queen: break
         }
         
-        let unitX = Int(round(Float(screenSize.width - 100) / 3))
-        let unitY = Int(round(Float(screenSize.height) / 6))
+        let unitX = Int(round(Float(screenSize.width - 50) / 3))
+        let unitY = Int(round(Float(screenSize.height) / 10))
         
        
         let ice = SKSpriteNode(texture: SKTexture(imageNamed: texture!), size: CGSize(width: 70, height: unitY))
-        ice.run(typeBoss.bossType.audioFX)
-        if typeBoss.bossType == .Mildred {
+        ice.run(typeBoss.audioFX)
+        if typeBoss == .Mildred {
             ice.run(.repeatForever(.sequence([
                 .resize(toWidth: 80, duration: 0.2),
                 .resize(toWidth: 70, duration: 0.2),
@@ -554,10 +559,11 @@ class GameInfo: GameInfoDelegate{
         }
         
         let texturePlant = SKTextureAtlas().loadAtlas(name: "Plants", prefix: nil)
-        let isMilfred = typeBoss.bossType == .Mildred
+        let isMilfred = typeBoss == .Mildred
        
         if isMilfred {
              glaciar = Enemy(texture: texturePlant.first!)
+            
             glaciar!.run(.repeatForever(.sequence([
                 .animate(with: texturePlant, timePerFrame: 0.5),
                 .resize(toHeight: screenSize.height - 100, duration: 1)
@@ -569,9 +575,9 @@ class GameInfo: GameInfoDelegate{
         
      
         
-            for x in 0...6 {
+            for x in 0...10 {
                 
-                guard let copyGlaciar = glaciar?.copy() as? Enemy else { return }
+           /*     guard let copyGlaciar = glaciar?.copy() as? Enemy else { return }
                 copyGlaciar.name = "Enemy_Regular_\(x)"
                 copyGlaciar.position = CGPoint(x: CGFloat(x * unitX) , y: screenSize.height-(copyGlaciar.frame.height)/2)
                 
@@ -581,29 +587,23 @@ class GameInfo: GameInfoDelegate{
                         if !isMilfred {
                             SKAction.moveTo(y: 0, duration: 3)
                         }
-                    },
-                    
-                    .run{ copyGlaciar.removeFromParent()}
+                    }
                 ]))
-                addChild(copyGlaciar)
+                mainScene.addChild(copyGlaciar)*/
                 
                 
                 let copy = ice.copy() as? SKSpriteNode
-                if typeBoss.bossType == .Mildred {
+                if typeBoss == .Mildred {
                     copy?.xScale = -1
                 }
                 copy?.name = "ice_L\(x)"
                 copy?.position = CGPoint(x: 10, y: (x * (unitY-20)))
-                addChild(copy!)
+                mainScene.addChild(copy!)
                 
                 let copyR = ice.copy() as? SKSpriteNode
                 copyR?.name = "ice_R\(x)"
                 copyR?.position = CGPoint(x: Int(screenSize.maxX)-10, y: (x * (unitY-20)))
-                addChild(copyR!)
-            }
-            
-            guard let mainScene = mainScene else {
-                return
+                mainScene.addChild(copyR!)
             }
 
             mainScene.run(.wait(forDuration: 5), completion: {
