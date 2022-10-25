@@ -11,11 +11,15 @@ import Foundation
 import CoreData
 import UIKit
 
+
+
 extension EggsDB {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<EggsDB> {
         return NSFetchRequest<EggsDB>(entityName: "EggsDB")
     }
+    
+   
     
     @nonobjc public class func removeAll() -> Bool {
         
@@ -33,7 +37,7 @@ extension EggsDB {
         }
     }
     
-    @nonobjc class func add(egg:Currency.EggsCurrencyType)  -> [EggsDB]?{
+    @nonobjc class func add<T:ProtocolCollection>(egg:T) throws -> [EggsDB]?{
         
         
         let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -41,23 +45,23 @@ extension EggsDB {
         
         if  let obj =  NSEntityDescription.insertNewObject(forEntityName: self.entity().name!, into: managedContext) as? EggsDB {
             
-            obj.date = Date()
-            obj.type = egg.name
+            
             do {
-                 try managedContext.save()
+                obj.date = Date()
+              
                 
-                let data = try managedContext.fetch(fetchRequest())
-                 return data
-            }catch {
-                fatalError()
+                    obj.type = egg.name
+                    try managedContext.save()
+                    
+                    let data = try managedContext.fetch(fetchRequest())
+                    
+                    return data
+              
+            } catch {
+                throw error
+                
             }
         }
         return nil
     }
-    
-    
-
-    @NSManaged public var type: String
-    @NSManaged public var date: Date
-
 }

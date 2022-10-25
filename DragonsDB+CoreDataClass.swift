@@ -10,7 +10,14 @@
 import Foundation
 import CoreData
 
+
+
 @objc(DragonsDB)
 public class DragonsDB: NSManagedObject {
 
+    
+    public override func awakeFromInsert() {
+        
+        
+    }
 }

@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="21G115" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="DataModel">
-    <entity name="DragonsDB" representedClassName="DragonsDB" syncable="YES" codeGenerationType="class">
-        <attribute name="classDragon" optional="YES" attributeType="String"/>
-        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="image" optional="YES" attributeType="String"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="rarity" optional="YES" attributeType="String"/>
-        <attribute name="skills" optional="YES" attributeType="String"/>
-        <attribute name="type" optional="YES" attributeType="String"/>
+    <entity name="DragonsDB" representedClassName="DragonsDB" syncable="YES">
+        <attribute name="picture" optional="YES" attributeType="String" customClassName="."/>
+        <attribute name="tier0" optional="YES" attributeType="String"/>
+        <attribute name="tier1" optional="YES" attributeType="String"/>
+        <attribute name="tier2" optional="YES" attributeType="String"/>
     </entity>
     <entity name="EggsDB" representedClassName=".EggsDB" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="type" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="Score" representedClassName=".Score" syncable="YES">
-        <attribute name="coin" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    <entity name="Player" representedClassName=".Player" syncable="YES" codeGenerationType="class">
+        <attribute name="eggs" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="fruit" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="gem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="highscore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="totalscore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="Score" representedClassName=".Score" syncable="YES">
+        <attribute name="coin" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="gem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="totalscore" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Settings" representedClassName=".Settings" syncable="YES">
         <attribute name="fast" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>

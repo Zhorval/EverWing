@@ -16,10 +16,11 @@ extension Score {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Score> {
         return NSFetchRequest<Score>(entityName: "Score")
     }
-
-    @NSManaged public var coin: Int16
-    @NSManaged public var gem: Int16
-    @NSManaged public var highscore: Int16
-    @NSManaged public var totalscore: Int16
+    
+    
+    
+    @NSManaged public var coin: Int32
+    @NSManaged public var gem: Int32
+    @NSManaged public var totalscore: Int32
 
 }

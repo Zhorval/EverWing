@@ -12,5 +12,14 @@ import CoreData
 
 
 public class Score: NSManagedObject {
-
+    
+    override public func awakeFromInsert() {
+     
+    super.awakeFromInsert()
+       
+        coin = Int32(0)
+        gem = Int32(0)
+        totalscore = Int32(0)
+        print("Cargado")
+   }
 }

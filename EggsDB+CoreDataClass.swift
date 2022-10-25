@@ -9,8 +9,27 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 
-public class EggsDB: NSManagedObject {
 
+@objc(EggsDB)
+class EggsDB: NSManagedObject {
+    
+    
+     @NSManaged public var type: String
+     @NSManaged public var date: Date
+     @NSManaged fileprivate var priorityValue:Currency.EggsCurrencyType.RawValue
+    
+    let managedObject = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    var priority:Currency.EggsCurrencyType {
+        get {
+            return Currency.EggsCurrencyType.init(rawValue: type) ?? .Common
+        }
+        set {
+            priorityValue = newValue.rawValue
+        }
+    }
+  
 }

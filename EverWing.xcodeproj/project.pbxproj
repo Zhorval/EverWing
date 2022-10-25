@@ -63,14 +63,20 @@
 		6E53BA0E282C1BD800B13AEA /* meteor_flames.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E53BA0D282C1BAE00B13AEA /* meteor_flames.m4a */; };
 		6E53BA0F282C1BD800B13AEA /* meteor_warn.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E53BA0C282C1BAE00B13AEA /* meteor_warn.m4a */; };
 		6E5B246C27F5B19000D7023F /* GoblinModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5B246B27F5B19000D7023F /* GoblinModel.swift */; };
+		6E5D9A8528FC95770091AC59 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5D9A8428FC95770091AC59 /* UILabel.swift */; };
 		6E5ED1652847D85900D5855D /* SpikeArm.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E5ED1642847D85900D5855D /* SpikeArm.sks */; };
 		6E5ED169284801EA00D5855D /* icicle_fall_1.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E5ED168284801BE00D5855D /* icicle_fall_1.m4a */; };
+		6E5F4DFC290315F3004F354A /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5F4DFB290315F3004F354A /* UIButton.swift */; };
+		6E5F4DFE29031649004F354A /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5F4DFD29031649004F354A /* UIView.swift */; };
 		6E63CB6827FF2BC300216A43 /* Death.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E63CB6727FF2BC300216A43 /* Death.sks */; };
 		6E6C83AF2845F92000C29A3A /* ice_walls_appear.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E6C83AE2845F8F200C29A3A /* ice_walls_appear.m4a */; };
 		6E6C83B128461F5F00C29A3A /* item_collect_magnet.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E6C83B028461F2F00C29A3A /* item_collect_magnet.m4a */; };
 		6E7D26192838D54600C6444B /* Mouth.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E7D26182838D54600C6444B /* Mouth.sks */; };
 		6E8B0FF9282977C80025BDC6 /* Leaf.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E8B0FF8282977C80025BDC6 /* Leaf.sks */; };
 		6E93915C27E11D7500911962 /* bulling.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E93915B27E11D7500911962 /* bulling.sks */; };
+		6E955BBC28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E955BBA28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift */; };
+		6E955BBD28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E955BBB28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift */; };
+		6E955BC328F9B70B005DFF67 /* property.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6E955BC228F9B70B005DFF67 /* property.plist */; };
 		6E9793C1282E43FD004EB912 /* ballColorFX.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E9793C0282E43FD004EB912 /* ballColorFX.sks */; };
 		6EA174FE27E6BAEC000DA2C9 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */; };
 		6EA9DF5628590B51003E5A9E /* flameSword.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EA9DF5528590B51003E5A9E /* flameSword.sks */; };
@@ -84,6 +90,7 @@
 		6EAFE8CF27F35A0D001ACBB5 /* boss_alarm.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAFE8CE27F3572F001ACBB5 /* boss_alarm.m4a */; };
 		6EB0E3B927F0B47B0013C15E /* changeOptions.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EB0E3B827F0B4430013C15E /* changeOptions.m4a */; };
 		6EB0E3BF27F1DC560013C15E /* DragonsMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB0E3BE27F1DC560013C15E /* DragonsMenuScene.swift */; };
+		6EB8E8DD29012C6D00AE88F4 /* ManagedDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB8E8DC29012C6D00AE88F4 /* ManagedDB.swift */; };
 		6EC2F9F127F8AC20003F906A /* CustomTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC2F9F027F8AC20003F906A /* CustomTableView.swift */; };
 		6EC4483E28E0B5F20042589D /* halcon.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EC4483D28E0B5DE0042589D /* halcon.m4a */; };
 		6ECFF8D328F58D580023907A /* buy_dragonfruit.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */; };
@@ -98,6 +105,7 @@
 		6ED7D3512844D418004FBE77 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7D3502844D418004FBE77 /* CGPoint.swift */; };
 		6ED7D35628456F44004FBE77 /* snow_roar.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7D35528456E0A004FBE77 /* snow_roar.m4a */; };
 		6ED7D35828457274004FBE77 /* gem_collect.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7D3572845726B004FBE77 /* gem_collect.m4a */; };
+		6EDE7E062900A36800FBB5A8 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDE7E052900A36800FBB5A8 /* String.swift */; };
 		6EE854ED282A5CD60069E0BF /* ballMilfred.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EE854EC282A5CD60069E0BF /* ballMilfred.sks */; };
 		6EE854EF282AC3240069E0BF /* boss_tree_attack.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EE854EE282AC30E0069E0BF /* boss_tree_attack.m4a */; };
 		6EF37A712837805B0040FBB0 /* boss_king_burp.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EF37A7028377FBB0040FBB0 /* boss_king_burp.m4a */; };
@@ -167,8 +175,11 @@
 		6E53BA0C282C1BAE00B13AEA /* meteor_warn.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = meteor_warn.m4a; sourceTree = "<group>"; };
 		6E53BA0D282C1BAE00B13AEA /* meteor_flames.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = meteor_flames.m4a; sourceTree = "<group>"; };
 		6E5B246B27F5B19000D7023F /* GoblinModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoblinModel.swift; sourceTree = "<group>"; };
+		6E5D9A8428FC95770091AC59 /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
 		6E5ED1642847D85900D5855D /* SpikeArm.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = SpikeArm.sks; sourceTree = "<group>"; };
 		6E5ED168284801BE00D5855D /* icicle_fall_1.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = icicle_fall_1.m4a; sourceTree = "<group>"; };
+		6E5F4DFB290315F3004F354A /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
+		6E5F4DFD29031649004F354A /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		6E63CB6727FF2BC300216A43 /* Death.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Death.sks; sourceTree = "<group>"; };
 		6E63CB6927FF62F200216A43 /* owl.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = owl.m4a; sourceTree = "<group>"; };
 		6E6C83AE2845F8F200C29A3A /* ice_walls_appear.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = ice_walls_appear.m4a; sourceTree = "<group>"; };
@@ -176,6 +187,9 @@
 		6E7D26182838D54600C6444B /* Mouth.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Mouth.sks; sourceTree = "<group>"; };
 		6E8B0FF8282977C80025BDC6 /* Leaf.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Leaf.sks; sourceTree = "<group>"; };
 		6E93915B27E11D7500911962 /* bulling.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = bulling.sks; sourceTree = "<group>"; };
+		6E955BBA28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DragonsDB+CoreDataClass.swift"; sourceTree = "<group>"; };
+		6E955BBB28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DragonsDB+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		6E955BC228F9B70B005DFF67 /* property.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = property.plist; sourceTree = "<group>"; };
 		6E9793C0282E43FD004EB912 /* ballColorFX.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ballColorFX.sks; sourceTree = "<group>"; };
 		6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		6EA9DF5528590B51003E5A9E /* flameSword.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = flameSword.sks; sourceTree = "<group>"; };
@@ -190,6 +204,7 @@
 		6EAFE8D027F3A309001ACBB5 /* vfx_jade_attack_4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = vfx_jade_attack_4.m4a; sourceTree = "<group>"; };
 		6EB0E3B827F0B4430013C15E /* changeOptions.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = changeOptions.m4a; sourceTree = "<group>"; };
 		6EB0E3BE27F1DC560013C15E /* DragonsMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragonsMenuScene.swift; sourceTree = "<group>"; };
+		6EB8E8DC29012C6D00AE88F4 /* ManagedDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedDB.swift; sourceTree = "<group>"; };
 		6EC2F9F027F8AC20003F906A /* CustomTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableView.swift; sourceTree = "<group>"; };
 		6EC4483D28E0B5DE0042589D /* halcon.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = halcon.m4a; sourceTree = "<group>"; };
 		6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = buy_dragonfruit.m4a; sourceTree = "<group>"; };
@@ -203,6 +218,7 @@
 		6ED7D3502844D418004FBE77 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		6ED7D35528456E0A004FBE77 /* snow_roar.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = snow_roar.m4a; sourceTree = "<group>"; };
 		6ED7D3572845726B004FBE77 /* gem_collect.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gem_collect.m4a; sourceTree = "<group>"; };
+		6EDE7E052900A36800FBB5A8 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		6EE854EC282A5CD60069E0BF /* ballMilfred.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ballMilfred.sks; sourceTree = "<group>"; };
 		6EE854EE282AC30E0069E0BF /* boss_tree_attack.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = boss_tree_attack.m4a; sourceTree = "<group>"; };
 		6EF37A7028377FBB0040FBB0 /* boss_king_burp.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = boss_king_burp.m4a; sourceTree = "<group>"; };
@@ -239,6 +255,7 @@
 				0C12CD8F1F068B00008BA78C /* Infobar.swift */,
 				0C12CD951F0C4CB4008BA78C /* BulletMaker.swift */,
 				6EC2F9F027F8AC20003F906A /* CustomTableView.swift */,
+				6EB8E8DC29012C6D00AE88F4 /* ManagedDB.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -386,6 +403,10 @@
 				6ED7D34E2844D400004FBE77 /* CGFloat.swift */,
 				6ED7D3502844D418004FBE77 /* CGPoint.swift */,
 				6EAB087828EED6F3006AB933 /* SKScene.swift */,
+				6E5D9A8428FC95770091AC59 /* UILabel.swift */,
+				6EDE7E052900A36800FBB5A8 /* String.swift */,
+				6E5F4DFB290315F3004F354A /* UIButton.swift */,
+				6E5F4DFD29031649004F354A /* UIView.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -393,6 +414,9 @@
 		F16A64531E0C969F00BC8255 = {
 			isa = PBXGroup;
 			children = (
+				6E955BC228F9B70B005DFF67 /* property.plist */,
+				6E955BBA28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift */,
+				6E955BBB28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift */,
 				6E13E79428ED9DE300C4844B /* EggsDB+CoreDataClass.swift */,
 				6E13E79528ED9DE300C4844B /* EggsDB+CoreDataProperties.swift */,
 				6E13E78728ED902E00C4844B /* Settings+CoreDataClass.swift */,
@@ -525,6 +549,7 @@
 				6EAEDA6D27F46C09004BCBE2 /* gameIntro.m4a in Resources */,
 				6EAFE8CF27F35A0D001ACBB5 /* boss_alarm.m4a in Resources */,
 				6ED7D34B2844B04C004FBE77 /* README.md in Resources */,
+				6E955BC328F9B70B005DFF67 /* property.plist in Resources */,
 				6EB0E3B927F0B47B0013C15E /* changeOptions.m4a in Resources */,
 				6E8B0FF9282977C80025BDC6 /* Leaf.sks in Resources */,
 				6E63CB6827FF2BC300216A43 /* Death.sks in Resources */,
@@ -573,6 +598,7 @@
 				0C12CD621F0293C4008BA78C /* Currency.swift in Sources */,
 				6E13E79328ED903300C4844B /* Settings+CoreDataProperties.swift in Sources */,
 				6E4E872827DAA5EC00CF0D38 /* UIColor.swift in Sources */,
+				6E5F4DFC290315F3004F354A /* UIButton.swift in Sources */,
 				0C12CD6E1F029433008BA78C /* Pinky.swift in Sources */,
 				6ED7611228A596D300C1CD66 /* CustomCollectionViewEggs.swift in Sources */,
 				6E13E78C28ED903300C4844B /* Score+CoreDataClass.swift in Sources */,
@@ -584,6 +610,7 @@
 				6EAF669828E78D630009D11B /* PersistentContainer.swift in Sources */,
 				0C12CD631F0293C4008BA78C /* HUD.swift in Sources */,
 				0C0655D41EE1681D00D38DA3 /* CharacterMenuScene.swift in Sources */,
+				6E955BBC28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift in Sources */,
 				F16A64601E0C96A000BC8255 /* AppDelegate.swift in Sources */,
 				6E13E79628ED9DE300C4844B /* EggsDB+CoreDataClass.swift in Sources */,
 				6ED7BA2527D263DC0084361E /* SKTextureAtlas.swift in Sources */,
@@ -594,14 +621,18 @@
 				0C12CD901F068B00008BA78C /* Infobar.swift in Sources */,
 				F112A6F81E0EA2B000A5DEE9 /* EndGame.swift in Sources */,
 				0C12CD581F0293B9008BA78C /* Global.swift in Sources */,
+				6E5F4DFE29031649004F354A /* UIView.swift in Sources */,
+				6E5D9A8528FC95770091AC59 /* UILabel.swift in Sources */,
 				0C12CD711F029479008BA78C /* Fireball.swift in Sources */,
 				0C12CD521F0293B9008BA78C /* AccountInfo.swift in Sources */,
+				6EDE7E062900A36800FBB5A8 /* String.swift in Sources */,
 				6EA174FE27E6BAEC000DA2C9 /* UIImage.swift in Sources */,
 				0C12CD591F0293B9008BA78C /* Map.swift in Sources */,
 				0C12CD641F0293C4008BA78C /* PhysicsCategory.swift in Sources */,
 				6EC2F9F127F8AC20003F906A /* CustomTableView.swift in Sources */,
 				6ED7D34F2844D400004FBE77 /* CGFloat.swift in Sources */,
 				6E13E7A928EDDF3C00C4844B /* BuyDragon.swift in Sources */,
+				6E955BBD28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift in Sources */,
 				0C12CD651F0293C4008BA78C /* Projectile.swift in Sources */,
 				6E5B246C27F5B19000D7023F /* GoblinModel.swift in Sources */,
 				F112A70A1E16705300A5DEE9 /* Extensions.swift in Sources */,
@@ -612,6 +643,7 @@
 				6E13E79728ED9DE300C4844B /* EggsDB+CoreDataProperties.swift in Sources */,
 				0C12CD571F0293B9008BA78C /* GameInfo.swift in Sources */,
 				6ED7BA2727D263FF0084361E /* SKLabelNode.swift in Sources */,
+				6EB8E8DD29012C6D00AE88F4 /* ManagedDB.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -742,8 +774,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9DQ85YJ434;
 				INFOPLIST_FILE = EverWing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "EverWing Arcade";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.0;
@@ -763,8 +798,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9DQ85YJ434;
 				INFOPLIST_FILE = EverWing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "EverWing Arcade";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.0;
