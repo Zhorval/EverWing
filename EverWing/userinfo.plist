@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Settings</key>
+	<dict>
+		<key>Music</key>
+		<true/>
+		<key>Voice</key>
+		<true/>
+		<key>Sfx</key>
+		<true/>
+		<key>Movement</key>
+		<false/>
+	</dict>
+	<key>CurrentToon</key>
+	<integer>0</integer>
+	<key>Level</key>
+	<integer>0</integer>
+	<key>Coin</key>
+	<integer>0</integer>
+	<key>Experience</key>
+	<integer>0</integer>
+	<key>Highscore</key>
+	<integer>0</integer>
+	<key>Eggs</key>
+	<dict>
+		<key>Magical</key>
+		<integer>0</integer>
+		<key>Common</key>
+		<integer>0</integer>
+		<key>Bronze</key>
+		<integer>0</integer>
+		<key>Golden</key>
+		<integer>0</integer>
+		<key>Silver</key>
+		<integer>0</integer>
+	</dict>
+	<key>Toons</key>
+	<dict>
+		<key>Alice</key>
+		<dict>
+			<key>Purchased</key>
+			<true/>
+			<key>Title</key>
+			<string>GUARDIAN OF COURAGE</string>
+			<key>Description</key>
+			<array>
+				<string>She never backs down from a </string>
+				<string>challenge and is always first to the</string>
+				<string>front lines of battle.</string>
+			</array>
+			<key>Level</key>
+			<integer>2</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>Jade</key>
+		<dict>
+			<key>Purchased</key>
+			<true/>
+			<key>Title</key>
+			<string>GUARDIAN OF SHADOWS</string>
+			<key>Description</key>
+			<array>
+				<string>As assassin who fears nothing!</string>
+				<string>Attacks charge up her skill, which</string>
+				<string>makes her invulnerable and deal double damage. </string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>Arcana</key>
+		<dict>
+			<key>Purchased</key>
+			<true/>
+			<key>Title</key>
+			<string>GUARDIAN OF MAGIC</string>
+			<key>Description</key>
+			<array>
+				<string>his sly illusionist has a few tricks</string>
+				<string>up her sleeve. She can clone</string>
+				<string>sidekicks after charging up.</string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>ModelToons</key>
+		<dict>
+			<key>Purchased</key>
+			<false/>
+			<key>Title</key>
+			<string>None</string>
+			<key>Description</key>
+			<array>
+				<string>She was born in the wilds and</string>
+				<string>raised by dragons. When dragons</string>
+				<string>fly with her, they earn 2x XP!</string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>Alpha</key>
+		<dict>
+			<key>Purchased</key>
+			<true/>
+			<key>Title</key>
+			<string>GUARDIAN OF DRAGONS</string>
+			<key>Description</key>
+			<array>
+				<string>She was born in the wilds and</string>
+				<string>raised by dragons. When dragons</string>
+				<string>fly with her, they earn 2x XP!</string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>Beta</key>
+		<dict>
+			<key>Purchased</key>
+			<false/>
+			<key>Title</key>
+			<string>GUARDIAN OF ADVENTURE</string>
+			<key>Description</key>
+			<array>
+				<string>Renowned, explorer, inventor, and</string>
+				<string>scientis, she is 2x faster</string>
+				<string>completing Quests!</string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>Celta</key>
+		<dict>
+			<key>Purchased</key>
+			<false/>
+			<key>Title</key>
+			<string>GUARDIAN OF TWILIGHT</string>
+			<key>Description</key>
+			<array>
+				<string>A mysterious loner, with a dark</string>
+				<string>and haunting past, some say she</string>
+				<string>acts as if she has 2 lives...</string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+		<key>Delta</key>
+		<dict>
+			<key>Purchased</key>
+			<false/>
+			<key>Title</key>
+			<string>GUARDIAN OF FORTUNE</string>
+			<key>Description</key>
+			<array>
+				<string>A master Alchemist and Mage of</string>
+				<string>the Third Order, she earns 2x</string>
+				<string>Coins. Cha-Ching!</string>
+			</array>
+			<key>Level</key>
+			<integer>1</integer>
+			<key>Experience</key>
+			<integer>0</integer>
+			<key>BulletLevel</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+</dict>
+</plist>
