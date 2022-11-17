@@ -11,6 +11,40 @@ import  UIKit
 
 extension UIView {
     
+   
+    func retangleView(title:String,gradient:UIImage) -> UIView{
+        
+    let shape = UIView()
+        shape.layer.backgroundColor = UIColor(red: 212/255, green: 172/255, blue: 112/255, alpha: 0.5).cgColor
+        shape.layer.cornerRadius = 10
+        shape.layer.borderColor = UIColor.gray.cgColor
+        shape.layer.borderWidth = 1
+        shape.layer.shadowOpacity = 1
+        shape.layer.shadowColor = UIColor.black.withAlphaComponent(1).cgColor
+        shape.layer.shadowRadius = 4
+        self.addSubview(shape)
+
+        let isPhone  = UIDevice().isPhone() ? 0 :  self.frame.height*0.05
+    
+        shape.translatesAutoresizingMaskIntoConstraints = false
+        shape.widthAnchor.constraint(equalToConstant: self.frame.width*0.9).isActive = true
+        shape.centerXAnchor.constraint(equalTo:self.centerXAnchor).isActive = true
+        shape.centerYAnchor.constraint(equalTo: self.centerYAnchor,constant: isPhone).isActive = true
+        shape.heightAnchor.constraint(equalToConstant: self.frame.height*0.33).isActive = true
+        shape.layoutIfNeeded()
+        
+        let title = UILabel()
+            .addFontAndText(font: "Cartwheel", text: title, size: self.frame.width*0.1)
+            .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
+        shape.addSubview(title)
+        
+        title.translatesAutoresizingMaskIntoConstraints = false
+        title.topAnchor.constraint(equalTo: shape.topAnchor,constant: 10).isActive = true
+        title.centerXAnchor.constraint(equalTo: shape.centerXAnchor).isActive = true
+        
+        return shape
+    }
+    
     /// Add image background to Self UIView return Self
     func viewBG(image:String,scale:ContentMode? = .scaleToFill) -> Self {
         
@@ -81,7 +115,6 @@ extension UIView {
             sun.transform = CGAffineTransform(rotationAngle:  .pi/2)
             sun.transform = CGAffineTransform(scaleX: 2, y: 2)
         }
-        
      
         return sun
     }

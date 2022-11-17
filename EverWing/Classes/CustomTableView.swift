@@ -45,13 +45,53 @@ enum Icons:String,Hashable{
         default:       return ""
         }
     }
-    
+}
+
+enum Weakness:String{
+   
+    case monsterKiller
+    case damage
+    case bossHoming
+    case bombs
+    case coinSplit
+    case rushFlowers
+    case poison
+    case itemSpawn
+    case itemBoost
+    case bossKiller
+    case synergy
+    case champion
+    case sugarRush
+    case charm
+    case bestFriend
+    case treasure
+    case slowing
+    case dualShot
+    case bulletLevel
+    case gems
+    case magnet
+    case toxicity
+    case tithe
+    case doubleShot
+    case ice
+    case spreadShot
 }
 
 
 
+protocol BaseProtocol {}
 
-protocol ProtocolTableViewGenericCell {
+protocol ProtocolWeakness:BaseProtocol {
+    var icons:[Weakness] { get set }
+}
+
+protocol ProtocolIconsExtra:BaseProtocol {
+    associatedtype A
+    static var items: [A] { get set }
+}
+
+
+protocol ProtocolTableViewGenericCell:BaseProtocol {
   
     static var items:[Self]        { get }
     var picture:Icons              { get }
@@ -60,14 +100,37 @@ protocol ProtocolTableViewGenericCell {
     var amount:Int                 { get }
     var gemAmount:Int?             { get }
     var icon:Currency.CurrencyType { get }
+}
+
+struct IconsExtra:Equatable {
     
+    enum BtnIcons:String,CaseIterable,Equatable,BaseProtocol {
+        case iconExtra_0
+        case iconExtra_1
+        case iconExtra_2
+        case iconExtra_3
+        case iconExtra_4
+        
+        static func == (lhs:BtnIcons,rhs:BtnIcons) -> Bool {
+            return lhs.title  == rhs.title
+        }
+        
+        var title: String {
+            switch self {
+            case .iconExtra_0: return "Equip\nLeft"
+            case .iconExtra_1: return "Equip\nRight"
+            case .iconExtra_2: return "Sell"
+            case .iconExtra_3: return "Feed"
+            case .iconExtra_4: return "Evolve"
+            }
+        }
+    }
+    
+    static var items: [IconsExtra.BtnIcons] = BtnIcons.allCases
 }
 
 
-
-
 struct BuyFruit:ProtocolTableViewGenericCell {
-   
     
     typealias A = BuyFruit
     
@@ -82,9 +145,7 @@ struct BuyFruit:ProtocolTableViewGenericCell {
     var icon: Currency.CurrencyType
     
     var gemAmount:Int?
-
-   
-   
+    
     static var items: [Self] = [
         BuyFruit(picture:.fruit,name: "", title: "", amount: 25,icon:.Gem,gemAmount:50),
         BuyFruit(picture:.doubleFruit,name: "", title: "125 + 25 BONUS", amount: 150,icon:.Gem,gemAmount:250),
@@ -92,8 +153,6 @@ struct BuyFruit:ProtocolTableViewGenericCell {
         BuyFruit(picture:.bagFruit,name: "", title: "500 + 200 BONUS", amount: 700,icon:.Gem,gemAmount:1000),
         BuyFruit(picture:.bagFruit,name: "",title: "1000 + 500 BONUS", amount: 1500,icon:.Gem,gemAmount:2000),
         BuyFruit(picture:.bagFruit,name: "",title: "2500 + 2000 BONUS", amount: 2500,icon:.Gem,gemAmount:5000)]
-    
-    
 }
 
 struct BuyGem:ProtocolTableViewGenericCell {
@@ -119,7 +178,6 @@ struct BuyGem:ProtocolTableViewGenericCell {
         BuyGem(picture:.bagFruit,name: "", title: "500 + 200 BONUS", amount: 700,icon:.Gem,gemAmount:1000),
         BuyGem(picture:.bagFruit,name: "",title: "1000 + 500 BONUS", amount: 1500,icon:.Gem,gemAmount:2000),
         BuyGem(picture:.bagFruit,name: "",title: "2500 + 2000 BONUS", amount: 2500,icon:.Gem,gemAmount:5000)]
-    
 }
 
 struct BuyCoins:ProtocolTableViewGenericCell {
@@ -145,8 +203,6 @@ struct BuyCoins:ProtocolTableViewGenericCell {
         BuyCoins(picture:.Buyfourcoin,name: "", title: "40000 + 10000 BONUS", amount: 50000,icon:.Gem,gemAmount:800),
         BuyCoins(picture:.Buyfivecoin,name: "",title: "80000 + 26000 BONUS", amount: 106000,icon:.Gem,gemAmount:1600),
         BuyCoins(picture:.Buysixcoin,name: "",title: "200000 + 80000 BONUS", amount: 280000,icon:.Gem,gemAmount:4000)]
-    
-    
 }
 
 struct BuyEggs:ProtocolTableViewGenericCell,Equatable {
@@ -154,8 +210,6 @@ struct BuyEggs:ProtocolTableViewGenericCell,Equatable {
     static func == (lhs: BuyEggs, rhs: BuyEggs) -> Bool {
         return lhs.name == rhs.name
     }
-    
-    
     
     typealias A = BuyEggs
     
@@ -170,7 +224,7 @@ struct BuyEggs:ProtocolTableViewGenericCell,Equatable {
     var icon: Currency.CurrencyType
     
     var gemAmount: Int?
-
+    
     static var items: [Self] = [
         BuyEggs(picture:.King,name: "KING´S COURT", title: "GUARATEED\nKING´S COURT SIDEKIT", amount: 100,icon:.Gem),
         BuyEggs(picture:.Toxic,name: "TOXIC",title: "A TOXIC AVENGER", amount: 100,icon:.Gem),
@@ -180,8 +234,6 @@ struct BuyEggs:ProtocolTableViewGenericCell,Equatable {
         BuyEggs(picture:.Golden,name: "Golden",title: "Golden Dragon Egg", amount: 32000,icon:.Coin),
         BuyEggs(picture:.Magical,name: "Magical",title: "Magical Dragon Egg",amount: 200,icon:.Gem),
         BuyEggs(picture:.Ancient,name: "Ancient",title: "AncientDragon Egg",amount: 700,icon:.Gem)]
-    
-    
 }
 
 class GenericTableView<T:ProtocolTableViewGenericCell,Cell:UITableViewCell>: UITableView,UITableViewDelegate,UITableViewDataSource {

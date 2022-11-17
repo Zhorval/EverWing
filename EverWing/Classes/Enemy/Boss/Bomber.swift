@@ -437,7 +437,7 @@ class Bomber:Enemy, BomberFx {
                 lance.run(SKAction.sequence([
                     .wait(forDuration: 5),
                     .run {
-                        let copy =  SKEmitterNode().addBallMosterKing(node: lance).copy() as! SKEmitterNode
+                        guard let copy =  SKEmitterNode().addBallMosterKing(node: lance)?.copy() as? SKEmitterNode else { return }
                      //   self.addPhysicsBall(node: copy)
                         copy.position = CGPoint(x: lance.position.x+25, y: lance.frame.height/2-20)
                         copy.targetNode = lance

@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "sidekick_skills1_8.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "bar_loading_empty.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

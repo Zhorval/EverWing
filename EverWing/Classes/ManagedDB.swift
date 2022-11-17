@@ -64,12 +64,17 @@ class ManagedDB {
        }
    }
     
-    static func addFruitTotal(addFruit:Int)->Bool {
+    static func addFruitTotal(addFruit:Int,arimethic:String)->Bool {
         
         do {
             guard let fetch = try shared.context.fetch(PlayerDB.fetchRequest()).first  else { return false }
             
-            fetch.fruit += Int32(addFruit)
+            if arimethic == "+" {
+                fetch.fruit += Int32(addFruit)
+            } else {
+                print("resto ManagedDB \(addFruit)")
+                fetch.fruit -= Int32(addFruit)
+            }
             
             try self.shared.context.save()
            
@@ -98,8 +103,8 @@ class ManagedDB {
     
     
     /// - Description: I look for the number of dragons that I have discovered
-    /// - Returns: (Int) Total dragons discoveredd
-    static func getDragonBuy() -> Int {
+    /// - Returns: (Int) Total dragons discovered
+    static func getNumberDragonBuy() -> Int {
         
         do {
             return try shared.context.fetch(DragonsBuyDB.fetchRequest()).count
@@ -110,6 +115,21 @@ class ManagedDB {
         return 0
     }
     
+    /// - Description: I look for the number of dragons that I have discovered
+    /// - Returns:[DragonsBuyDB] Total dragons discovered
+    ///
+    static func getNumberDragonBuy() -> [DragonsBuyDB] {
+        
+        do {
+            return try shared.context.fetch(DragonsBuyDB.fetchRequest())
+            
+        }catch {
+            print("Error query DB")
+        }
+        return []
+    }
+    
+    
     /// - Description: I check if I have the dragon in the DB
     /// - Returns: @handler(Bool)  True if exist dragon
     func isBuyDragon(name:String,completion:@escaping(Bool) -> Void){
@@ -117,7 +137,7 @@ class ManagedDB {
         do{
             let arr = try ManagedDB.shared.context.fetch(DragonsBuyDB.fetchRequest())
             
-            completion(arr.filter({ $0.picture! == name}).first != nil)
+            completion(arr.filter({ $0.name == name}).first != nil)
         } catch  {
             print("Error query DB")
         }

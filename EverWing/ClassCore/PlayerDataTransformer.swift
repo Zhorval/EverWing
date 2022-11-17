@@ -30,14 +30,11 @@ class PlayerDataTransformer:NSSecureUnarchiveFromDataTransformer,NSCoding {
     
     required  init?(coder: NSCoder) {
         data = coder.decodeObject(forKey: "data") as? DragonProperties
-         
     }
     
     func encode(with coder: NSCoder) {
         coder.encode(data,forKey: "data")
     }
-    
-   
 }
 
 

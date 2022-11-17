@@ -227,7 +227,7 @@ class BuyDragon:SKScene,ProtocolEffectBlur {
                 guard let buyAgain =  BuyEggs.items.filter({ $0.self == dragons.self}).first else { return }
                 gameInfo.mainScene = self
                 
-             //   view?.addSubview(gameInfo.showViewBuyAditionalItem(scene: self, items: buyAgain))
+                view?.addSubview(self.showViewBuyAditionalItem(gameInfo: gameInfo, scene: self, items: buyAgain))
             }
         }
     }

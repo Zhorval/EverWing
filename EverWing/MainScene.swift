@@ -535,7 +535,8 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
             let sideEffectX =  highNode.name!.contains("Enemy_FX_R")
            
             let position = self.convert(highNode.position, from: highNode.parent!)
-            let emitter = SKEmitterNode().contactBallHandEnemy(sideEffectX: sideEffectX, position: position)
+            
+            guard let emitter = SKEmitterNode().contactBallHandEnemy(sideEffectX: sideEffectX, position: position) else { return}
             
             emitter.run(.sequence([.wait(forDuration: 5),.removeFromParent()]))
             self.addChild(emitter)

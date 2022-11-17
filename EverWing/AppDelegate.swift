@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: screenSize)
         window?.makeKeyAndVisible()
         window?.rootViewController = ViewController()
-     /*   do{
+        do{
             let managed = ManagedDB.shared.context
             
             let d = try managed.fetch(DragonsBuyDB.fetchRequest())
@@ -31,12 +31,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             try managed.save()
         }catch {}
-    */
+    
         if !defaults.bool(forKey: "isPreloadScore") {
               preloadDataScore()
         }
         
-      //  preloadData()
+        preloadData() { d in
+            
+        }
         
         SJParentValueTransformer<PlayerDataTransformer>.registerTransformer()
         
@@ -86,7 +88,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
       
         let directory = Bundle.main.url(forResource: "property", withExtension: "plist")!
-        var items:[Dragons.A] = []
+        
+        var items:[Dragons] = []
         
         guard let data = try? Data(contentsOf: directory) else { fatalError() }
         
@@ -95,14 +98,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                   let js =  json["sidekicks"] as? Dictionary<String,Any>  else { fatalError()}
             
        
-            let order = js.keys.sorted(by: {$0 < $1}).reversed()
+            let order = js.keys.sorted(by: {$0 < $1})
             for x in order {
-                guard let val = js[x] as? Dictionary<String,Dictionary<String,String>> else { return }
-                for (i,d) in val["names"]!.enumerated() {
-                    items.append(contentsOf: [Dragons(name: d.value, picture: Dragons.dragons(name: x+"_T\(i+1)_icon"))])
+               
+                guard let val = js[x] as? Dictionary<String,Dictionary<String,Any>> else { continue }
+                
+                let keysSort = val.keys.sorted(by: {$0 < $1})
+                
+                let _ = keysSort.enumerated().compactMap{ (i,z) -> Void in
+                    
+                    let picture = (x + "_T\(i+1)_icon")
+                   
+                    guard let element = val[z]?["element"] as? String,
+                          let name = val[z]?["name"] as? String,
+                          let rarity = val[z]?["rarity"] as? String,
+                          let type = val[z]?["type"] as? String,
+                          let class_ = val[z]?["class"] as? String,
+                          let skills = val[z]?["skills"] as? Dictionary<String,String> else { return }
+                     
+                    let weakness = skills.values.compactMap { Weakness(rawValue: $0) }
+                    
+                    items.append(Dragons(name: name, rarity: Dragons.RarityDragon(rawValue: rarity)!, type: type, class_: class_, picture: Dragons.dragons(name: picture), icons: weakness, element: element))
                 }
             }
-            Dragons.items = items.sorted{$0.name < $1.name}
+            
+            Dragons.items = items
             completion(Dragons.items)
         } catch  {
             fatalError(error.localizedDescription)

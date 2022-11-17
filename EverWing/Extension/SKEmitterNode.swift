@@ -20,9 +20,9 @@ extension SKEmitterNode {
         return emiter
     }
     
-    func addBallMosterKing(node:SKSpriteNode) ->SKEmitterNode {
+    func addBallMosterKing(node:SKSpriteNode) ->SKEmitterNode? {
         
-        let ball = SKEmitterNode(fileNamed: "Mouth")!
+        guard let ball = SKEmitterNode(fileNamed: "Mouth") else { return nil}
             ball.position =  node.position
             ball.name = "Enemy_" + UUID().uuidString
             ball.physicsBody = SKPhysicsBody(circleOfRadius: ball.particleSize.width)
@@ -37,11 +37,11 @@ extension SKEmitterNode {
     }
     
     /// Contact ball Enemy Boss with Toon
-    func contactBallHandEnemy(sideEffectX:Bool,position:CGPoint) -> SKEmitterNode {
+    func contactBallHandEnemy(sideEffectX:Bool,position:CGPoint) -> SKEmitterNode? {
        
       
             
-        let emitter =  SKEmitterNode(fileNamed: "SpikeArm")!
+        guard  let emitter =  SKEmitterNode(fileNamed: "SpikeArm") else { return nil}
             emitter.particleSpeed  = sideEffectX ? -150 : 150
             emitter.name = "Enemy_Ball_\(UUID().uuidString)"
             emitter.particleRotation = .pi

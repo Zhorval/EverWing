@@ -16,10 +16,8 @@ enum ActionButton:String,CaseIterable {
    case Index              = "Index"
    case CancelInfoDragon   = "CancelInfoDragon"
    case CancelFruitSell    = "CancelFruitSell"
-   case btnRight           = "btnRight"
-   case btnLeft            = "btnLeft"
+  
    case btnMainToSell      = "btnMainToSell"
-   case btnFeed            = "btnFeed"
   
    case btnSellFruit       = "btnSellFruit"
    case txtSellFruit       = "txtSellFruit"
@@ -35,10 +33,8 @@ enum ActionButton:String,CaseIterable {
        case .Index:                 return  "indexMainPage"
        case .CancelInfoDragon:      return "viewInfoDragon"
        case .CancelFruitSell:       return "viewSellFruit"
-       case .btnRight:              return "viewBuyGem"
-       case .btnLeft:               return "viewBuyGem"
+     
        case .btnMainToSell:         return "viewBuyGem"
-       case .btnFeed:               return "viewBuyGem"
       
        case .btnSellFruit:          return "viewBuyGem"
        case .txtSellFruit:          return "viewBuyGem"
@@ -55,6 +51,8 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
     private var gameinfo:GameInfo = GameInfo.shared
     
     private var eggsPage:UIView? = nil
+    
+    private var isHiddenPopup: Bool = false
     
     var blurNode: SKEffectNode = SKEffectNode()
     
@@ -164,7 +162,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
     /// - Parameters : @width: CGFloat   width for view
     ///               @typeGrid: Enum TypeGridCollection Only display toon in th view main
     /// - Returns:    The view created
-    private func createViewForCollection(frame:CGRect,typeGrid:TypeGridCollection,hasCancelBtn:Bool) -> UIView {
+    private func templateMainGeneric(frame:CGRect,typeGrid:TypeGridCollection,hasCancelBtn:Bool) -> UIView {
         
         let sizePlayer = max(screenSize.width, screenSize.height)
         
@@ -207,10 +205,9 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
                  case .sell:  select(dragon)
               }
         }  handlerDeselect: { dragon in
-            
             switch type {
                 case .eggs,.main,.index: break
-                case .sell:  select(dragon)
+                case .sell:  deSelect(dragon)
             }
          }
            handlerTapAudio: { [self] in
@@ -222,9 +219,9 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
 
         if let nameImage = sender.restorationIdentifier {
                 
-            guard let dragon =  Dragons.items.filter({ $0.picture.name == nameImage }).first else { return }
+        /*    guard let dragon =  Dragons.items.filter({ $0.picture.name == nameImage }).first else { return }
         
-            showPanelDragonCircle(item: dragon)        }
+            showPanelDragonCircle(item: dragon)       */ }
     }
     
     // Search for purchased dragons in the database
@@ -233,353 +230,14 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         let managed = ManagedDB.shared.context
         
         do {
-            let fetch = try managed.fetch(DragonsBuyDB.fetchRequest())
-            
-            Dragons.items = fetch.map { Dragons(name: $0.name!, picture: Dragons.dragons(name:  $0.picture!))}
-            
-            
-            return Dragons.items.count > 0
+            return try managed.fetch(DragonsBuyDB.fetchRequest()).count > 0
             
         }catch let error {
             fatalError(error.localizedDescription)
         }
     }
     
-    // MARK: SHOW MAIN PAGE SCREEN
-    private func showMainPage() {
-    
-        let width =  min(screenSize.width,screenSize.height) > 500 ? 600 : min(screenSize.width,screenSize.height)
-        let frame = CGRect(x: 0, y: 0, width: width, height: width)
-        
-        let mainView = createViewForCollection(frame:frame, typeGrid: .main, hasCancelBtn: false)
-
-        mainView.translatesAutoresizingMaskIntoConstraints = false
-        mainView.widthAnchor.constraint(equalToConstant: width).isActive = true
-        mainView.heightAnchor.constraint(equalToConstant: width).isActive = true
-        mainView.centerXAnchor.constraint(equalTo: view!.centerXAnchor).isActive = true
-        mainView.bottomAnchor.constraint(equalTo: view!.bottomAnchor,constant: -(view?.frame.height)!*0.1).isActive = true
-        
-        
-
-       /*
-       
-        let dragonRight = UIButton(frame: CGRect(x:  (width -  sizeCircle), y:  screenSize.height*0.05, width: sizeCircle, height:  sizeCircle))
-        dragonRight.setImage(UIImage(named: "WC02_T1_icon")?.resized(to: CGSize(width: sizeCircle*0.8, height: sizeCircle*0.8)), for: .normal)
-        dragonRight.imageView?.contentMode = .scaleAspectFit
-        dragonRight.restorationIdentifier = "WC02_T1_icon"
-
-        dragonRight.layer.cornerRadius = sizeCircle/2
-        dragonRight.backgroundColor = .black.withAlphaComponent(0.5)
-        dragonRight.addTarget(self, action: #selector(tapCircleDragon), for: .touchUpInside)
-        mainView.addSubview(dragonRight)
-        
-        let dragonLeft = UIButton(frame: CGRect(x: sizeCircle/2, y: screenSize.height*0.05, width: sizeCircle, height:  sizeCircle))
-        dragonLeft.setImage(UIImage(named: "LC01_T1_icon")?.resized(to: CGSize(width: sizeCircle*0.8, height: sizeCircle*0.8)), for: .normal)
-        dragonLeft.restorationIdentifier = "LC01_T1_icon"
-        dragonLeft.backgroundColor = .black.withAlphaComponent(0.5)
-        dragonLeft.layer.cornerRadius = sizeCircle/4
-        dragonLeft.addTarget(self, action: #selector(tapCircleDragon), for: .touchUpInside)
-        mainView.addSubview(dragonLeft)*/
-        
-        if SearchDragonBuyInDB() {
-            
-            let collection = ManagedCollectionInView(view: mainView, type: .main) { _ in } deSelect: { _ in }
-
-            mainView.addSubview(collection)
-            collection.translatesAutoresizingMaskIntoConstraints = false
-            collection.centerXAnchor.constraint(equalTo: mainView.centerXAnchor).isActive = true
-            collection.centerYAnchor.constraint(equalTo: mainView.centerYAnchor).isActive = true
-            collection.widthAnchor.constraint(equalTo: mainView.widthAnchor,constant: -mainView.frame.width*0.15).isActive = true
-            collection.heightAnchor.constraint(equalTo: mainView.heightAnchor,constant: -mainView.frame.height*0.15).isActive = true
-            
-        } else {
-            let txtInsideTable = UILabel(frame: mainView.bounds)
-                .addFontAndText(font: "Cartwheel", text: "EARN GOLD TO\nBUY DRAGONS", size: mainView.bounds.width/8)
-                .shadowText(colorText: .brown, colorShadow: .white, aligment: .center)
-          
-            txtInsideTable.numberOfLines = 0
-            mainView.addSubview(txtInsideTable)
-            
-            txtInsideTable.translatesAutoresizingMaskIntoConstraints = false
-            txtInsideTable.centerYAnchor.constraint(equalTo: mainView.centerYAnchor).isActive = true
-            txtInsideTable.centerXAnchor.constraint(equalTo: mainView.centerXAnchor).isActive = true
-        }
-    }
-    
-    
-    private func showIndexPageBook(){
-        
-        let width = screenSize.width*0.9
-        let height = screenSize.height*0.8
-        let marginX = (screenSize.width-width)/2
-        let marginY = (screenSize.height-height)/2
-        let rect = CGRect(x: marginX, y: marginY, width: width, height: height)
-        
-        (UIApplication.shared.delegate as? AppDelegate)?.preloadData { d in
-           
-            self.scene?.backgroundBlack(withSpinnerActive: false)
-            
-            let view = self.createViewForCollection(frame: rect, typeGrid: .sell, hasCancelBtn: true)
-            
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.leadingAnchor.constraint(equalTo: (self.scene?.view!.leadingAnchor)!,constant: marginX).isActive = true
-            view.heightAnchor.constraint(equalToConstant: height).isActive = true
-            view.widthAnchor.constraint(equalToConstant: width).isActive = true
-            view.topAnchor.constraint(equalTo: (self.scene?.view!.topAnchor)!,constant: marginY).isActive = true
-            
-            let gradient = UIImage.gradientImage(bounds: view.bounds, colors: [.white,.white])
-            
-            let title = UILabel()
-                .addFontAndText(font: "Cartwheel", text: "YOUR COLLECTION:", size: view.frame.width*0.07)
-                .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
-            view.addSubview(title)
-            
-            title.translatesAutoresizingMaskIntoConstraints = false
-            title.topAnchor.constraint(equalTo: view.topAnchor,constant: view.frame.height*0.05).isActive = true
-            title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            
-            
-            let getPercent = Double(300)/Double(Dragons.items.count)
-            let totalWidth = (view.frame.width*0.8)*getPercent
-            
-            let barProgress = UIImageView()
-            barProgress.image = UIImage(named: "barProgress")
-            barProgress.contentMode = .scaleAspectFill
-
-            view.addSubview(barProgress)
-            
-            barProgress.translatesAutoresizingMaskIntoConstraints = false
-            barProgress.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            barProgress.topAnchor.constraint(equalTo: title.bottomAnchor,constant: 20).isActive = true
-            barProgress.widthAnchor.constraint(equalToConstant: view.frame.width*0.8).isActive = true
-            let height_ = barProgress.heightAnchor.constraint(equalToConstant: (view.frame.width*0.8)/5)
-            height_.isActive = true
-            
-            let progress = UIView(frame: .zero)
-            progress.layer.cornerRadius = height_.constant/2
-            progress.backgroundColor = UIColor(red: 179/255, green: 71/255, blue: 154/255, alpha: 1)
-            barProgress.addSubview(progress)
-        
-            progress.translatesAutoresizingMaskIntoConstraints = false
-            progress.heightAnchor.constraint(equalTo:barProgress.heightAnchor,constant: -10).isActive = true
-            progress.leadingAnchor.constraint(equalTo: barProgress.leadingAnchor, constant: 5).isActive = true
-            progress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor, constant: 0).isActive = true
-            let contrait = progress.widthAnchor.constraint(equalToConstant: 10)
-
-            NSLayoutConstraint.activate([contrait,height_])
-            
-            UIView.animate(withDuration: 0.3) {
-                contrait.constant = totalWidth
-                progress.layoutIfNeeded()
-            }
-            
-            let textProgress = UILabel()
-                textProgress.textColor = .white
-            textProgress.font =  UIFont.systemFont(ofSize: height_.constant/4, weight: .bold)
-            textProgress.text = "COLLECTED \(ManagedDB.getDragonBuy())/\(Dragons.items.count)"
-            
-            barProgress.addSubview(textProgress)
-            
-            textProgress.translatesAutoresizingMaskIntoConstraints = false
-            textProgress.centerXAnchor.constraint(equalTo: barProgress.centerXAnchor, constant: 0).isActive = true
-            textProgress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor, constant: 0).isActive = true
-            
-            
-            let collection =  self.ManagedCollectionInView(view: view,type: .index) { _ in } deSelect: { _ in }
-            view.addSubview(collection)
-            
-            collection.translatesAutoresizingMaskIntoConstraints = false
-            collection.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            collection.widthAnchor.constraint(equalToConstant: width*0.95).isActive = true
-            collection.heightAnchor.constraint(equalToConstant: height*0.75).isActive = true
-            collection.topAnchor.constraint(equalTo: barProgress.bottomAnchor,constant: 40).isActive = true
-            
-        }
-    }
-    
-    // REVISAR ESTA FUNCION
-    private func SellMainPage() {
-        
-       let width = screenSize.width*0.9
-       let height = screenSize.height*0.8
-       let marginX = (screenSize.width-width)/2
-       let marginY = (screenSize.height-height)/2
-    
-       var dragonSelected:[Dragons] = []
-        
-       let rect = CGRect(x: marginX, y: marginY, width: width, height: height)
-       
-       var btnSell:UIButton =  UIButton()
-        
-       var textCount:UILabel?
-        
-       var textSeleted:Int = 0 {
-           
-        didSet {
-            if textSeleted >  0 {
-                btnSell.setBackgroundImage(img: UIImage(named: "GreenButton")!)
-                btnSell.restorationIdentifier = textCount?.text
-                btnSell.isEnabled = true
-                textCount?.text = "+\(textSeleted)"
-
-            } else {
-                btnSell.setBackgroundImage(img: UIImage(named: "disableSell")!)
-                btnSell.isEnabled = false
-                textCount?.text = "+ 0"
-
-            }
-        }
-    }
-        
-        removeUIViews()
-
-        let view = createViewForCollection(frame: rect, typeGrid: .sell, hasCancelBtn: true)
-        
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.leadingAnchor.constraint(equalTo: (scene?.view!.leadingAnchor)!,constant: marginX).isActive = true
-        view.heightAnchor.constraint(equalToConstant: height).isActive = true
-        view.widthAnchor.constraint(equalToConstant: width).isActive = true
-        view.topAnchor.constraint(equalTo: (scene?.view!.topAnchor)!,constant: marginY).isActive = true
-        
-        let gradient = UIImage.gradientImage(bounds: view.bounds, colors: [.orange, .yellow])
-
-        let title = UILabel()
-            .addFontAndText(font: "Cartwheel", text: "BULK SELL", size: view.frame.width*0.1)
-            .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
-        view.addSubview(title)
-        
-        title.translatesAutoresizingMaskIntoConstraints = false
-        title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        title.topAnchor.constraint(equalTo: view.topAnchor,constant: view.frame.height*0.05).isActive = true
-        
-        let subtitle = UILabel()
-            .addFontAndText(font: "Cartwheel", text: "CHOOSE DRAGONS TO SELL", size: view.frame.width*0.08)
-            .shadowText(colorText: .brown, colorShadow: .black, aligment: .center)
-        view.addSubview(subtitle)
-        
-        subtitle.translatesAutoresizingMaskIntoConstraints = false
-        subtitle.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        subtitle.topAnchor.constraint(equalTo: view.topAnchor,constant: view.frame.height*0.1).isActive = true
-        
-        
-        let collection = ManagedCollectionInView(view: view,type: .sell) { dragon in
-            textSeleted +=  dragon.hasValue()
-            dragonSelected.append(dragon)
-            
-        } deSelect: { dragon in
-            textSeleted -= dragon.hasValue()
-            guard let index = dragonSelected.firstIndex(where: {$0.name == dragon.name}) else { return }
-            dragonSelected.remove(at: index)
-        }
-        
-        view.addSubview(collection)
-        
-        collection.translatesAutoresizingMaskIntoConstraints = false
-        collection.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        collection.topAnchor.constraint(equalTo: subtitle.bottomAnchor,constant: 20).isActive = true
-        collection.widthAnchor.constraint(equalToConstant: width*0.9).isActive = true
-        collection.heightAnchor.constraint(equalToConstant: height*0.45).isActive = true
-
-        let contador = UIButton(frame: CGRect(x: width*0.1, y: view.frame.height*0.65, width: view.frame.width*0.3, height: view.frame.width*0.1))
-            contador.setBackgroundImage(img: UIImage(named: "counter")!)
-        view.addSubview(contador)
-        
-        let fruit = UIImageView(image:UIImage(named: "fruit")!)
-            contador.addSubview(fruit)
-       
-        fruit.translatesAutoresizingMaskIntoConstraints = false
-        fruit.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant: 0).isActive = true
-        fruit.trailingAnchor.constraint(equalTo: contador.trailingAnchor,constant: -5).isActive = true
-        fruit.widthAnchor.constraint(equalToConstant: contador.frame.height*0.8).isActive = true
-        fruit.heightAnchor.constraint(equalTo: fruit.widthAnchor,constant: 0).isActive = true
-
-        
-        textCount = UILabel()
-            .addFontAndText(font: "Cartwheel", text: "+ \(textSeleted)", size: contador.frame.width*0.2)
-            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
-        contador.addSubview(textCount!)
-        
-        textCount?.translatesAutoresizingMaskIntoConstraints = false
-        textCount?.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant: 0).isActive = true
-        textCount?.centerXAnchor.constraint(equalTo: contador.centerXAnchor,constant: -5).isActive = true
-        
-        btnSell = UIButton(frame: contador.frame)
-        btnSell.setBackgroundImage(img: UIImage(named: "disableSell")!)
-        btnSell.addTarget(self, action: #selector(sellTapButton), for: .touchUpInside)
-        view.addSubview(btnSell)
-        
-        btnSell.translatesAutoresizingMaskIntoConstraints = false
-        btnSell.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant:  0).isActive = true
-        btnSell.centerXAnchor.constraint(equalTo: view.trailingAnchor,constant:  -contador.frame.width).isActive = true
-        btnSell.widthAnchor.constraint(equalTo: contador.widthAnchor,constant:  0).isActive = true
-        btnSell.heightAnchor.constraint(equalTo: contador.heightAnchor,constant:  0).isActive = true
-        
-        let bag = UIImageView(image:UIImage(named: "iconExtra_2")!)
-        btnSell.addSubview(bag)
-
-        bag.translatesAutoresizingMaskIntoConstraints = false
-        bag.centerYAnchor.constraint(equalTo: btnSell.centerYAnchor,constant: 0).isActive = true
-        bag.trailingAnchor.constraint(equalTo: btnSell.trailingAnchor,constant: 10).isActive = true
-        bag.widthAnchor.constraint(equalToConstant: btnSell.frame.height).isActive = true
-        bag.heightAnchor.constraint(equalToConstant:  btnSell.frame.height).isActive = true
-       
-        let txtSell = UILabel()
-            .addTextWithFont(font: UIFont.systemFont(ofSize: btnSell.frame.width*0.15, weight: .bold),
-                             text: "SELL",color: .brown)
-        
-        btnSell.addSubview(txtSell)
-        txtSell.translatesAutoresizingMaskIntoConstraints = false
-        txtSell.centerXAnchor.constraint(equalTo: btnSell.centerXAnchor,constant: 0).isActive = true
-        txtSell.centerYAnchor.constraint(equalTo: btnSell.centerYAnchor,constant: 0).isActive = true
-
-       
-        let txtUndone = UILabel(frame: CGRect(x: 0, y:  view.frame.height*0.7, width: view.frame.width,height: height*0.1))
-            .addTextWithFont(font: UIFont.systemFont(ofSize: view.frame.width*0.03, weight: .bold),text: "(This cannot be undone)",color: .brown)
-            view.addSubview(txtUndone)
-        
-        let bagFruit = UIImageView(frame: CGRect(x: view.frame.width*0.1, y: view.frame.height*0.75,width: view.frame.width/4, height: view.frame.width/4))
-            bagFruit.image = UIImage(named: "bagFruit")
-        view.addSubview(bagFruit)
-      
-        
-        let getMoreFruit = UILabel(frame: CGRect(x: width*0.1, y:  view.frame.height*0.72, width: view.frame.width,height: height*0.2))
-            .addTextWithFont(font: UIFont.systemFont(ofSize: view.frame.width*0.05, weight: .bold), text: "GET MORE\nDRAGONFRUIT",color: .brown)
-            .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
-            view.addSubview(getMoreFruit)
-        
-        
-        let contadorMoreFruit = UIImageView(frame: CGRect(x: width*0.5, y: view.frame.height*0.87,
-                                                          width: view.frame.width*0.4,
-                                                          height: view.frame.width*0.1))
-            contadorMoreFruit.image = UIImage(named: "counter")
-            contadorMoreFruit.isUserInteractionEnabled = true
-            
-        let totalFruit = UILabel()
-                .addFontAndText(font: "Cartwheel", text: "\(ManagedDB.getFruitTotal())"
-                .convertDecimal(), size: contador.frame.width*0.2)
-                .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
-        contadorMoreFruit.addSubview(totalFruit)
-        
-        totalFruit.translatesAutoresizingMaskIntoConstraints = false
-        totalFruit.centerYAnchor.constraint(equalTo: contadorMoreFruit.centerYAnchor,constant: 0).isActive = true
-        totalFruit.centerXAnchor.constraint(equalTo: contadorMoreFruit.centerXAnchor,constant: 0).isActive = true
-
-        view.addSubview(contadorMoreFruit)
-
-        let iconPlus =  UIButton()
-            iconPlus.setImage(UIImage(named: "btnAdd"), for: .normal)
-            iconPlus.addTarget(self, action: #selector(tapCounter), for: .touchUpInside)
-        contadorMoreFruit.addSubview(iconPlus)
-        
-        iconPlus.translatesAutoresizingMaskIntoConstraints = false
-        iconPlus.widthAnchor.constraint(equalTo: contadorMoreFruit.heightAnchor,constant: 0).isActive = true
-        iconPlus.heightAnchor.constraint(equalTo: contadorMoreFruit.heightAnchor,constant: 0).isActive = true
-        iconPlus.trailingAnchor.constraint(equalTo: contadorMoreFruit.trailingAnchor,constant: iconPlus.frame.width).isActive = true
-        
-
-        scene?.view?.addSubview(view)
-    }
-    
+  
     @objc func tapCounter() {
       //  childNode(withName:"viewBuyGem")?.removeFromParent()
         self.viewBuyGem(item: BuyFruit.items)
@@ -612,19 +270,13 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
                 
             case .GetEggs:                              genericTableView(items:BuyEggs.items)
              
-            case .Sell:                                 SellMainPage()
+            case .Sell:                                 SellMainPage(isBulkSell: .Bulk, isFeedBtn: false,item: nil)
             
             case .Index:                                showIndexPageBook()
                 
-            case .btnLeft,.btnRight:break
-           
-            case .btnFeed:break
-                
             case .btnMainToSell,.btnCancelBuyGem,
-                 .CancelFruitSell,.CancelInfoDragon:
-                                                            removeBackgroundBlack(removeBlur: blurNode)
+                 .CancelFruitSell,.CancelInfoDragon:        removeBackgroundBlack(removeBlur: blurNode)
                                                             showMainPage()
-            
                 
             case .btnSellFruit, .txtSellFruit:         AnimationSellDragonGetFruit()
             
@@ -643,13 +295,15 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         
         sender.isEnabled = false
         
-        guard let strTotal = sender.restorationIdentifier?.components(separatedBy: " ").last,
-              let total = Int(strTotal) else { return }
+        guard let arimethic = sender.restorationIdentifier?.components(separatedBy: " ").first,
+              let strTotal = sender.restorationIdentifier?.components(separatedBy: " ").last,
+              let total = Int(strTotal) else { fatalError() }
         
         run(gameinfo.mainAudio.getAction(type: .ChangeOption))
         
-        createAnimationFruitSell(typeObject: Icons.fruit) {  _  in
-            if ManagedDB.addFruitTotal(addFruit: total) {
+        createAnimationFruitSell(typeObject: Icons.fruit,numberFruit: total) {  _  in
+          
+            if ManagedDB.addFruitTotal(addFruit: total,arimethic: arimethic) {
                 self.tapButtonCancel(sender:sender)
             }
         }
@@ -676,7 +330,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         }
         
         
-        let view = createViewForCollection(frame: rect, typeGrid: .index, hasCancelBtn: true)
+        let view = templateMainGeneric(frame: rect, typeGrid: .index, hasCancelBtn: true)
         
         let dragonIcon = UIImageView(image: UIImage(named: dragon.picture.name)!)
         view.addSubview(dragonIcon)
@@ -686,7 +340,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         dragonIcon.heightAnchor.constraint(equalToConstant: view.frame.width*0.5).isActive = true
         dragonIcon.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
         
-        ManagedDB.shared.isBuyDragon(name: dragon.picture.name) { exist in
+        ManagedDB.shared.isBuyDragon(name: dragon.name) { exist in
              if !exist {
                  dragonIcon.image = dragonIcon.image?.maskWithColor(color: .black)
              }
@@ -712,11 +366,19 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         arrowR.centerYAnchor.constraint(equalTo: dragonIcon.centerYAnchor,constant: 0).isActive = true
         arrowR.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -5).isActive = true
         
+        let element = UIImageView(image: UIImage(named: dragon.element + "_Weakness"))
+            view.addSubview(element)
         
+        element.translatesAutoresizingMaskIntoConstraints = false
+        element.bottomAnchor.constraint(equalTo: dragonIcon.bottomAnchor,constant: 0).isActive = true
+        element.leadingAnchor.constraint(equalTo: dragonIcon.trailingAnchor,constant: 15).isActive = true
+        
+        
+        var star = UIImageView()
         let number = dragon.picture.name.getNumberStarName()
         for x in 0...2 {
-            let image = x <= number ? "starB" : "startGray"
-            let star = UIImageView(image: UIImage(named: image))
+            let image = x <= number ? "starB" : "starGray"
+            star = UIImageView(image: UIImage(named: image))
             let x =  star.image!.size.width + CGFloat(CGFloat(x-1) * star.image!.size.width)
             view.addSubview(star)
             star.translatesAutoresizingMaskIntoConstraints = false
@@ -728,16 +390,19 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         
         let sizeFont = view.frame.width * 0.05
         let shape = UIView()
-        shape.layer.cornerRadius = view.frame.width * 0.05
-        shape.layer.backgroundColor = UIColor.orange.withLuminosity(0.5).cgColor
-        shape.backgroundColor = .brown
-        view.addSubview(shape)
+            shape.layer.backgroundColor = UIColor(red: 212/255, green: 172/255, blue: 112/255, alpha: 0.5).cgColor
+            shape.layer.cornerRadius = 10
+            shape.layer.shadowOpacity = 1
+            shape.layer.shadowColor = UIColor.black.withAlphaComponent(1).cgColor
+            shape.layer.shadowRadius = 4
+            view.addSubview(shape)
        
         shape.translatesAutoresizingMaskIntoConstraints = false
-        shape.topAnchor.constraint(equalTo: dragonIcon.bottomAnchor,constant: 70).isActive = true
+        shape.topAnchor.constraint(equalTo: star.bottomAnchor,constant: 10).isActive = true
         shape.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         shape.widthAnchor.constraint(equalToConstant: view.frame.width*0.9).isActive = true
         shape.heightAnchor.constraint(equalToConstant: view.frame.height*0.4).isActive = true
+        shape.layoutIfNeeded()
         
         let name = UILabel()
             .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: "Name:", color: .white)
@@ -749,8 +414,8 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         name.topAnchor.constraint(equalTo: shape.topAnchor,constant: 10).isActive = true
         
         let valueName = UILabel()
-            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: dragon.picture.name, color: .white)
-            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: dragon.name, color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
 
         shape.addSubview(valueName)
         valueName.translatesAutoresizingMaskIntoConstraints = false
@@ -769,8 +434,8 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         
         
         let valueRarity = UILabel()
-            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: "Common", color: .white)
-            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: dragon.rarity.rawValue, color: .white)
+            .shadowText(colorText: dragon.colorFontRarityElement(), colorShadow: .black, aligment: .center)
 
         shape.addSubview(valueRarity)
         valueRarity.translatesAutoresizingMaskIntoConstraints = false
@@ -788,8 +453,8 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         type.topAnchor.constraint(equalTo: rarity.bottomAnchor,constant: 10).isActive = true
         
         let valueType = UILabel()
-            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: "Permanent", color: .white)
-            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: dragon.type, color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
         
         shape.addSubview(valueType)
         valueType.translatesAutoresizingMaskIntoConstraints = false
@@ -806,8 +471,8 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         class_.topAnchor.constraint(equalTo: type.bottomAnchor,constant: 10).isActive = true
         
         let valueClass = UILabel()
-            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: "Chaser", color: .white)
-            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            .addTextWithFont(font: .systemFont(ofSize: sizeFont, weight: .bold), text: dragon.class_, color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
 
         shape.addSubview(valueClass)
         valueClass.translatesAutoresizingMaskIntoConstraints = false
@@ -823,21 +488,6 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         skills.trailingAnchor.constraint(equalTo: class_.trailingAnchor,constant: 0).isActive = true
         skills.topAnchor.constraint(equalTo: class_.bottomAnchor,constant: 10).isActive = true
         
-                
-        for x in 0...3{
-            
-            let valueSkills = UIImageView(image: UIImage(named: "sidekick_skills1_0")!)
-            shape.addSubview(valueSkills)
-            
-            let width = view.frame.width/6
-            let marginX = width  - (CGFloat(x+1) * width)
-            
-            valueSkills.translatesAutoresizingMaskIntoConstraints = false
-            valueSkills.heightAnchor.constraint(equalToConstant: width).isActive = true
-            valueSkills.widthAnchor.constraint(equalToConstant: width).isActive = true
-            valueSkills.topAnchor.constraint(equalTo: class_.bottomAnchor,constant: 10).isActive = true
-            valueSkills.trailingAnchor.constraint(equalTo: shape.trailingAnchor,constant: marginX).isActive = true
-        }
         
         let txtDiscover = UILabel()
             .addTextWithFont(font: .systemFont(ofSize: 20, weight: .bold), text: "Discover", color: .white)
@@ -849,6 +499,33 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         txtDiscover.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         txtDiscover.centerYAnchor.constraint(equalTo: view.bottomAnchor,constant: -view.frame.height*0.07).isActive = true
   
+        
+        let viewTemp = UIView(frame: .zero)
+        shape.addSubview(viewTemp)
+        
+        viewTemp.translatesAutoresizingMaskIntoConstraints = false
+        viewTemp.topAnchor.constraint(equalTo: skills.bottomAnchor,constant: 0).isActive = true
+        viewTemp.leadingAnchor.constraint(equalTo: shape.leadingAnchor).isActive = true
+        viewTemp.trailingAnchor.constraint(equalTo: shape.trailingAnchor).isActive = true
+        viewTemp.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        viewTemp.layoutIfNeeded()
+        
+        for x in 0..<dragon.icons.count{
+            
+            let valueSkills = MyButton(frame: .zero, item: dragon, view: viewTemp, index: x)  { _ in }
+            valueSkills.setImage(UIImage(named: dragon.icons[x].rawValue),for: .normal)
+            shape.addSubview(valueSkills)
+            
+            let width = viewTemp.frame.width/6
+            let marginX = (width  - (CGFloat(x+1) * width) - 15)
+            
+            valueSkills.translatesAutoresizingMaskIntoConstraints = false
+            valueSkills.heightAnchor.constraint(equalToConstant: width).isActive = true
+            valueSkills.widthAnchor.constraint(equalToConstant: width).isActive = true
+            valueSkills.topAnchor.constraint(equalTo: valueClass.bottomAnchor,constant: 0).isActive = true
+            valueSkills.trailingAnchor.constraint(equalTo: shape.trailingAnchor,constant: marginX).isActive = true
+        }
+        
         scene?.view?.addSubview(view)
     }
     
@@ -875,11 +552,17 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
             switch direction {
                 case .Left:
                     number -= 1
-                if number  > 0 {  return Dragons.items.filter { $0.picture.name == "\(name)_T\(number)_icon"}.first }
+                if number  > 0 {
+                    return Dragons.items.filter { $0.picture.name == "\(name)_T\(number)_icon"}.first
+                    
+                }
                 
                 case .Right:
                     number += 1
-                  if number  < 4 {  return Dragons.items.filter { $0.picture.name == "\(name)_T\(number)_icon"}.first }
+                  if number  < 4 {
+                      return Dragons.items.filter { $0.picture.name == "\(name)_T\(number)_icon"}.first
+                      
+                  }
             }
             return nil
         }
@@ -922,27 +605,722 @@ extension String{
 extension DragonsMenuScene {
     
     
-    // MARK: ADD ANIMATION FRUITS WHEN SELL DRAGONS FOR BY FRUIT
-    private func createAnimationFruitSell(typeObject:Icons,completion:@escaping(Bool)->Void) {
+    // MARK: SHOW MAIN PAGE SCREEN
+    private func showMainPage() {
+    
+        let width =  min(screenSize.width,screenSize.height) > 500 ? 600 : min(screenSize.width,screenSize.height)
+        let frame = CGRect(x: 0, y: 0, width: width, height: width)
+        
+        let mainView = templateMainGeneric(frame:frame, typeGrid: .main, hasCancelBtn: false)
+
+        mainView.translatesAutoresizingMaskIntoConstraints = false
+        mainView.widthAnchor.constraint(equalToConstant: width).isActive = true
+        mainView.heightAnchor.constraint(equalToConstant: width).isActive = true
+        mainView.centerXAnchor.constraint(equalTo: view!.centerXAnchor).isActive = true
+        mainView.bottomAnchor.constraint(equalTo: view!.bottomAnchor,constant: -(view?.frame.height)!*0.1).isActive = true
+        
+        
+
+       /*
+       
+        let dragonRight = UIButton(frame: CGRect(x:  (width -  sizeCircle), y:  screenSize.height*0.05, width: sizeCircle, height:  sizeCircle))
+        dragonRight.setImage(UIImage(named: "WC02_T1_icon")?.resized(to: CGSize(width: sizeCircle*0.8, height: sizeCircle*0.8)), for: .normal)
+        dragonRight.imageView?.contentMode = .scaleAspectFit
+        dragonRight.restorationIdentifier = "WC02_T1_icon"
+
+        dragonRight.layer.cornerRadius = sizeCircle/2
+        dragonRight.backgroundColor = .black.withAlphaComponent(0.5)
+        dragonRight.addTarget(self, action: #selector(tapCircleDragon), for: .touchUpInside)
+        mainView.addSubview(dragonRight)
+        
+        let dragonLeft = UIButton(frame: CGRect(x: sizeCircle/2, y: screenSize.height*0.05, width: sizeCircle, height:  sizeCircle))
+        dragonLeft.setImage(UIImage(named: "LC01_T1_icon")?.resized(to: CGSize(width: sizeCircle*0.8, height: sizeCircle*0.8)), for: .normal)
+        dragonLeft.restorationIdentifier = "LC01_T1_icon"
+        dragonLeft.backgroundColor = .black.withAlphaComponent(0.5)
+        dragonLeft.layer.cornerRadius = sizeCircle/4
+        dragonLeft.addTarget(self, action: #selector(tapCircleDragon), for: .touchUpInside)
+        mainView.addSubview(dragonLeft)*/
+        
+        if SearchDragonBuyInDB() {
+            
+            let collection = ManagedCollectionInView(view: mainView, type: .main) { _ in } deSelect: { _ in }
+
+            mainView.addSubview(collection)
+            collection.translatesAutoresizingMaskIntoConstraints = false
+            collection.centerXAnchor.constraint(equalTo: mainView.centerXAnchor).isActive = true
+            collection.centerYAnchor.constraint(equalTo: mainView.centerYAnchor).isActive = true
+            collection.widthAnchor.constraint(equalTo: mainView.widthAnchor,constant: -mainView.frame.width*0.15).isActive = true
+            collection.heightAnchor.constraint(equalTo: mainView.heightAnchor,constant: -mainView.frame.height*0.15).isActive = true
+            
+        } else {
+            
+            let txtInsideTable = UILabel(frame: mainView.bounds)
+                .addFontAndText(font: "Cartwheel", text: "EARN GOLD TO\nBUY DRAGONS", size: mainView.bounds.width/8)
+                .shadowText(colorText: .brown, colorShadow: .white, aligment: .center)
+          
+            txtInsideTable.numberOfLines = 0
+            mainView.addSubview(txtInsideTable)
+            
+            txtInsideTable.translatesAutoresizingMaskIntoConstraints = false
+            txtInsideTable.centerYAnchor.constraint(equalTo: mainView.centerYAnchor).isActive = true
+            txtInsideTable.centerXAnchor.constraint(equalTo: mainView.centerXAnchor).isActive = true
+            
+            let arrow = UIImageView(image: UIImage(named: "arrowBrown")!)
+            mainView.addSubview(arrow)
+            
+            arrow.translatesAutoresizingMaskIntoConstraints = false
+            arrow.centerXAnchor.constraint(equalTo: mainView.centerXAnchor,constant: 0).isActive = true
+            arrow.topAnchor.constraint(equalTo: txtInsideTable.bottomAnchor).isActive = true
+            arrow.widthAnchor.constraint(equalToConstant: mainView.frame.width/4).isActive = true
+            arrow.heightAnchor.constraint(equalTo: arrow.widthAnchor).isActive = true
+            arrow.topAnchor.constraint(equalTo: txtInsideTable.bottomAnchor).isActive = true
+        }
+    }
+    
+    private func showIndexPageBook(){
+        
+        let width = screenSize.width*0.9
+        let height = screenSize.height*0.8
+        let marginX = (screenSize.width-width)/2
+        let marginY = (screenSize.height-height)/2
+        let rect = CGRect(x: marginX, y: marginY, width: width, height: height)
+        
+        (UIApplication.shared.delegate as? AppDelegate)?.preloadData { d in
+           
+            self.scene?.backgroundBlack(withSpinnerActive: false)
+            
+            let view = self.templateMainGeneric(frame: rect, typeGrid: .sell, hasCancelBtn: true)
+            
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.leadingAnchor.constraint(equalTo: (self.scene?.view!.leadingAnchor)!,constant: marginX).isActive = true
+            view.heightAnchor.constraint(equalToConstant: height).isActive = true
+            view.widthAnchor.constraint(equalToConstant: width).isActive = true
+            view.topAnchor.constraint(equalTo: (self.scene?.view!.topAnchor)!,constant: marginY).isActive = true
+            
+            let gradient = UIImage.gradientImage(bounds: view.bounds, colors: [.white,.white])
+            
+            let title = UILabel()
+                .addFontAndText(font: "Cartwheel", text: "YOUR COLLECTION:", size: view.frame.width*0.07)
+                .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
+            view.addSubview(title)
+            
+            title.translatesAutoresizingMaskIntoConstraints = false
+            title.topAnchor.constraint(equalTo: view.topAnchor,constant: 20).isActive = true
+            title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            
+            
+            let getPercent = Double(ManagedDB.getNumberDragonBuy())/Double(Dragons.items.count)
+            let totalWidth = (view.frame.width*0.8)*getPercent
+            
+            let barProgress = UIImageView()
+            barProgress.image = UIImage(named: "barProgress")
+            barProgress.contentMode = .scaleAspectFill
+
+            view.addSubview(barProgress)
+            
+            barProgress.translatesAutoresizingMaskIntoConstraints = false
+            barProgress.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            barProgress.topAnchor.constraint(equalTo: title.bottomAnchor,constant: 10).isActive = true
+            barProgress.widthAnchor.constraint(equalTo: title.widthAnchor).isActive = true
+            
+            let progress = UIImageView(image:UIImage(named: "progress"))
+            barProgress.addSubview(progress)
+        
+            progress.translatesAutoresizingMaskIntoConstraints = false
+            progress.heightAnchor.constraint(equalTo:barProgress.heightAnchor,constant: 0).isActive = true
+            progress.leadingAnchor.constraint(equalTo: barProgress.leadingAnchor, constant: 10).isActive = true
+            progress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor, constant: 0).isActive = true
+           
+            UIView.animate(withDuration: 1) {
+                progress.widthAnchor.constraint(equalToConstant: totalWidth).isActive = true
+            }
+            
+            let textProgress = UILabel()
+                .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            textProgress.font =  UIFont.systemFont(ofSize: view.frame.width*0.05, weight: .bold)
+            textProgress.text = "COLLECTED \(ManagedDB.getNumberDragonBuy())/\(Dragons.items.count)"
+            barProgress.addSubview(textProgress)
+            
+            textProgress.translatesAutoresizingMaskIntoConstraints = false
+            textProgress.centerXAnchor.constraint(equalTo: barProgress.centerXAnchor, constant: 0).isActive = true
+            textProgress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor, constant: 0).isActive = true
+            
+            
+            let collection =  self.ManagedCollectionInView(view: view,type: .index) { _ in } deSelect: { _ in }
+            view.addSubview(collection)
+            
+            collection.translatesAutoresizingMaskIntoConstraints = false
+            collection.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            collection.widthAnchor.constraint(equalToConstant: width*0.95).isActive = true
+            collection.heightAnchor.constraint(equalToConstant: height*0.75).isActive = true
+            collection.topAnchor.constraint(equalTo: barProgress.bottomAnchor,constant: 40).isActive = true
+            
+        }
+    }
+    
+    // REVISAR ESTA FUNCION
+    private func SellMainPage(isBulkSell:typeGenericView,isFeedBtn:Bool,item: Dragons?) {
+        
+        let width = screenSize.width*0.95
+        let height = screenSize.height*0.8
+        let marginX = (screenSize.width-width)/2
+        let marginY = (screenSize.height-height)/2
+        
+        let rect = CGRect(x: marginX, y: marginY, width: width, height: height)
+
+        removeUIViews()
+        
+        let view = templateMainGeneric(frame: rect, typeGrid: .sell, hasCancelBtn: true)
+        let gradient = UIImage.gradientImage(bounds: view.bounds, colors: [.orange, .yellow])
+
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.leadingAnchor.constraint(equalTo: (scene?.view!.leadingAnchor)!,constant: marginX).isActive = true
+        view.heightAnchor.constraint(equalToConstant: height).isActive = true
+        view.widthAnchor.constraint(equalToConstant: width).isActive = true
+        view.topAnchor.constraint(equalTo: (scene?.view!.topAnchor)!,constant: marginY).isActive = true
+        
+        
+        if isBulkSell == .Bulk {
+            
+            partialViewBulkSell(view: view,gradient:gradient)
+           
+        } else if isBulkSell == .Feed {
+            
+            partialViewSellIndividual(view:view,item: item!,gradient:gradient, isFeedBtn: isFeedBtn)
+
+        } else {
+            partialViewEvolve(view:view,item: item!,gradient:gradient, isFeedBtn: false)
+        }
+        
+        let bagFruit = UIImageView(image:UIImage(named: "bagFruit"))
+            view.addSubview(bagFruit)
+        
+        bagFruit.translatesAutoresizingMaskIntoConstraints = false
+        bagFruit.bottomAnchor.constraint(equalTo: view.bottomAnchor,constant: -20).isActive = true
+        bagFruit.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 50).isActive = true
+        bagFruit.widthAnchor.constraint(equalToConstant: view.frame.height*0.2).isActive = true
+        bagFruit.heightAnchor.constraint(equalToConstant: view.frame.height*0.2).isActive = true
+      
+        
+        let getMoreFruit = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "GET MORE\nDRAGONFRUIT", size: view.frame.width*0.06)
+            .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
+            getMoreFruit.numberOfLines = 0
+            view.addSubview(getMoreFruit)
+        
+        getMoreFruit.translatesAutoresizingMaskIntoConstraints = false
+        getMoreFruit.centerXAnchor.constraint(equalTo: view.centerXAnchor,constant: view.frame.width/4).isActive = true
+        getMoreFruit.topAnchor.constraint(equalTo:bagFruit.topAnchor,constant: -15).isActive = true
+        
+        let contadorMoreFruit = UIImageView(frame: CGRect(x: width*0.5, y: view.frame.height*0.87,
+                                                          width: view.frame.width*0.4,
+                                                          height: view.frame.width*0.1))
+            contadorMoreFruit.image = UIImage(named: "counter")
+            contadorMoreFruit.isUserInteractionEnabled = true
+            
+        let totalFruit = UILabel()
+                .addFontAndText(font: "Cartwheel", text: "\(ManagedDB.getFruitTotal())"
+                .convertDecimal(), size: contadorMoreFruit.frame.width*0.10)
+                .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+        contadorMoreFruit.addSubview(totalFruit)
+        
+        totalFruit.translatesAutoresizingMaskIntoConstraints = false
+        totalFruit.centerYAnchor.constraint(equalTo: contadorMoreFruit.centerYAnchor,constant: 0).isActive = true
+        totalFruit.centerXAnchor.constraint(equalTo: contadorMoreFruit.centerXAnchor,constant: 0).isActive = true
+
+        view.addSubview(contadorMoreFruit)
+
+        let iconPlus =  UIButton()
+            iconPlus.setImage(UIImage(named: "btnAdd"), for: .normal)
+            iconPlus.addTarget(self, action: #selector(tapCounter), for: .touchUpInside)
+        contadorMoreFruit.addSubview(iconPlus)
+        
+        iconPlus.translatesAutoresizingMaskIntoConstraints = false
+        iconPlus.widthAnchor.constraint(equalTo: contadorMoreFruit.heightAnchor,constant: 0).isActive = true
+        iconPlus.heightAnchor.constraint(equalTo: contadorMoreFruit.heightAnchor,constant: 0).isActive = true
+        iconPlus.trailingAnchor.constraint(equalTo: contadorMoreFruit.trailingAnchor,constant: iconPlus.frame.width).isActive = true
+
+        scene?.view?.addSubview(view)
+    }
+    
+    /// - Description: Partial view to evolve the dragons
+    private func partialViewEvolve(view:UIView,item: Dragons,gradient:UIImage, isFeedBtn: Bool) {
+        
+        partialViewHeader(view:view,item:item,isFeedBtn:false)
+        
+        let title = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "CHOOSE EVO PARTNER", size: view.frame.height*0.05)
+            .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
+        title.adjustsFontSizeToFitWidth = true
+        title.minimumScaleFactor = 0.5
+        title.textAlignment = .center
+        title.lineBreakMode = .byWordWrapping
+        view.addSubview(title)
+        
+        title.translatesAutoresizingMaskIntoConstraints = false
+        title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        title.centerYAnchor.constraint(equalTo: view.centerYAnchor,constant: -view.frame.height*0.1).isActive = true
+        title.widthAnchor.constraint(equalTo: view.widthAnchor,constant: -50).isActive = true
+
+        let text = """
+                        Choose a dragon to evolve together.
+                        Only dragons of the same name and level can be used.
+                  """
+        
+        let subtitle = UILabel()
+            .addFontAndText(font: "Cartwheel", text: text, size: view.frame.height*0.03)
+            .shadowText(colorText: .black, colorShadow: .white,aligment: .center)
+        subtitle.numberOfLines = 0
+        subtitle.adjustsFontSizeToFitWidth = false
+        subtitle.minimumScaleFactor = 0.75
+        subtitle.textAlignment = .left
+        subtitle.lineBreakMode = .byWordWrapping
+        view.addSubview(subtitle)
+        
+        subtitle.translatesAutoresizingMaskIntoConstraints = false
+        subtitle.centerXAnchor.constraint(equalTo: title.centerXAnchor).isActive = true
+        subtitle.topAnchor.constraint(equalTo: title.bottomAnchor).isActive = true
+        subtitle.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        subtitle.widthAnchor.constraint(equalTo:view.widthAnchor,constant: -25).isActive = true
+        
+        
+        
+        let collection = ManagedCollectionInView(view: view, type: .sell) { dragonSelected in
+            
+        } deSelect: { dragonDeselect in
+            
+        }
+        view.addSubview(collection)
+        
+        collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.topAnchor.constraint(equalTo: subtitle.bottomAnchor).isActive = true
+        collection.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        collection.heightAnchor.constraint(equalToConstant: view.frame.height*0.25).isActive = true
+        collection.widthAnchor.constraint(equalToConstant: view.frame.height/2).isActive = true
+
+
+        
+    }
+    
+    /// - Description: View partial for header generic,  left show dragon  image and the dragon info to right
+    private func partialViewHeader(view:UIView,item:Dragons,isFeedBtn:Bool)  {
+
+        view.subviews.first {$0.tag == 1000}?.removeFromSuperview()
+        
+        let header = UIView()
+        header.tag  = 1000
+        view.addSubview(header)
+        
+        let imgDragon = UIImageView(image: UIImage(named: item.picture.name))
+        header.addSubview(imgDragon)
+        
+        let width = UIDevice().isPhone() ? view.frame.height*0.2 : view.frame.height*0.3
+        imgDragon.translatesAutoresizingMaskIntoConstraints  = false
+        imgDragon.widthAnchor.constraint(equalToConstant: width).isActive = true
+        imgDragon.heightAnchor.constraint(equalTo: imgDragon.widthAnchor).isActive = true
+        imgDragon.topAnchor.constraint(equalTo: view.topAnchor,constant: 40).isActive = true
+        imgDragon.centerXAnchor.constraint(equalTo: view.centerXAnchor,constant: -view.frame.width/4 ).isActive = true
+
+        let shape = UIView()
+        shape.backgroundColor = UIColor(red: 239 / 255, green: 204/255, blue: 151/255, alpha: 0.5)
+        shape.layer.cornerRadius = view.frame.width * 0.05
+        shape.layer.borderColor = UIColor.darkText.withAlphaComponent(0.8).cgColor
+        shape.layer.borderWidth = 1
+        shape.layer.shadowColor = UIColor.gray.cgColor
+        shape.layer.shadowOffset = CGSize(width: 10, height:  1)
+        header.addSubview(shape)
+       
+        shape.translatesAutoresizingMaskIntoConstraints = false
+        shape.topAnchor.constraint(equalTo: imgDragon.topAnchor,constant: 0).isActive = true
+        shape.leadingAnchor.constraint(equalTo: view.centerXAnchor,constant: 5).isActive = true
+        shape.widthAnchor.constraint(equalToConstant: view.frame.width*0.45).isActive = true
+        
+        if  UIDevice().isPhone() {
+            shape.heightAnchor.constraint(equalToConstant: view.frame.height*0.25).isActive = true
+        } else {
+            shape.heightAnchor.constraint(equalTo:imgDragon.heightAnchor,constant: 30).isActive = true
+        }
+        
+        let imgHeart = UIButton()
+            imgHeart.setImage(UIImage(named: "heartOff"), for: .normal)
+            imgHeart.setImage(UIImage(named: "heartOn"), for: .selected)
+        header.addSubview(imgHeart)
+        
+        imgHeart.translatesAutoresizingMaskIntoConstraints = false
+        imgHeart.widthAnchor.constraint(equalToConstant: (view.frame.width/2)*0.2).isActive = true
+        imgHeart.heightAnchor.constraint(equalTo: imgHeart.widthAnchor).isActive = true
+        imgHeart.bottomAnchor.constraint(equalTo: shape.bottomAnchor).isActive = true
+        imgHeart.trailingAnchor.constraint(equalTo: shape.leadingAnchor,constant: -5).isActive = true
+
+        var star = UIImageView()
+        /// Icons Stars
+        for x in 0...2 {
+            let numberStart = item.picture.name.getNumberStarName()
+            let picture = x <= numberStart ? "starB" : "starGray"
+            star = UIImageView(frame: CGRect(x: 0, y: 0, width: view.frame.height*0.05, height: view.frame.height*0.05))
+            star.image = UIImage(named:  picture)!
+            shape.addSubview(star)
+            
+            star.translatesAutoresizingMaskIntoConstraints = false
+            star.widthAnchor.constraint(equalToConstant: (view.frame.width/2)/6).isActive = true
+            star.heightAnchor.constraint(equalTo: star.widthAnchor).isActive = true
+            star.topAnchor.constraint(equalTo: shape.topAnchor,constant: 5).isActive = true
+            let marginX = Double((view.frame.width/2)/6)  * CGFloat(x) + 5
+            star.leadingAnchor.constraint(equalTo: shape.leadingAnchor, constant: marginX).isActive = true
+        }
+    
+        let name = UILabel()
+            .addFontAndText(font: "Cartwheel", text: item.name, size: (view.frame.width/2)*0.1)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+        shape.addSubview(name)
+    
+        name.translatesAutoresizingMaskIntoConstraints = false
+        name.leadingAnchor.constraint(equalTo: shape.leadingAnchor,constant: 10).isActive = true
+        name.topAnchor.constraint(equalTo:star.bottomAnchor, constant: 10).isActive = true
+        
+        let subtitle = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "\(item.rarity)", size: (view.frame.width/2)*0.1)
+            .shadowText(colorText: item.colorFontRarityElement(), colorShadow: .black, aligment: .center)
+        shape.addSubview(subtitle)
+        
+        subtitle.translatesAutoresizingMaskIntoConstraints = false
+        subtitle.leadingAnchor.constraint(equalTo: shape.leadingAnchor,constant: 10).isActive = true
+        subtitle.topAnchor.constraint(equalTo: name.bottomAnchor,constant:5).isActive = true
+     
+        if isFeedBtn  && item.getLevel()  {
+            
+            item.setMaxLevel()
+        }
+        let level = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "LVL \(item.level) \(item.class_)", size: (view.frame.width/2)*0.1)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        shape.addSubview(level)
+        
+        level.translatesAutoresizingMaskIntoConstraints = false
+        level.leadingAnchor.constraint(equalTo: shape.leadingAnchor,constant: 10).isActive = true
+        level.topAnchor.constraint(equalTo: subtitle.bottomAnchor,constant:5).isActive = true
+        level.layoutIfNeeded()
+        
+        let barProgress = UIImageView(image: UIImage(named: "barProgress"))
+        shape.addSubview(barProgress)
+        
+        barProgress.translatesAutoresizingMaskIntoConstraints = false
+        barProgress.topAnchor.constraint(equalTo: level.bottomAnchor,constant:0).isActive = true
+        barProgress.centerXAnchor.constraint(equalTo: shape.centerXAnchor).isActive = true
+        barProgress.widthAnchor.constraint(equalTo: shape.widthAnchor,constant: -30).isActive = true
+        barProgress.heightAnchor.constraint(equalToConstant: view.frame.width*0.45/4.3).isActive = true
+        barProgress.layoutIfNeeded()
+
+        let barProgresPercent  = round(item.getPercent(width: barProgress.frame.width))
+        
+        let progress = UIImageView(image: UIImage(named: "progress"))
+        shape.addSubview(progress)
+        
+        progress.translatesAutoresizingMaskIntoConstraints = false
+        progress.leadingAnchor.constraint(equalTo: barProgress.leadingAnchor,constant: 0).isActive = true
+        progress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor,constant:0).isActive = true
+        progress.heightAnchor.constraint(equalTo: barProgress.heightAnchor,constant: -6).isActive = true
+        progress.widthAnchor.constraint(equalToConstant: barProgresPercent).isActive = true
+        progress.layoutIfNeeded()
+        
+        let percent = String(format: "%.0f",item.percent)
+        let textPrgress = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "\(percent)%", size: 20)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        shape.addSubview(textPrgress)
+        
+        textPrgress.translatesAutoresizingMaskIntoConstraints = false
+        textPrgress.centerXAnchor.constraint(equalTo: barProgress.centerXAnchor,constant: 0).isActive = true
+        textPrgress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor,constant:0).isActive = true
+
+    }
+    
+    /// - Description: Main view where I add the partial views to sell the dragons
+    private func partialViewSellIndividual(view:UIView,item: Dragons,gradient:UIImage,isFeedBtn:Bool) {
+        
+        partialViewHeader(view: view,item: item,isFeedBtn: isFeedBtn)
+        
+        let shape = view.retangleView(title: !isFeedBtn ? "SELL \(item.name)?" : "FEED \(item.name)?",gradient: gradient)
+        
+        let counter:UILabel = partialCounter(view: view, shape: shape) { button in
+            
+            let textValFruit = isFeedBtn ? item.calculateFruit() : item.rarity.valueFruitDragon
+            
+            let txtValueFruit = UILabel()
+                .addFontAndText(font: "Cartwheel", text: textValFruit, size: button.frame.height/2)
+                .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
+            button.addSubview(txtValueFruit)
+            
+            txtValueFruit.translatesAutoresizingMaskIntoConstraints = false
+            txtValueFruit.centerXAnchor.constraint(equalTo: button.centerXAnchor,constant: -5).isActive = true
+            txtValueFruit.centerYAnchor.constraint(equalTo: button.centerYAnchor,constant: 0).isActive = true
+            
+            if !isFeedBtn {
+                let txtUndone = UILabel()
+                    .addTextWithFont(font: UIFont.systemFont(ofSize: view.frame.width*0.03, weight: .bold), text: "(This cannot be undone)", color: .white)
+                shape.addSubview(txtUndone)
+                
+                txtUndone.translatesAutoresizingMaskIntoConstraints = false
+                txtUndone.centerXAnchor.constraint(equalTo: shape.centerXAnchor,constant: 0).isActive = true
+                txtUndone.topAnchor.constraint(equalTo: button.bottomAnchor,constant: 0).isActive = true
+            }
+            let btnSell = UIButton(frame: CGRect(x: 0, y: 0, width: button.frame.width, height: button.frame.height))
+            btnSell.setBackgroundImage(img: UIImage(named: "GreenButton")!)
+            btnSell.restorationIdentifier = isFeedBtn ? "\(item.getValueFruit())" : item.rarity.valueFruitDragon
+            btnSell.addTarget(self, action: #selector(sellTapButton), for: .touchUpInside)
+            shape.addSubview(btnSell)
+            
+            btnSell.translatesAutoresizingMaskIntoConstraints = false
+            btnSell.centerXAnchor.constraint(equalTo: button.centerXAnchor).isActive = true
+            btnSell.bottomAnchor.constraint(equalTo: shape.bottomAnchor,constant: -10).isActive = true
+            btnSell.widthAnchor.constraint(equalToConstant: button.frame.width).isActive = true
+            btnSell.heightAnchor.constraint(equalToConstant: button.frame.height).isActive = true
+            
+            if !isFeedBtn{
+                let iconBag = UIImageView(image: UIImage(named: "iconExtra_2")!)
+                view.addSubview(iconBag)
+                
+                iconBag.translatesAutoresizingMaskIntoConstraints = false
+                iconBag.centerYAnchor.constraint(equalTo: btnSell.centerYAnchor).isActive = true
+                iconBag.centerXAnchor.constraint(equalTo: btnSell.trailingAnchor).isActive = true
+                iconBag.widthAnchor.constraint(equalTo: button.heightAnchor).isActive = true
+                iconBag.heightAnchor.constraint(equalTo: button.heightAnchor).isActive = true
+            }
+            let txtSell = UILabel()
+                .addTextWithFont(font: UIFont.systemFont(ofSize: view.frame.width*0.05, weight: .bold), text: !isFeedBtn ? "SELL":"FEED", color: .white)
+            btnSell.addSubview(txtSell)
+            
+            txtSell.translatesAutoresizingMaskIntoConstraints = false
+            txtSell.centerXAnchor.constraint(equalTo: btnSell.centerXAnchor,constant: 0).isActive = true
+            txtSell.centerYAnchor.constraint(equalTo: btnSell.centerYAnchor,constant: 0).isActive = true
+            
+            return txtValueFruit
+        }
+ 
+        if isFeedBtn {
+            
+            var btnLeft = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+            var btnRight = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+            
+            
+            btnLeft = MyButton(frame: btnLeft.frame, item: item, view: shape, identifier: .Left) { _ in
+                
+                if item.lessPercent() {
+                    self.partialViewHeader(view: view, item: item, isFeedBtn: true)
+                    counter.text = "\(item.calculateFruit())"
+                    btnRight.isEnabled = true
+                }
+            }
+            
+            btnRight = MyButton(frame: btnLeft.frame, item: item, view: shape, identifier: .Right) { _ in
+                
+                if item.addPercent() {
+                    self.partialViewHeader(view: view, item: item, isFeedBtn: true)
+                    counter.text = "\(item.calculateFruit())"
+                    btnLeft.isEnabled = true
+                    btnLeft.setImage(UIImage(named: "btnBlueLess"), for: .normal)
+                }
+            }
+        }
+    }
+    
+    
+    /// - Description: Partial view for the view shared sell FEED dragons
+    /// - Parameters: @view:  The view add components UIView
+    ///               @gradient:  Gradient UImage for text effect
+    
+    private func partialCounter(view:UIView,shape:UIView,handler:(UIButton)->UILabel) -> UILabel {
+        
+        let val = view.frame.height - shape.frame.height
+        
+        let widthBtn  = val*0.25
+        
+        let heightBtn = widthBtn / 2.65
+        
+        let contador = UIButton(frame: CGRect(x: 0, y: 0, width: widthBtn, height: heightBtn))
+        contador.isEnabled = false
+        contador.setBackgroundImage(img: UIImage(named: "counter")!)
+        shape.addSubview(contador)
+        
+        contador.translatesAutoresizingMaskIntoConstraints = false
+        contador.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        contador.centerYAnchor.constraint(equalTo: shape.centerYAnchor).isActive = true
+        contador.widthAnchor.constraint(equalToConstant: widthBtn).isActive = true
+        contador.heightAnchor.constraint(equalToConstant: heightBtn).isActive = true
+        contador.layoutIfNeeded()
+        
+        let fruit = UIImageView(image:UIImage(named: "fruit")!)
+        contador.addSubview(fruit)
+        
+        fruit.translatesAutoresizingMaskIntoConstraints = false
+        fruit.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant: 0).isActive = true
+        fruit.centerXAnchor.constraint(equalTo: contador.trailingAnchor,constant: 0).isActive = true
+        fruit.heightAnchor.constraint(equalTo: contador.heightAnchor).isActive = true
+        fruit.widthAnchor.constraint(equalTo: contador.heightAnchor).isActive = true
+        fruit.layoutIfNeeded()
+        
+        
+        return handler(contador)
+    }
+    
+    
+    /// - Description: Partial view for the share view sell group dragons and sell individual dragon
+    /// - Parameters: @view:  The view add components UIView
+    ///               @gradient:  Gradient UImage for text effect
+    private func partialViewBulkSell(view:UIView,gradient:UIImage) {
+        
+        let width = view.frame.width
+        let height = view.frame.height
+        
+        var btnSell:UIButton =  UIButton()
+        
+        var textCount:UILabel?
+        
+        var dragonSelected:[Dragons] = []
+        
+         var textSeleted:Int = 0 {
+            
+            didSet {
+                if textSeleted >  0 {
+                    btnSell.setBackgroundImage(img: UIImage(named: "GreenButton")!)
+                    btnSell.restorationIdentifier = textCount?.text
+                    btnSell.isEnabled = true
+                    textCount?.text = "+\(textSeleted)"
+                    
+                } else {
+                    btnSell.setBackgroundImage(img: UIImage(named: "disableSell")!)
+                    btnSell.isEnabled = false
+                    textCount?.text = "+ 0"
+                    
+                }
+            }
+        }
+        
+        
+        let title = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "BULK SELL", size: view.frame.width*0.1)
+            .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
+        view.addSubview(title)
+        
+        title.translatesAutoresizingMaskIntoConstraints = false
+        title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        title.topAnchor.constraint(equalTo: view.topAnchor,constant: view.frame.height*0.05).isActive = true
+        
+        let subtitle = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "CHOOSE DRAGONS TO SELL", size: view.frame.width*0.06)
+            .shadowText(colorText: .brown, colorShadow: .black, aligment: .center)
+        view.addSubview(subtitle)
+        
+        subtitle.translatesAutoresizingMaskIntoConstraints = false
+        subtitle.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        subtitle.topAnchor.constraint(equalTo: title.bottomAnchor).isActive = true
+        
+        
+        let collection = ManagedCollectionInView(view: view,type: .sell) { dragon in
+            textSeleted +=  dragon.getValueFruit()
+            dragonSelected.append(dragon)
+            
+        } deSelect: { dragon in
+            textSeleted -= dragon.getValueFruit()
+            guard let index = dragonSelected.firstIndex(where: {$0.name == dragon.name}) else { return }
+            dragonSelected.remove(at: index)
+        }
+        
+        view.addSubview(collection)
+        
+        collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        collection.topAnchor.constraint(equalTo: subtitle.bottomAnchor,constant: 0).isActive = true
+        collection.widthAnchor.constraint(equalToConstant: width*0.9).isActive = true
+        collection.heightAnchor.constraint(equalToConstant: height*0.45).isActive = true
+        
+        let contador = UIButton(frame: CGRect(x: width*0.1, y: view.frame.height*0.65, width: view.frame.width*0.3, height: view.frame.width*0.1))
+        contador.setBackgroundImage(img: UIImage(named: "counter")!)
+        view.addSubview(contador)
+        
+        let fruit = UIImageView(image:UIImage(named: "fruit")!)
+        contador.addSubview(fruit)
+        
+        fruit.translatesAutoresizingMaskIntoConstraints = false
+        fruit.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant: 0).isActive = true
+        fruit.trailingAnchor.constraint(equalTo: contador.trailingAnchor,constant: -5).isActive = true
+        fruit.widthAnchor.constraint(equalToConstant: contador.frame.height*0.8).isActive = true
+        fruit.heightAnchor.constraint(equalTo: fruit.widthAnchor,constant: 0).isActive = true
+        
+        
+        textCount = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "+ \(textSeleted)", size: contador.frame.width*0.2)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+        contador.addSubview(textCount!)
+        
+        textCount?.translatesAutoresizingMaskIntoConstraints = false
+        textCount?.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant: 0).isActive = true
+        textCount?.centerXAnchor.constraint(equalTo: contador.centerXAnchor,constant: -5).isActive = true
+        
+        btnSell = UIButton(frame: contador.frame)
+        btnSell.setBackgroundImage(img: UIImage(named: "disableSell")!)
+        btnSell.addTarget(self, action: #selector(sellTapButton), for: .touchUpInside)
+        view.addSubview(btnSell)
+        
+        btnSell.translatesAutoresizingMaskIntoConstraints = false
+        btnSell.centerYAnchor.constraint(equalTo: contador.centerYAnchor,constant:  0).isActive = true
+        btnSell.centerXAnchor.constraint(equalTo: view.trailingAnchor,constant:  -contador.frame.width).isActive = true
+        btnSell.widthAnchor.constraint(equalTo: contador.widthAnchor,constant:  0).isActive = true
+        btnSell.heightAnchor.constraint(equalTo: contador.heightAnchor,constant:  0).isActive = true
+        
+        let bag = UIImageView(image:UIImage(named: "iconExtra_2")!)
+        btnSell.addSubview(bag)
+        
+        bag.translatesAutoresizingMaskIntoConstraints = false
+        bag.centerYAnchor.constraint(equalTo: btnSell.centerYAnchor,constant: 0).isActive = true
+        bag.trailingAnchor.constraint(equalTo: btnSell.trailingAnchor,constant: 10).isActive = true
+        bag.widthAnchor.constraint(equalToConstant: btnSell.frame.height).isActive = true
+        bag.heightAnchor.constraint(equalToConstant:  btnSell.frame.height).isActive = true
+        
+        let txtSell = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: btnSell.frame.width*0.15, weight: .bold),
+                             text: "SELL",color: .brown)
+        
+        btnSell.addSubview(txtSell)
+        txtSell.translatesAutoresizingMaskIntoConstraints = false
+        txtSell.centerXAnchor.constraint(equalTo: btnSell.centerXAnchor,constant: 0).isActive = true
+        txtSell.centerYAnchor.constraint(equalTo: btnSell.centerYAnchor,constant: 0).isActive = true
+    
+    
+        let txtUndone = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: view.frame.width*0.03, weight: .bold),text: "(This cannot be undone)",color: .brown)
+        view.addSubview(txtUndone)
+        
+        txtUndone.translatesAutoresizingMaskIntoConstraints = false
+        txtUndone.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        txtUndone.topAnchor.constraint(equalTo: txtSell.bottomAnchor,constant: 15).isActive = true
+    }
+    
+    /// - Description: Make animation fruits  when sell dragon for fruitst
+    /// - Parameters: @typeObject:Icons  Create type icons for effect
+    /// - Returns:     completion when finalice effect
+    private func createAnimationFruitSell(typeObject:Icons,numberFruit:Int,completion:@escaping(Bool)->Void) {
      
         var index = 0
-      
+        
         let _ = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { t in
-            
+           
             if index > 10 {
                 t.invalidate()
-            }
-            self.coinAnimation(index:index,typeObject:typeObject ,t:t.timeInterval) { _  in
                 self.run(self.gameinfo.mainAudio.getAction(type: .Result_Coin))
                 completion(true)
             }
             index += 1
+            
+            self.coinAnimation(index:index,typeObject:typeObject ,t:t.timeInterval) { _  in }
         }
     }
     
     //MARK: ANIMATE SEVERAL FRUIT IN CENTER SCREEN WHEN SELL DRAGON FOR FRUIT
     private func coinAnimation(index:Int,typeObject:Icons,t:TimeInterval,handler:@escaping(Bool)->Void) {
-
+        if index > 10 {
+            handler(true)
+        }
         let smallFruit = UIImage(named: typeObject.rawValue)!
 
         let imageView = UIImageView(image: smallFruit)
@@ -954,7 +1332,7 @@ extension DragonsMenuScene {
         imageView.contentMode = .scaleAspectFit
         let position = CGPoint(x: screenSize.minX, y: screenSize.minY)
 
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration: 0.2,delay: 0,options: .curveEaseOut) {
             imageView.center = position
             imageView.transform = CGAffineTransform(rotationAngle: 90)
             imageView.transform = CGAffineTransform(translationX: screenSize.minX, y: screenSize.minY)
@@ -978,7 +1356,6 @@ extension DragonsMenuScene {
                          genericTableView(items: BuyGem.items)
                     case .Fruit:
                         genericTableView(items: BuyFruit.items)
-                        
                     default: break
                 }
         }
@@ -997,8 +1374,7 @@ extension DragonsMenuScene {
             print("HAS not COIN TO BUY")
             return false
         }
-        createAnimationFruitSell(typeObject: .coin, completion: { [self] _ in
-            
+        createAnimationFruitSell(typeObject: .coin, numberFruit: 10, completion: { [self] _ in
             
             do {
                 try ManagedDB.shared.lessAmount(typeCoin: typeCoin, amount: amount)
@@ -1026,351 +1402,6 @@ extension DragonsMenuScene {
             print("Should not reach Here - doTask from CharacterMenuScene")
         }
     }
-    
-    private func headerPanel(item:Dragons,actionButton:ActionButton)  -> SKSpriteNode{
-       
-        
-        /// Background view
-        let bg = SKSpriteNode(imageNamed: "panelInfo")
-        
-        bg.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        bg.name = "panelInfo"
-        bg.size = CGSize(width: screenSize.width*0.9, height: screenSize.height*0.7)
-        bg.position = CGPoint(x: screenSize.midX, y: screenSize.midY)
-        
-        
-        let iconCancel = SKSpriteNode(imageNamed: "CancelButton")
-        iconCancel.name = actionButton.rawValue
-        iconCancel.size = CGSize(width: 50, height: 50)
-        iconCancel.position = CGPoint(x: bg.size.width/2, y: bg.size.height/2)
-        bg.addChild(iconCancel)
-        
-        
-        
-        /// Dragon image
-        let imgDragon = SKSpriteNode(texture:SKTexture(imageNamed: item.picture.name))
-        imgDragon.name = "dragonNode"
-        imgDragon.size = CGSize(width: bg.size.height * 0.25, height: bg.size.height * 0.3)
-        imgDragon.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        imgDragon.position =  CGPoint(x: -bg.size.width/2 + imgDragon.size.width/2,
-                                      y: bg.size.height/2 - imgDragon.size.height/2)
-        
-        let heart = SKSpriteNode(imageNamed: "heartOff")
-        heart.name = "iconHeart"
-        heart.size = CGSize(width: imgDragon.size.width/4, height: imgDragon.size.width/4)
-        heart.position = CGPoint(x: imgDragon.size.width/2, y: -imgDragon.size.height/2)
-        imgDragon.addChild(heart)
-        
-        bg.addChild(imgDragon)
-        /// Background info dragon selected
-        
-        let bgInfoDragon = SKShapeNode(rect: CGRect(x: 0,
-                                                    y: -bg.size.height*0.35,
-                                                    width: bg.size.width*0.45,
-                                                    height: bg.size.height*0.3),
-                                       cornerRadius: bg.size.width*0.03)
-        bgInfoDragon.fillColor = UIColor(red: 239 / 255, green: 204/255, blue: 151/255, alpha: 0.5)
-        bgInfoDragon.strokeColor = .clear
-        bgInfoDragon.position =  CGPoint(x: 0, y: bg.frame.height/2 )
-        
-        
-        bg.addChild(bgInfoDragon)
-        
-        /// Icons Stars
-        for x in 0...2 {
-            let start = SKSpriteNode(imageNamed: "starB")
-            start.size = CGSize(width: bgInfoDragon.frame.size.width/5, height: bgInfoDragon.frame.size.width/5)
-            start.name = "star_\(x)"
-            start.position = CGPoint(x: start.size.width/2 + CGFloat(x) * start.size.width, y: -bgInfoDragon.frame.size.height*0.3)
-            bgInfoDragon.addChild(start)
-        }
-        
-        /// Name Dragon text
-        let nameDragon = SKLabelNode(fontNamed: "Cartwheel",
-                                     andText: item.name,
-                                     andSize: bgInfoDragon.frame.size.width*0.14, fontColor: .purple,
-                                     withShadow: .white)!
-        nameDragon.name = "nameDragon"
-        nameDragon.horizontalAlignmentMode = .left
-        nameDragon.verticalAlignmentMode = .center
-        
-        nameDragon.position = CGPoint(x: bgInfoDragon.frame.width * 0.15 , y: -bgInfoDragon.frame.size.height*0.55)
-        bgInfoDragon.addChild(nameDragon)
-        
-        /// Type Dragons text
-        let typeDragon = SKLabelNode(fontNamed: "Cartwheel",
-                                     andText: "Common",
-                                     andSize: bgInfoDragon.frame.size.width*0.1, fontColor: .green,
-                                     withShadow: .black)!
-        typeDragon.name = "typeDragon"
-        typeDragon.position = CGPoint(x: bgInfoDragon.frame.width * 0.15, y: -bgInfoDragon.frame.size.height*0.75)
-        bgInfoDragon.addChild(typeDragon)
-        
-        /// Text level charser
-        let levelCharser = SKLabelNode(fontNamed: "Cartwheel",
-                                       andText: "LVL 5 CHARSER",
-                                       andSize: bgInfoDragon.frame.size.width*0.1, fontColor: .white,
-                                       withShadow: .black)!
-        levelCharser.name = "typeDragon"
-        levelCharser.position = CGPoint(x: bgInfoDragon.frame.width * 0.30, y: -bgInfoDragon.frame.size.height*0.85)
-        bgInfoDragon.addChild(levelCharser)
-        
-        /// Background bar progress
-        let bgProgress = SKSpriteNode(imageNamed: "barProgress")
-        bgProgress.size = CGSize(width: bgInfoDragon.frame.size.width*0.9, height: bgInfoDragon.frame.size.width*0.15)
-        bgProgress.name = "bgProgress"
-        bgProgress.position = CGPoint(x:  bgInfoDragon.frame.width*0.85/2, y: -bgInfoDragon.frame.size.height)
-        bgInfoDragon.addChild(bgProgress)
-        
-        /// Bar progress
-        let barProgress = SKSpriteNode(imageNamed: "progress")
-        barProgress.anchorPoint = CGPoint(x: 0, y: 0.5)
-        barProgress.size = CGSize(width: bgProgress.size.width*0.8, height: bgProgress.size.height*0.8)
-        barProgress.name = "progress"
-        barProgress.position.x = -bgProgress.size.width*0.48
-        barProgress.run(.resize(toWidth: bgProgress.size.width*0.96, duration: 1))
-        bgProgress.addChild(barProgress)
-        
-        // Text percent center barProgress
-        let textPercent = SKLabelNode(fontNamed: "Cartwheel",
-                                      andText: "23%",
-                                      andSize: bgProgress.frame.size.width*0.1, fontColor: .white,
-                                      withShadow: .black)!
-        textPercent.name = "txtPercent"
-        bgProgress.addChild(textPercent)
-        
-        return bg
-        
-    }
-    
-    //MARK: SHOW VIEW PANEL DRAGON CIRCLE SELECTED
-    private func showPanelDragonCircle(item:Dragons) {
-        
-        if let view = scene?.view?.subviews.filter({$0.tag == 1}).first {
-            UIView.animate(withDuration: 0.05, animations:  {
-                view.transform = CGAffineTransform(translationX: -screenSize.width, y:0 )
-            })
-        }
-        let arrayNameIconExtra = [(text:"EQUIP\nLEFT",value:ActionButton.btnLeft),
-                                  (text:"EQUIP\nRIGHT",value:ActionButton.btnRight),
-                                  (text:"SELL",value:ActionButton.btnFeed),
-                                  (text:"FEED",value:ActionButton.btnFeed)]
-        
-        
-        let width = screenSize.width*0.9
-        let height = screenSize.height*0.8
-        let marginX = (screenSize.width-width)/2
-        let marginY = (screenSize.height-height)/2
-        let rect = CGRect(x: marginX, y: marginY, width: width, height: height)
-        
-        let view = createViewForCollection(frame: rect, typeGrid: .sell, hasCancelBtn: true)
-        self.view?.addSubview(view)
-        
-        let imgDragon = UIImageView(image: UIImage(named: item.picture.name))
-        view.addSubview(imgDragon)
-        
-        imgDragon.translatesAutoresizingMaskIntoConstraints  = false
-        imgDragon.widthAnchor.constraint(equalToConstant: view.frame.height*0.25).isActive = true
-        imgDragon.heightAnchor.constraint(equalToConstant: view.frame.height*0.3).isActive = true
-        imgDragon.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
-        imgDragon.centerXAnchor.constraint(equalTo: view.centerXAnchor,constant: -view.frame.width/4 ).isActive = true
-
-
-        let imgHeart = UIImageView(image: UIImage(named: "heartOff"))
-        view.addSubview(imgHeart)
-        
-        imgHeart.translatesAutoresizingMaskIntoConstraints = false
-        imgHeart.widthAnchor.constraint(equalToConstant: imgDragon.frame.width/4).isActive = true
-        imgHeart.heightAnchor.constraint(equalToConstant: imgDragon.frame.width/4).isActive = true
-        imgHeart.bottomAnchor.constraint(equalTo: imgDragon.bottomAnchor).isActive = true
-        imgHeart.trailingAnchor.constraint(equalTo: view.centerXAnchor,constant: -10).isActive = true
-
-        let shape = UIView()
-        shape.backgroundColor = UIColor(red: 239 / 255, green: 204/255, blue: 151/255, alpha: 0.5)
-        shape.layer.cornerRadius = view.frame.width * 0.05
-        view.addSubview(shape)
-        
-        shape.translatesAutoresizingMaskIntoConstraints = false
-        shape.topAnchor.constraint(equalTo: imgDragon.topAnchor).isActive = true
-        shape.leadingAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        shape.widthAnchor.constraint(equalToConstant: view.frame.width*0.45).isActive = true
-        shape.heightAnchor.constraint(equalTo: imgDragon.heightAnchor).isActive = true
-        
-
-        /// Icons Stars
-        for x in 0...2 {
-            let star = UIImageView(image: UIImage(named:  "starB")!)
-            shape.addSubview(star)
-            
-            star.translatesAutoresizingMaskIntoConstraints = false
-            let constWidth = star.widthAnchor.constraint(equalToConstant: 50)
-            star.heightAnchor.constraint(equalTo: star.widthAnchor).isActive = true
-            star.topAnchor.constraint(equalTo: shape.topAnchor,constant: 10).isActive = true
-            let marginX = Double((view.frame.width/8)  * CGFloat(x + 1))/2
-            star.leadingAnchor.constraint(equalTo: shape.leadingAnchor, constant: marginX).isActive = true
-        }
-        
-        let name = UILabel()
-            .addFontAndText(font: "Cartwheel", text: item.name, size: 18)
-        shape.addSubview(name)
-        
-        name.translatesAutoresizingMaskIntoConstraints = false
-        name.leadingAnchor.constraint(equalTo: shape.leadingAnchor,constant: 10).isActive = true
-        name.topAnchor.constraint(equalTo: shape.topAnchor,constant: 50).isActive = true
-        
-      /*
-        let node:SKNode = SKNode()
-        node.name = ActionButton.CancelInfoDragon.getNameView
-        
-        
-        let bg = headerPanel(item:item as! Dragons, actionButton: .CancelInfoDragon)
-        
-       
-        /// View DMG
-        let dmg = SKSpriteNode(imageNamed: "bgDragonsIcons")
-        dmg.size = CGSize(width: bg.size.width*0.6, height: bg.size.height*0.1)
-        dmg.name = "dmgView"
-        dmg.position =  CGPoint(x: -dmg.size.width*0.3,y:dmg.size.height/2)
-        
-        let iconNature = SKSpriteNode(imageNamed: "Nature_Weakness")
-        iconNature.size = CGSize(width: dmg.size.height*0.8, height: dmg.size.height*0.8)
-        iconNature.position.x = -dmg.size.width*0.35
-        dmg.addChild(iconNature)
-        
-        // Text level DMG
-        let text1DMG = SKLabelNode(fontNamed: "Cartwheel",
-                                   andText: "14",
-                                   andSize: dmg.frame.size.width*0.1, fontColor: .yellow,
-                                   withShadow: .black)!
-        text1DMG.name = "txt1DMG"
-        text1DMG.numberOfLines = 0
-        text1DMG.position = CGPoint(x: -dmg.size.width * 0.10, y:  0)
-        dmg.addChild(text1DMG)
-        
-        // Text percent center barProgress
-        let textDMG = SKLabelNode(fontNamed: "Cartwheel",
-                                  andText: "DMG",
-                                  andSize: dmg.frame.size.width*0.07, fontColor: .brown,
-                                  withShadow: .clear)!
-        
-        textDMG.name = "DMGtxt"
-        textDMG.numberOfLines = 0
-        textDMG.position = CGPoint(x: -dmg.size.width * 0.10, y:  -dmg.size.height*0.35)
-        dmg.addChild(textDMG)
-        
-        
-        /// Icon arrow brown
-        let iconArrow = SKSpriteNode(imageNamed: "arrow")
-        iconArrow.size = CGSize(width: dmg.size.height*0.6, height: dmg.size.height*0.6)
-        iconArrow.position.x = dmg.size.width*0.15
-        dmg.addChild(iconArrow)
-        
-        // Text two level DMG
-        let text2DMG = SKLabelNode(fontNamed: "Cartwheel",
-                                   andText: "19",
-                                   andSize: dmg.frame.size.width*0.1, fontColor: .yellow,
-                                   withShadow: .black)!
-        text2DMG.name = "txt2DMG"
-        text2DMG.numberOfLines = 0
-        text2DMG.position = CGPoint(x: dmg.size.width * 0.35, y:  0)
-        dmg.addChild(text2DMG)
-        
-        let copyTextDMG  = textDMG.copy() as! SKLabelNode
-        copyTextDMG.position = CGPoint(x: dmg.size.width * 0.35, y:  -dmg.size.height*0.35)
-        dmg.addChild(copyTextDMG)
-        
-        bg.addChild(dmg)
-        
-        /// View   Horoscope
-        let horoscopeView = SKSpriteNode(imageNamed: "bgDragonsIcons")
-        horoscopeView.size = CGSize(width: bg.size.width*0.3, height: bg.size.height*0.1)
-        horoscopeView.name = "horoscopeView"
-        horoscopeView.position = CGPoint(x: horoscopeView.size.width,y:horoscopeView.size.height/2)
-        bg.addChild(horoscopeView)
-        
-        /// Icon horoscope
-        let iconHoroscope = SKSpriteNode(imageNamed: "pisces")
-        iconHoroscope.size = CGSize(width: horoscopeView.size.height * 0.6, height: horoscopeView.size.height*0.7)
-        iconHoroscope.position.x = -horoscopeView.size.width*0.3
-        horoscopeView.addChild(iconHoroscope)
-        
-        /// counter page view horoscope
-        let counter = SKLabelNode(fontNamed: "Cartwheel",
-                                  andText: "1/3",
-                                  andSize: horoscopeView.frame.size.height/2, fontColor: .brown,
-                                  withShadow: .darkGray)!
-        counter.name = "counterTxt"
-        counter.numberOfLines = 0
-        counter.position = CGPoint(x: horoscopeView.size.width * 0.25, y: 0)
-        horoscopeView.addChild(counter)
-        
-        /// Text skills
-        let txtSkills = SKLabelNode(fontNamed: "Cartwheel",
-                                    andText: "SKILLS",
-                                    andSize: bg.size.width * 0.05,fontColor: .brown,
-                                    withShadow: .white)!
-        txtSkills.name = "txtSkills"
-        txtSkills.numberOfLines = 0
-        txtSkills.position = CGPoint(x: 0, y: -bg.size.height*0.04)
-        bg.addChild(txtSkills)
-        
-        /// View   Skills
-        let skillsView = SKSpriteNode(imageNamed: "bgDragonsIcons")
-        skillsView.size = CGSize(width: bg.size.width*0.95, height: bg.size.height*0.2)
-        skillsView.name = "skillsView"
-        skillsView.position = CGPoint(x: 0,y:-bg.size.height*0.17)
-        bg.addChild(skillsView)
-        
-        /// Icons skills
-        for x in 0...4 {
-            let skills = SKSpriteNode(imageNamed: "sidekick_skills1_\(x)")
-            skills.name = "sidekick_skills1_0"
-            skills.size = CGSize(width: (bg.size.width/5)*0.9, height: (bg.size.width/5)*0.9)
-            skills.position = CGPoint(x: -bg.size.width*0.35 + CGFloat(x) * skills.size.width, y: 0)
-            skillsView.addChild(skills)
-        }
-        
-        /// Icons  actions extra
-        for x in 0...3 {
-            let iconsExtra = SKSpriteNode(imageNamed: "BulletButton")
-            iconsExtra.name = "iconExtra_\(x)"
-            iconsExtra.size = CGSize(width: (bg.size.width/5)*0.6, height: (bg.size.width/5)*0.6)
-            iconsExtra.position = CGPoint(x: -bg.size.width*0.35 + CGFloat(x) * iconsExtra.size.width*2, y: -bg.size.height*0.34)
-            
-            let icon = SKSpriteNode(imageNamed: iconsExtra.name!)
-            icon.name = arrayNameIconExtra[x].value.rawValue
-            icon.size = CGSize(width: iconsExtra.size.width/2, height: iconsExtra.size.width/2)
-            iconsExtra.addChild(icon)
-            
-            let actionIconExtra = SKLabelNode(fontNamed: "Cartwheel",
-                                              andText: arrayNameIconExtra[x].text,
-                                              andSize: bg.size.width * 0.04,fontColor: .white,
-                                              withShadow: .black)!
-            
-            actionIconExtra.name = arrayNameIconExtra[x].text
-            actionIconExtra.numberOfLines = 0
-            actionIconExtra.position.y = -icon.frame.size.height*1.6
-            iconsExtra.addChild(actionIconExtra)
-            
-            bg.addChild(iconsExtra)
-        }
-        
-        node.addChild(bg)
-        self.addChild(node)
-         */
-    }
-    
-    //MARK: SHOW VIEW BUY T  ITEM
-    private func viewBuyGem<T:ProtocolTableViewGenericCell>(item:[T]){
-        
-        
-        self.view?.addSubview(createViewForCollection(frame: .zero, typeGrid: .sell, hasCancelBtn: true))
-    
-        genericTableView(items: item)
-       
-    }
-    
-  
     
     //MARK: MAKE ANIMATION WHEN SELL DRAGON ANIMATE FRUITE TO SCORE
     private func AnimationSellDragonGetFruit() {
@@ -1450,3 +1481,215 @@ extension DragonsMenuScene {
 
 
 
+extension DragonsMenuScene {
+    
+    //MARK: SHOW VIEW PANEL DRAGON CIRCLE SELECTED
+    private func showPanelDragonCircle(item:Dragons) {
+        
+        if let view = scene?.view?.subviews.filter({$0.tag == 1}).first {
+            UIView.animate(withDuration: 0.05, animations:  {
+                view.transform = CGAffineTransform(translationX: -screenSize.width, y:0 )
+            })
+        }
+        
+        let width = screenSize.width*0.95
+        let height = screenSize.height*0.8
+        let marginX = (screenSize.width-width)/2
+        let marginY = (screenSize.height-height)/2
+        let rect = CGRect(x: marginX, y: marginY, width: width, height: height)
+        
+        let view = templateMainGeneric(frame: rect, typeGrid: .sell, hasCancelBtn: true)
+        self.view?.addSubview(view)
+        
+        partialViewHeader(view: view,item: item,isFeedBtn: false)
+        
+        let dmgView = UIImageView(image: UIImage(named: "bgDragonsIcons"))
+        view.addSubview(dmgView)
+        
+        let isPhone  = UIDevice().isPhone() ? view.frame.height*0.35 : view.frame.height*0.4
+        
+        dmgView.translatesAutoresizingMaskIntoConstraints = false
+        dmgView.topAnchor.constraint(equalTo: view.topAnchor,constant: isPhone).isActive = true
+        dmgView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant:10).isActive = true
+        dmgView.widthAnchor.constraint(equalToConstant: view.frame.width*0.6).isActive = true
+        dmgView.heightAnchor.constraint(equalToConstant: view.frame.height*0.1).isActive = true
+        
+        let iconWeakness = UIImageView(image: UIImage(named: "\(item.element)_Weakness"))
+        dmgView.addSubview(iconWeakness)
+        
+        iconWeakness.translatesAutoresizingMaskIntoConstraints = false
+        iconWeakness.centerYAnchor.constraint(equalTo: dmgView.centerYAnchor).isActive = true
+        iconWeakness.leadingAnchor.constraint(equalTo: dmgView.leadingAnchor,constant: 10).isActive = true
+        iconWeakness.heightAnchor.constraint(equalTo: dmgView.heightAnchor,constant: -30).isActive = true
+        iconWeakness.widthAnchor.constraint(equalTo: iconWeakness.heightAnchor).isActive = true
+        
+        let txtDmgL = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "\(item.rarity.dmgVal)", size: view.frame.width*0.05)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+        dmgView.addSubview(txtDmgL)
+        
+        txtDmgL.translatesAutoresizingMaskIntoConstraints = false
+        txtDmgL.centerYAnchor.constraint(equalTo: dmgView.centerYAnchor,constant: -10).isActive = true
+        txtDmgL.leadingAnchor.constraint(equalTo: iconWeakness.trailingAnchor,constant: 5).isActive = true
+        
+        let txtDmg = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "DMG", size: view.frame.width*0.05)
+            .shadowText(colorText: .darkText, colorShadow: .white, aligment: .center)
+        dmgView.addSubview(txtDmg)
+        
+        txtDmg.translatesAutoresizingMaskIntoConstraints = false
+        txtDmg.centerYAnchor.constraint(equalTo: dmgView.centerYAnchor,constant: view.frame.width*0.03).isActive = true
+        txtDmg.centerXAnchor.constraint(equalTo: txtDmgL.centerXAnchor,constant: 0).isActive = true
+        
+        let txtDmgR = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "\(item.getDMG()+4)", size: view.frame.width*0.05)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+        dmgView.addSubview(txtDmgR)
+        
+        txtDmgR.translatesAutoresizingMaskIntoConstraints = false
+        txtDmgR.centerYAnchor.constraint(equalTo: dmgView.centerYAnchor,constant: -10).isActive = true
+        txtDmgR.trailingAnchor.constraint(equalTo: dmgView.trailingAnchor,constant: -15).isActive = true
+        
+        let dmgCopy = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "DMG", size: view.frame.width*0.05)
+            .shadowText(colorText: .darkText, colorShadow: .white, aligment: .center)
+        dmgView.addSubview(dmgCopy)
+        
+        dmgCopy.translatesAutoresizingMaskIntoConstraints = false
+        dmgCopy.centerYAnchor.constraint(equalTo: dmgView.centerYAnchor,constant: view.frame.width*0.03).isActive = true
+        dmgCopy.centerXAnchor.constraint(equalTo: txtDmgR.centerXAnchor,constant: 0).isActive = true
+        
+        let arrow = UIImageView(image: UIImage(named: "arrow"))
+        view.addSubview(arrow)
+        
+        arrow.translatesAutoresizingMaskIntoConstraints = false
+        arrow.centerYAnchor.constraint(equalTo: iconWeakness.centerYAnchor).isActive = true
+        arrow.leadingAnchor.constraint(equalTo: txtDmgL.trailingAnchor,constant: 10).isActive = true
+        arrow.trailingAnchor.constraint(equalTo: txtDmgR.leadingAnchor,constant: -10).isActive = true
+        arrow.heightAnchor.constraint(equalTo: iconWeakness.widthAnchor,constant: -20).isActive = true
+        arrow.widthAnchor.constraint(equalTo: arrow.heightAnchor).isActive = true
+        
+        
+        let horoscopeView = UIImageView(image: UIImage(named: "bgDragonsIcons"))
+        view.addSubview(horoscopeView)
+        
+        horoscopeView.translatesAutoresizingMaskIntoConstraints = false
+        horoscopeView.topAnchor.constraint(equalTo: dmgView.topAnchor,constant: 0).isActive = true
+        horoscopeView.leadingAnchor.constraint(equalTo: dmgView.trailingAnchor,constant:15).isActive = true
+        horoscopeView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant:-10).isActive = true
+        horoscopeView.heightAnchor.constraint(equalTo: dmgView.heightAnchor).isActive = true
+        
+        let iconHoroscope = UIImageView(image: UIImage(named: "pisces"))
+        horoscopeView.addSubview(iconHoroscope)
+        
+        iconHoroscope.translatesAutoresizingMaskIntoConstraints = false
+        iconHoroscope.centerYAnchor.constraint(equalTo: iconWeakness.centerYAnchor,constant: 0).isActive = true
+        iconHoroscope.leadingAnchor.constraint(equalTo: horoscopeView.leadingAnchor,constant:10).isActive = true
+        iconHoroscope.widthAnchor.constraint(equalTo: iconWeakness.widthAnchor).isActive = true
+        iconHoroscope.heightAnchor.constraint(equalTo: iconWeakness.heightAnchor).isActive = true
+        
+        let textHoroscope = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "1/3", size: view.frame.width*0.06)
+            .shadowText(colorText: .brown, colorShadow: .white, aligment: .center)
+        horoscopeView.addSubview(textHoroscope)
+        
+        textHoroscope.translatesAutoresizingMaskIntoConstraints = false
+        textHoroscope.centerYAnchor.constraint(equalTo: iconHoroscope.centerYAnchor,constant: 0).isActive = true
+        textHoroscope.trailingAnchor.constraint(equalTo: horoscopeView.trailingAnchor,constant:-10).isActive = true
+        textHoroscope.widthAnchor.constraint(equalTo: txtDmgR.widthAnchor).isActive = true
+        textHoroscope.heightAnchor.constraint(equalTo: textHoroscope.widthAnchor).isActive = true
+        
+        let txtSkill = UILabel()
+            .addFontAndText(font: "Cartwheel", text: "SKILLS", size: view.frame.width*0.1)
+            .shadowText(colorText: .brown, colorShadow: .white, aligment: .center)
+        view.addSubview(txtSkill)
+        
+        txtSkill.translatesAutoresizingMaskIntoConstraints = false
+        txtSkill.topAnchor.constraint(equalTo: dmgView.bottomAnchor,constant: 20).isActive = true
+        txtSkill.centerXAnchor.constraint(equalTo: view.centerXAnchor,constant:0).isActive = true
+        
+        let skillView = UIImageView(image: UIImage(named: "bgDragonsIcons"))
+        view.addSubview(skillView)
+        
+        skillView.translatesAutoresizingMaskIntoConstraints = false
+        skillView.topAnchor.constraint(equalTo: txtSkill.bottomAnchor,constant: 0).isActive = true
+        skillView.leadingAnchor.constraint(equalTo: dmgView.leadingAnchor).isActive = true
+        skillView.trailingAnchor.constraint(equalTo: horoscopeView.trailingAnchor).isActive = true
+        skillView.heightAnchor.constraint(equalToConstant: view.frame.width/5*0.9).isActive = true
+        skillView.widthAnchor.constraint(greaterThanOrEqualToConstant: view.frame.width*0.8).isActive = true
+        
+        for x in 0..<item.icons.count {
+            
+            let skills = MyButton(frame: .zero, item: item, view: skillView, index: x)  { _ in
+                print("dentro button skills")
+            }
+            skills.setImage(UIImage(named: item.icons[x].rawValue),for: .normal)
+            view.addSubview(skills)
+            
+            let width = (view.frame.width/5)*0.7
+            skills.translatesAutoresizingMaskIntoConstraints = false
+            skills.heightAnchor.constraint(equalToConstant: width).isActive = true
+            skills.widthAnchor.constraint(equalToConstant: width).isActive = true
+            skills.centerYAnchor.constraint(equalTo: skillView.centerYAnchor).isActive = true
+            
+            let marginX = (width+10) * CGFloat(x)+15
+            
+            skills.trailingAnchor.constraint(equalTo: skillView.trailingAnchor,constant:  -marginX).isActive = true
+        }
+        
+        
+        let _ = IconsExtra.items.getItems(item: item, remove: .iconExtra_3).enumerated().map { (idx,element) in
+        
+            let _ = MyButton(frame: .zero, item: element ,view: view,index:idx) { [self] _ in
+                
+                switch element {
+                case .iconExtra_0: SellMainPage(isBulkSell:.Bulk, isFeedBtn: false,item: item)
+                case .iconExtra_1: SellMainPage(isBulkSell:.Bulk, isFeedBtn: false,item: item)
+                case .iconExtra_2: SellMainPage(isBulkSell:.Bulk, isFeedBtn: false,item: item)
+                case .iconExtra_3: SellMainPage(isBulkSell:.Feed, isFeedBtn: true,item: item)
+                case .iconExtra_4: SellMainPage(isBulkSell:.Evolve, isFeedBtn: true,item: item)
+                }
+            }
+        }
+    }
+    
+    //MARK: SHOW VIEW BUY T  ITEM
+    private func viewBuyGem<T:ProtocolTableViewGenericCell>(item:[T]){
+        
+        self.view?.addSubview(templateMainGeneric(frame: .zero, typeGrid: .sell, hasCancelBtn: true))
+    
+        genericTableView(items: item)
+       
+    }
+}
+
+extension DragonsMenuScene {
+    
+    enum typeGenericView:String {
+        case Bulk
+        case Feed
+        case Evolve
+    }
+}
+
+
+extension Sequence  where Element == IconsExtra.BtnIcons{
+    
+    func getItems(item:Dragons,remove:Self.Element) -> [Element] {
+            
+        var data:[Self.Element] = IconsExtra.BtnIcons.allCases
+    
+        if item.level == 10 && item.percent == 100 {
+          
+             let index =  data.firstIndex { $0 == remove}
+            
+             data.remove(at: index!)
+
+        } else {
+            
+            data.removeLast()
+        }
+        
+        return data
+    }
+}
