@@ -44,6 +44,7 @@
 		6E13E79728ED9DE300C4844B /* EggsDB+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E79528ED9DE300C4844B /* EggsDB+CoreDataProperties.swift */; };
 		6E13E7A928EDDF3C00C4844B /* BuyDragon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13E7A828EDDF3C00C4844B /* BuyDragon.swift */; };
 		6E18F67B27D94AB600354BC1 /* SKEmitterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E18F67A27D94AB600354BC1 /* SKEmitterNode.swift */; };
+		6E29A6962921896200FB8F6B /* MyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E29A6952921896200FB8F6B /* MyButton.swift */; };
 		6E2B71ED284D4C750090FF19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E2B71EC284D4C750090FF19 /* Assets.xcassets */; };
 		6E3ADF8727FC8B980007C2C4 /* getClover.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8627FC8B8E0007C2C4 /* getClover.m4a */; };
 		6E3ADF8927FC8FDC0007C2C4 /* player_death.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8827FC8FD20007C2C4 /* player_death.m4a */; };
@@ -158,6 +159,7 @@
 		6E18F67827D9439F00354BC1 /* puff.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = puff.m4a; sourceTree = "<group>"; };
 		6E18F67927D9439F00354BC1 /* getcoin.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = getcoin.m4a; sourceTree = "<group>"; };
 		6E18F67A27D94AB600354BC1 /* SKEmitterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKEmitterNode.swift; sourceTree = "<group>"; };
+		6E29A6952921896200FB8F6B /* MyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyButton.swift; sourceTree = "<group>"; };
 		6E2B71EC284D4C750090FF19 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6E3ADF8627FC8B8E0007C2C4 /* getClover.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = getClover.m4a; sourceTree = "<group>"; };
 		6E3ADF8827FC8FD20007C2C4 /* player_death.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = player_death.m4a; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				0C12CD951F0C4CB4008BA78C /* BulletMaker.swift */,
 				6EC2F9F027F8AC20003F906A /* CustomTableView.swift */,
 				6EB8E8DC29012C6D00AE88F4 /* ManagedDB.swift */,
+				6E29A6952921896200FB8F6B /* MyButton.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -601,6 +604,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6EAB087928EED6F3006AB933 /* SKScene.swift in Sources */,
+				6E29A6962921896200FB8F6B /* MyButton.swift in Sources */,
 				0C12CD621F0293C4008BA78C /* Currency.swift in Sources */,
 				6E4E872827DAA5EC00CF0D38 /* UIColor.swift in Sources */,
 				6E5F4DFC290315F3004F354A /* UIButton.swift in Sources */,

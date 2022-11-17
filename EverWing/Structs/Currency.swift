@@ -25,12 +25,14 @@ class Currency{
     }
     
     enum EggsCurrencyType:String,CaseIterable,Hashable,ProtocolCurrency,ProtocolCollection {
+        
      
       
         typealias A = Self
         
         static var items:[A] = [.Common ,.Bronze,.Golden,.Magical,.Silver]
-        
+        var icons: [Weakness] { [] }
+
         case Common
         case Bronze
         case Golden
