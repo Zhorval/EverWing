@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "aries.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "aries.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

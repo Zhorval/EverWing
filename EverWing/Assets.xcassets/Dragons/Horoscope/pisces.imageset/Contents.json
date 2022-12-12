@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "pisces.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "pisces.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

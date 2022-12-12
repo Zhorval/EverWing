@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "FC06_T1_icon.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "FC06_T1_icon.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

@@ -39,7 +39,7 @@ extension SKLabelNode {
     
     func shadowNode(nodeName:String) -> SKEffectNode{
         
-        let myShader = SKShader(fileNamed: "monogradient")
+        let myShader = SKShader(fileNamed: nodeName)
         
         let effectNode = SKEffectNode()
         effectNode.shader = myShader

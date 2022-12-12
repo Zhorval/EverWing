@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "taurus.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "taurus.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "virgo.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "virgo.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "gemini.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "gemini.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

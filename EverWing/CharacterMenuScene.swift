@@ -16,54 +16,32 @@ protocol ProtocolTaskScenes {
 }
 
 
+
 class CharacterMenuScene:SKScene,ProtocolTaskScenes{
-    
     
     deinit{
         print("CharacterMenuScene deinitiated")
     }
-    
-    private enum CurrToon:Int{
-        case Alpha = 0
-        case Beta
-        case Celta
-        case Delta
-        case Jade
-        case Arcana
-        case Alice
-        
-        var string:String{
-            let name = String(describing: self)
-            return name.uppercased()
-        }
-    }
+  
     
     private enum Update{
-        case ToonSelected
-        case ToonChanged
-        case UpdateTexture
-        case UpgradedBullet
+        case ToonSelected,ToonChanged
     }
-    
-    private enum State{
-        case Select
-        case Upgrade
-    }
-    
-    let MAXTOONS:Int = Toon.Character.allCases.count-1
 
-    
     private var charNode = SKSpriteNode()
+   
     var gameinfo:GameInfo!
-    private var currToonIndex = 0
+    
+    private var currToonIndex = 0 {
+        willSet {
+            gameinfo.requestChangeToon(index: newValue)
+        }
+    }
     private let bulletMaker = BulletMaker()
-    private var state:State = .Select
-    
-    
     
     override func didMove(to view: SKView) {
         
-        self.anchorPoint = CGPoint(x: 0.5, y:0.5)
+       self.anchorPoint = CGPoint(x: 0, y:0)
         currToonIndex = gameinfo.requestCurrentToonIndex()
         loadBackground()
         load()
@@ -73,7 +51,7 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
     
     private func loadBackground(){
         let bg = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_Background))
-        bg.zPosition = -10
+        bg.anchorPoint = CGPoint(x: 0, y: 0)
         bg.size = CGSize(width: screenSize.width, height: screenSize.height)
         self.addChild(bg)
     }
@@ -86,476 +64,191 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
             return
         }
         
-        // update index
-            currToonIndex = self.gameinfo.requestCurrentToonIndex()
+        currToonIndex = self.gameinfo.requestCurrentToonIndex()
 
-        // Title
         let title = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_TitleMenu))
-        title.position.y = screenSize.height/2-50
-            title.size = CGSize(width: screenSize.width*0.6, height: screenSize.height*0.1)
-        
+            title.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            title.size = CGSize(width: screenSize.width*0.6, height:  screenSize.height*0.1)
+            title.position = CGPoint(x: screenSize.width/2, y: UIDevice().isPhone() ? screenSize.height*0.9 :screenSize.height)
+
         
         let titleLabel = SKLabelNode(fontNamed: "Family Guy")
             titleLabel.text = "EVERWING ACADEMY"
             titleLabel.fontColor = SKColor(red: 254/255, green: 189/255, blue: 62/255, alpha: 1)
             titleLabel.fontSize = screenSize.width/28
-            title.addChild(titleLabel.shadowNode(nodeName: "titleEffectNodeLabel"))
-        
+            title.addChild(titleLabel.shadowNode(nodeName: "monogradient"))
         self.addChild(title)
         
-        // BackArrow
         let backarrow = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_BackArrow))
             backarrow.name = Global.Main.Character_Menu_BackArrow.rawValue
-            backarrow.anchorPoint = CGPoint(x: 1.0, y: 0.5)
-            backarrow.position = CGPoint(x: -title.size.width/2 - 10, y: title.position.y + 3)
+            backarrow.position = CGPoint(x: screenSize.width*0.1, y: title.position.y + 3)
             backarrow.size = CGSize(width: screenSize.width/8, height: screenSize.height*0.06)
         self.addChild(backarrow)
         
-        // Left Arrow
         let Larrow = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_LeftArrow))
-            Larrow.position.x = -screenSize.width/2 * 0.8
-            Larrow.position.y = 50
+            Larrow.position.x = screenSize.width*0.1
+            Larrow.position.y = screenSize.height*0.6
             Larrow.size = CGSize(width: screenSize.width/8, height: screenSize.height*0.1)
             Larrow.name = Global.Main.Character_Menu_LeftArrow.rawValue
         self.addChild(Larrow)
         
-        // Right Arrow
         let Rarrow = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_RightArrow))
-            Rarrow.position.x = screenSize.width/2 * 0.8
-            Rarrow.position.y = 50
+            Rarrow.position.x = screenSize.width*0.9
+            Rarrow.position.y = screenSize.height*0.6
             Rarrow.size = CGSize(width: screenSize.width/8, height: screenSize.height*0.1)
             Rarrow.name = Global.Main.Character_Menu_RightArrow.rawValue
         self.addChild(Rarrow)
         
-        
-        // Character
-            charNode.texture = global.getMainTexture(main: .Character_Menu_Alpha) // Default
-            charNode.anchorPoint = CGPoint(x: 0.5, y: 0.3)
+        do {
+            charNode.texture = SKTexture(image: UIImage(named: try ManagedDB.shared.getCharacterPlayer().name!.rawValue)!)
+            charNode.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            charNode.position = CGPoint(x: screenSize.midX, y: screenSize.height * 0.6)
             charNode.size = CGSize(width: screenSize.width/1.5, height: screenSize.height/2.55)
-            charNode.run(SKAction.repeatForever(SKAction.sequence([SKAction.moveBy(x: 0, y: 10, duration: 1), SKAction.moveBy(x: 0, y: -10, duration: 1.2)])))
-        self.addChild(charNode)
-        
-        // Selected Char
-        let selected = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_GlowingEffect))
-            selected.name = Global.Main.Character_Menu_GlowingEffect.rawValue
-            selected.position.y = -48
-            selected.alpha = 0.7
-        self.addChild(selected)
-        
-        // Ground Effect
+            charNode.run(SKAction.repeatForever(SKAction.sequence([
+                SKAction.moveBy(x: 0, y: 10, duration: 1),
+                SKAction.moveBy(x: 0, y: -10, duration: 1.2)])))
+            self.addChild(charNode)
+        } catch {
+            fatalError()
+        }
+      
         let gEffect = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_GroundEffect))
         let scaleY = SKAction.scaleY(to: -0.4, duration: 0)
-        let scaleX = SKAction.scaleX(to: 1.8, duration: 0)
+        let scaleX = SKAction.scaleX(to: 2, duration: 0)
         let distort = SKAction.group([scaleX, scaleY])
             gEffect.name = Global.Main.Character_Menu_GroundEffect.rawValue
-            gEffect.position.y = -130
+            gEffect.position = CGPoint(x: charNode.position.x, y: screenSize.height*0.35)
             gEffect.run(distort)
         self.addChild(gEffect)
         
-        // Message Box
-        let msgBox = SKSpriteNode()
-            msgBox.size = CGSize(width: screenSize.width, height: screenSize.height/4)
-            msgBox.name = Global.Main.Character_Menu_MessageBox.rawValue
-            msgBox.texture = global.getMainTexture(main: .Character_Menu_MessageBox)
-            msgBox.position.y = -screenSize.height/2 + msgBox.size.height/2 + 10
-        self.addChild(msgBox)
+        do {
+            try drawPanelWood(character: ManagedDB.shared.getCharacterByName(name:  ManagedDB.shared.getCharacterPlayer().name!))
+            
+        } catch  { fatalError()}
         
-        // Character Name
-        let char_name_box = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_CharacterNameBar))
-            char_name_box.size = CGSize(width: screenSize.width*0.6, height: screenSize.height*0.1)
-            char_name_box.name = "char_name_box"
-            char_name_box.position.y = msgBox.size.height/2
-            msgBox.addChild(char_name_box)
-        
-        let nameBoxLabel = SKLabelNode(fontNamed: "Cartwheel")
-            nameBoxLabel.name = "nameBoxLabel"
-            nameBoxLabel.text = "ALPHA"
-            nameBoxLabel.fontSize = char_name_box.size.width/10
-            nameBoxLabel.fontColor = SKColor(red: 254/255, green: 189/255, blue: 62/255, alpha: 1)
-            char_name_box.addChild(nameBoxLabel.shadowNode(nodeName: "nameBoxLabel"))
-        
-        let titleBoxLabel = SKLabelNode(fontNamed: "Cartwheel")
-            titleBoxLabel.name = "titleBoxLabel"
-            titleBoxLabel.text = "GUARDIAN OF DRAGONS"
-            titleBoxLabel.position.y -= char_name_box.size.height/4
-            titleBoxLabel.fontSize = char_name_box.size.width/14
-            titleBoxLabel.fontColor = SKColor(red: 254/255, green: 189/255, blue: 62/255, alpha: 1)
-            char_name_box.addChild(titleBoxLabel.shadowNode(nodeName: "titleBoxLabel"))
-        
-        // MessageBox left Root
-        let leftRoot = SKSpriteNode()
-            leftRoot.color = .clear
-            leftRoot.name = "leftRoot"
-            leftRoot.size = CGSize(width: msgBox.size.height/3, height: msgBox.size.height/3)
-            leftRoot.position.x = -msgBox.size.width/4
-            msgBox.addChild(leftRoot)
-        
-        // Icon Badge
-        let iconBadge = SKSpriteNode()
-            iconBadge.name = "iconBadge"
-            iconBadge.size = CGSize(width: leftRoot.size.width*0.9, height: leftRoot.size.height*0.9)
-            iconBadge.texture = global.getMainTexture(main: .Character_Menu_Badge)
-            leftRoot.addChild(iconBadge)
-        
-        // Projectile Sprite
-        let projectile = bulletMaker.make(level: .Level_1, char: .Alpha)
-            projectile.position = CGPoint(x: iconBadge.position.x, y: -iconBadge.size.height/3)
-            projectile.name = "projectile"
-            projectile.setScale(2)
-            iconBadge.addChild(projectile)
-   
-        // MessageBox Right Root
-        let rightRoot = SKSpriteNode()
-            rightRoot.color = .clear
-            rightRoot.name = "character_menu_rightRoot"
-            rightRoot.anchorPoint = CGPoint(x: 0, y: 0.5)
-            rightRoot.size = CGSize(width: msgBox.size.width/2, height: msgBox.size.height/2)
-            rightRoot.position = leftRoot.position
-            rightRoot.position.x += leftRoot.size.width/2
-            rightRoot.position.y -= 5
-            msgBox.addChild(rightRoot)
-        
-        //text area of Message Box
-        let txtBox = SKSpriteNode()
-            txtBox.name = "character_menu_text_box"
-            txtBox.size = CGSize(width: rightRoot.size.width*0.9, height: rightRoot.size.height/2)
-            txtBox.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-            txtBox.position.x = msgBox.size.width*0.03
-            txtBox.position.y = txtBox.size.height - 4
-            txtBox.color = .clear
-            rightRoot.addChild(txtBox)
-        
-        let MAGICNUMBER:CGFloat = 17
-     
-        // 1st Line
-        let firstlinebox = SKSpriteNode()
-            firstlinebox.name = "character_menu_firstlinebox"
-            firstlinebox.size = CGSize(width: txtBox.size.width, height: txtBox.size.height/3)
-            firstlinebox.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-            firstlinebox.color = .clear
-            txtBox.addChild(firstlinebox)
-        let firstLabel = SKLabelNode()
-            firstLabel.name = "character_menu_firstlabel"
-            firstLabel.horizontalAlignmentMode = .left
-            firstLabel.verticalAlignmentMode = .top
-            firstLabel.fontColor = .brown
-            firstLabel.text = "She was born in the wilds and"
-            firstLabel.fontName = "GillSans-Bold"
-            firstLabel.fontSize = firstlinebox.size.width/MAGICNUMBER
-            firstlinebox.addChild(firstLabel)
-   
-        // 2nd Line
-        let secondlinebox = SKSpriteNode()
-            secondlinebox.name = "character_menu_secondlinebox"
-            secondlinebox.size = CGSize(width: txtBox.size.width, height: txtBox.size.height/3)
-            secondlinebox.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-            secondlinebox.position.y = -secondlinebox.size.height
-            secondlinebox.color = .clear
-            txtBox.addChild(secondlinebox)
-    
-        let secondLabel = SKLabelNode()
-            secondLabel.name = "character_menu_secondlabel"
-            secondLabel.horizontalAlignmentMode = .left
-            secondLabel.verticalAlignmentMode = .top
-            secondLabel.fontColor = .brown
-            secondLabel.text = "raised by dragons. When dragons"
-            secondLabel.fontName = "GillSans-Bold"
-            secondLabel.fontSize = secondlinebox.size.width/MAGICNUMBER
-            secondlinebox.addChild(secondLabel)
+        update(Case: .ToonChanged)
        
-        // 3rd Line
-        let thirdlinebox = SKSpriteNode()
-            thirdlinebox.name = "character_menu_thirdlinebox"
-            thirdlinebox.size = CGSize(width: txtBox.size.width, height: txtBox.size.height/3)
-            thirdlinebox.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-            thirdlinebox.position.y = -2*thirdlinebox.size.height
-            thirdlinebox.color = .clear
-            txtBox.addChild(thirdlinebox)
-       
-        let thirdLabel = SKLabelNode()
-            thirdLabel.name = "character_menu_thirdlabel"
-            thirdLabel.horizontalAlignmentMode = .left
-            thirdLabel.verticalAlignmentMode = .top
-            thirdLabel.fontColor = .brown
-            thirdLabel.text = "fly with her, they earn 2x XP!"
-            thirdLabel.fontName = "GillSans-Bold"
-            thirdLabel.fontSize = thirdlinebox.size.width/MAGICNUMBER
-            thirdlinebox.addChild(thirdLabel)
-        
-        // Green Button
-        let msgGreenButton = SKSpriteNode()
-            msgGreenButton.size = CGSize(width: rightRoot.size.height, height: rightRoot.size.height/2)
-            msgGreenButton.color = .clear
-            msgGreenButton.name = Global.Main.Character_Menu_GreenButton.rawValue
-            msgGreenButton.texture = global.getMainTexture(main: .Character_Menu_GreenButton)
-            msgGreenButton.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-            msgGreenButton.position.y = -txtBox.size.height
-            msgGreenButton.position.x = rightRoot.size.width/2
-            rightRoot.addChild(msgGreenButton)
-
-        let gbuttonLabel = SKLabelNode(fontNamed: "Cartwheel")
-            gbuttonLabel.name = "label"
-            gbuttonLabel.position.y += msgGreenButton.size.height*0.377
-            gbuttonLabel.fontSize = msgGreenButton.size.width/5
-            gbuttonLabel.text = "UPDATE"
-            msgGreenButton.addChild(gbuttonLabel)
-        
-        // Blue Button
-        let msgBlueButton = SKSpriteNode()
-            msgBlueButton.size = CGSize(width: rightRoot.size.height, height: rightRoot.size.height/2)
-            msgBlueButton.color = .clear
-            msgBlueButton.name = Global.Main.Character_Menu_BlueButton.rawValue
-            msgBlueButton.texture = global.getMainTexture(main: .Character_Menu_BlueButton)
-            msgBlueButton.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-            msgBlueButton.position.y = -txtBox.size.height
-            msgBlueButton.position.x = rightRoot.size.width/2
-            msgBlueButton.isHidden = true
-            rightRoot.addChild(msgBlueButton)
-        
-        let bbuttonLabel = SKLabelNode(fontNamed: "Cartwheel")
-            bbuttonLabel.position.y += msgBlueButton.size.height*0.377
-            bbuttonLabel.fontSize = msgBlueButton.size.width/5
-            bbuttonLabel.text = "Equip"
-            msgBlueButton.addChild(bbuttonLabel)
-        
-        update(Case: .UpdateTexture) // update toon texture
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
         var pos:CGPoint!
+        
         for touch in touches{
             pos = touch.location(in: self)
         }
-        
-        switch state {
-        case .Select:
-            for c in nodes(at: pos){
-                if c.name == "pause"{
-                    return
-                }
-                else if c.name == Global.Main.Character_Menu_BackArrow.rawValue{
-                    doTask(gb: .Character_Menu_BackArrow)
-                }
-                else if c.name == Global.Main.Character_Menu_RightArrow.rawValue{
-                    doTask(gb: .Character_Menu_RightArrow)
-                }
-                else if c.name == Global.Main.Character_Menu_LeftArrow.rawValue{
-                    doTask(gb: .Character_Menu_LeftArrow)
-                }
-                else if c.name == Global.Main.Character_Menu_BlueButton.rawValue{
-                    doTask(gb: .Character_Menu_BlueButton)
-                    let delay = SKSpriteNode()
-                    delay.size = self.size
-                    delay.color = .black
-                    delay.alpha = 0.0
-                    delay.zPosition = 15.0
-                    delay.name = "pause"
-                    let fadein = SKAction.fadeAlpha(to: 0.7, duration: 1.3)
-                    let fadeout = SKAction.fadeAlpha(to: 0.0, duration: 0.7)
-                    delay.run(SKAction.sequence([fadein, fadeout]))
-                    self.addChild(delay)
-                    run(SKAction.sequence([SKAction.wait(forDuration: 2.0)]), completion: delay.removeFromParent)
-                }
-                else if c.name == Global.Main.Character_Menu_GreenButton.rawValue{
-                    doTask(gb: .Character_Menu_GreenButton)
-                }
+      
+        for c in nodes(at: pos){
+            if c.name == Global.Main.Character_Menu_BackArrow.rawValue{
+                doTask(gb: .Character_Menu_BackArrow)
             }
-        case .Upgrade:
-            for c in nodes(at: pos){
-                if c.name == Global.Main.Character_Menu_UpgradeCloseButton.rawValue{
-                    doTask(gb: .Character_Menu_UpgradeCloseButton)
-                }
-                else if c.name == Global.Main.Character_Menu_UpgradeGreenButton.rawValue{
-                    doTask(gb: .Character_Menu_UpgradeGreenButton)
-                }
+            else if c.name == Global.Main.Character_Menu_RightArrow.rawValue{
+                doTask(gb: .Character_Menu_RightArrow)
+            }
+            else if c.name == Global.Main.Character_Menu_LeftArrow.rawValue{
+                doTask(gb: .Character_Menu_LeftArrow)
             }
         }
-    
     }
     
     internal func doTask(gb:Global.Main){
+        
         self.run(gameinfo.mainAudio.getAction(type: .ChangeOption))
 
         switch gb {
-        case .Character_Menu_BackArrow:
+            case .Character_Menu_BackArrow:
+              
+                gameinfo.prepareToChangeScene(scene: .MainScene, skscene: self)
+                
+            case .Character_Menu_LeftArrow:
+             
+                prevArrow(currToon: MainScene.accountInfo.getToonByIndex(index: currToonIndex))
             
+            case .Character_Menu_RightArrow:
+              
+               nextArrow(currToon: MainScene.accountInfo.getToonByIndex(index: currToonIndex))
            
-            self.gameinfo.prepareToChangeScene()
-            self.recursiveRemovingSKActions(sknodes: self.children)
-            self.removeAllChildren()
-            self.removeAllActions()
-            let newScene = MainScene(size: self.size)
-            self.view?.presentScene(newScene)
-        case .Character_Menu_LeftArrow:
-            prevArrow(currToon: CurrToon(rawValue: currToonIndex)!)
-        case .Character_Menu_RightArrow:
-            nextArrow(currToon: CurrToon(rawValue: currToonIndex)!)
-        case .Character_Menu_BlueButton:
-           update(Case: .ToonSelected)
-        case .Character_Menu_GreenButton:
-            self.state = showUpgrade() ? .Upgrade : .Select
-        case .Character_Menu_UpgradeCloseButton:
-            closeUpgrade()
-        case .Character_Menu_UpgradeGreenButton:
-           /* let (success, msg) = gameinfo.requestUpgradeBullet()
-            if !success{
-                print("ERROR001:",msg)
-                break
-            }*/
-            self.update(Case: .UpgradedBullet)
-            if gameinfo.requestToonBulletLevel(index: currToonIndex) >= 50{
-                closeUpgrade()
-            }
-        default:
-            print("Should not reach Here - doTask from CharacterMenuScene")
+            default:
+                print("Should not reach Here - doTask from CharacterMenuScene")
         }
     }
     
     private func update(Case: Update){
     
-        print("El indice \(currToonIndex)")
-        let toon = CurrToon(rawValue: currToonIndex)
-        let msgbox = self.childNode(withName: Global.Main.Character_Menu_MessageBox.rawValue)!
-        let msgboxRightRoot = msgbox.childNode(withName: "character_menu_rightRoot")!
-        let blueButton = msgboxRightRoot.childNode(withName: Global.Main.Character_Menu_BlueButton.rawValue)!
-        let greenButton = msgboxRightRoot.childNode(withName: Global.Main.Character_Menu_GreenButton.rawValue)!
+        let toon = MainScene.accountInfo.getToonByIndex(index: currToonIndex)
+    
         let groundEffect = self.childNode(withName: Global.Main.Character_Menu_GroundEffect.rawValue)!
-        let glowingEffect = self.childNode(withName: Global.Main.Character_Menu_GlowingEffect.rawValue)!
-        let greenButtonLabel = greenButton.childNode(withName: "label") as! SKLabelNode
-        
+      
         switch Case {
       
         case .ToonChanged:
-            
-            if toon!.rawValue != gameinfo.requestCurrentToonIndex(){
-                glowingEffect.isHidden = true
+          
+            if toon.getCharacter()  != gameinfo.accountInfo.getActualPlayer().getCharacter(){
                 groundEffect.isHidden = true
-                blueButton.isHidden = false
-                greenButton.isHidden = true
+               
             }
             else{
-                glowingEffect.isHidden = false
                 groundEffect.isHidden = false
-                blueButton.isHidden = true
-                greenButton.isHidden = false
+               
             }
-            updateToonUI(toon: toon!)
+            updateToonUI(toon: toon)
       
         case .ToonSelected:
             self.gameinfo.requestChangeToon(index: self.currToonIndex)
-            glowingEffect.isHidden = false
             groundEffect.isHidden = false
-            blueButton.isHidden = true
-            greenButton.isHidden = false
+           
             selectedCharAnimation()
-        case .UpdateTexture:
-            updateToonUI(toon: toon!)
-        case .UpgradedBullet:
-            updateUpgradeScene()
-            updateToonUI(toon: toon!)
         }
-        
-        greenButtonLabel.text = (gameinfo.requestToonBulletLevel(index: currToonIndex) >= 50) ? "MAX" : "UPDATE"
     }
-    
-    private func updateToonUI(toon:CurrToon){
        
-        let msgbox = self.childNode(withName: Global.Main.Character_Menu_MessageBox.rawValue)!
-        let leftRoot = msgbox.childNode(withName: "leftRoot")!
-        let icon = leftRoot.childNode(withName: "iconBadge")!
-        let charBoxName = msgbox.childNode(withName: "char_name_box")!
-        let nameBoxLabelEffect = charBoxName.childNode(withName: "nameBoxLabel") as! SKEffectNode
-        let nameBoxLabel = nameBoxLabelEffect.childNode(withName: "nameBoxLabel") as! SKLabelNode
-        let titleBoxLabelEffect = charBoxName.childNode(withName: "titleBoxLabel") as! SKEffectNode
-        let titleBoxLabel = titleBoxLabelEffect.childNode(withName: "titleBoxLabel") as! SKLabelNode
-        let msgboxRightRoot = msgbox.childNode(withName: "character_menu_rightRoot")!
-        let textbox = msgboxRightRoot.childNode(withName: "character_menu_text_box")
-        let fbox = textbox?.childNode(withName: "character_menu_firstlinebox")
-        let flabel = fbox?.childNode(withName: "character_menu_firstlabel") as! SKLabelNode
-        let sbox = textbox?.childNode(withName: "character_menu_secondlinebox")
-        let slabel = sbox?.childNode(withName: "character_menu_secondlabel") as! SKLabelNode
-        let tbox = textbox?.childNode(withName: "character_menu_thirdlinebox")
-        let tlabel = tbox?.childNode(withName: "character_menu_thirdlabel") as! SKLabelNode
+    private func updateToonUI(toon:Toon){
         
-        // Update Texture
-        switch toon {
-        case .Alpha:
-            charNode.texture! = global.getMainTexture(main: .Character_Menu_Alpha)
-        case .Beta:
-            charNode.texture! = global.getMainTexture(main: .Character_Menu_Beta)
-        case .Celta:
-            charNode.texture! = global.getMainTexture(main: .Character_Menu_Celta)
-        case .Delta:
-            charNode.texture! = global.getMainTexture(main: .Character_Menu_Delta)
-        case .Jade:
-            charNode.texture! = SKTexture(imageNamed: toon.string.capitalized)
-        case .Arcana:
-            charNode.texture! = global.getMainTexture(main: .Character_Menu_Delta) // SKTexture(imageNamed: toon.string.capitalized)
-        case .Alice:
-            charNode.texture! =  SKTexture(imageNamed: toon.string.capitalized)
+        charNode.texture! =  SKTexture(imageNamed: toon.getCharacter().rawValue)
+        
+        do {
+            let newToon = try ManagedDB.shared.getCharacterByName(name: toon.getCharacter())
+            
+            self.drawPanelWood(character:  newToon)
+        }catch {
+            fatalError()
         }
-        
-     
-        // Update Description
-            flabel.text = self.gameinfo.requestToonDescription(index: toon.rawValue)[0]
-            slabel.text = self.gameinfo.requestToonDescription(index: toon.rawValue)[1]
-            tlabel.text = self.gameinfo.requestToonDescription(index: toon.rawValue)[2]
-        
-        // Update Name & Title
-            nameBoxLabel.text = gameinfo.requestToonName(index: toon.rawValue)
-            titleBoxLabel.text = gameinfo.requestToonTitle(index: toon.rawValue)
-        
-        // Update Projectile (Bullet)
-        let bulletLevel = gameinfo.requestToonBulletLevel(index: toon.rawValue)
-        guard let currToon = Toon.Character(rawValue: toon.string),
-              let blevel = BulletMaker.Level(rawValue: bulletLevel)
-        else{
-            return
-        }
-        
-        if let bullet = icon.childNode(withName: "projectile"){
-        bullet.removeFromParent()
-        }
-        let newBullet = bulletMaker.make(level: blevel, char: currToon)
-        newBullet.name = "projectile"
-        icon.addChild(newBullet)
-        
     }
    
-    private func nextArrow(currToon:CurrToon){
-        currToonIndex = currToon.rawValue + 1
+    private func nextArrow(currToon:Toon){
+        currToonIndex +=  1
         
-        if (currToonIndex >= MAXTOONS){
+        if (currToonIndex >= MainScene.accountInfo.getTotalCharacter()-1){
             currToonIndex = 0
         }
-        
+      
         update(Case: .ToonChanged)
     }
     
-    private func prevArrow(currToon:CurrToon){
-        currToonIndex = currToon.rawValue - 1
+    private func prevArrow(currToon:Toon){
+        currToonIndex -= 1
         
         if (currToonIndex < 0){
-            currToonIndex = MAXTOONS - 1
+            currToonIndex = MainScene.accountInfo.getTotalCharacter()-1
         }
         
         update(Case: .ToonChanged)
     }
-    
+  
     private func selectedCharAnimation(){
-        let yPos:CGFloat = -charNode.size.height/3
+        
+        let yPos:CGFloat = screenSize.height*0.3
         
         let removeChildAction = SKAction.sequence([SKAction.wait(forDuration: 2.0), SKAction.removeFromParent()])
         let effect1 = SKEmitterNode(fileNamed: "selectedChar-One.sks")
         effect1?.position.y = yPos
-        effect1?.position.x = -50
+        effect1?.position.x = screenSize.width/2
         effect1?.run(removeChildAction)
         effect1?.zPosition = -1.0
         addChild(effect1!)
         
         let effect2 = SKEmitterNode(fileNamed: "selectedChar-One.sks")
         effect2?.position.y = yPos
-        effect2?.position.x = 50
+        effect2?.position.x = screenSize.width/2
         effect2?.run(removeChildAction)
         effect2?.zPosition = -1.0
         effect2?.emissionAngle = 0.698132 // Double.pi/180 * 40
@@ -564,20 +257,21 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
         
         let effect3 = SKEmitterNode(fileNamed: "selectedChar-Two.sks")
         effect3?.position.y = yPos
+        effect3?.position.x = screenSize.width/2
         effect3?.run(removeChildAction)
         effect3?.zPosition = 0.0
         addChild(effect3!)
         
         let effect4 = SKEmitterNode(fileNamed: "selectedChar-Three.sks")
         effect4?.position.y = yPos
-        effect4?.position.x = -30
+        effect4?.position.x = screenSize.width/2
         effect4?.run(removeChildAction)
         effect4?.zPosition = 1.0
         addChild(effect4!)
         
         let effect5 = SKEmitterNode(fileNamed: "selectedChar-Three.sks")
         effect5?.position.y = yPos
-        effect5?.position.x = 30
+        effect5?.position.x = screenSize.width/2
         effect5?.run(removeChildAction)
         effect5?.zPosition = 1.0
         effect5?.emissionAngle = CGFloat(Double.pi/180 * 80)
@@ -585,229 +279,388 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
         addChild(effect5!)
         
     }
+}
+
+extension CharacterMenuScene {
     
-    private func showUpgrade() -> Bool{
+    /// #Description: Draw the bottom panel of wood
+    private func drawPanelWood(character:CharactersDB) {
         
-        let toonLevel = gameinfo.requestToonBulletLevel(index: currToonIndex)
-        let nextBulletLevel = gameinfo.requestToonBulletLevel(index: self.currToonIndex) + 1
-        let currCharStr = CharacterMenuScene.CurrToon(rawValue: self.currToonIndex)!.string
-        
-        guard let currToon = Toon.Character(rawValue: currCharStr),
-            let blevel = BulletMaker.Level(rawValue: nextBulletLevel)
-            else{
-                return false
-            }
-        
-        let upgradeSceneRoot = SKSpriteNode()
-            upgradeSceneRoot.name = "upgrade_rootView"
-            upgradeSceneRoot.zPosition = 10.0
-        
-        let bground = SKSpriteNode()
-            bground.size = self.size
-            bground.color = .black
-            bground.name = "upgrade_background"
-            bground.alpha = 0.0
-            bground.run(SKAction.fadeAlpha(to: 0.7, duration: 0.15))
-            upgradeSceneRoot.addChild(bground)
+        let _ = self.view?.subviews.filter {$0.tag == 100}.map { $0.removeFromSuperview()}
+     
+        let panelWood = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height*0.3))
+            panelWood.tag = 100
+            panelWood.setBackgroundImage(img: UIImage(named: "characterPanel")!)
+            self.view?.addSubview(panelWood)
+            panelWood.translatesAutoresizingMaskIntoConstraints = false
+            panelWood.leadingAnchor.constraint(equalTo: view!.leadingAnchor,constant: 0).isActive = true
+            panelWood.trailingAnchor.constraint(equalTo: view!.trailingAnchor,constant: 0).isActive = true
+            panelWood.bottomAnchor.constraint(equalTo: view!.bottomAnchor,constant: 0).isActive = true
+            panelWood.heightAnchor.constraint(equalToConstant: screenSize.height*0.3).isActive = true
+            panelWood.layoutIfNeeded()
         
         
-        let contentRoot = SKSpriteNode()
-            contentRoot.setScale(0.1)
-            contentRoot.alpha = 0.1
-            contentRoot.name = "upgrade_contentRoot"
-            upgradeSceneRoot.addChild(contentRoot)
+        let panelTitle = UIImageView(image: UIImage(named: "panelWoodTitle")!)
+            panelWood.addSubview(panelTitle)
+            panelTitle.translatesAutoresizingMaskIntoConstraints = false
+            panelTitle.centerXAnchor.constraint(equalTo: panelWood.centerXAnchor).isActive = true
+            panelTitle.bottomAnchor.constraint(equalTo: panelWood.topAnchor,constant:0).isActive = true
+            panelTitle.widthAnchor.constraint(equalToConstant: panelWood.frame.width/1.5).isActive = true
+            panelTitle.heightAnchor.constraint(equalToConstant: (panelWood.frame.width/2)/3).isActive = true
         
-        // Upgrade Box
-        let upgradeBox = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_UpgradeBox))
-            upgradeBox.size.width = screenSize.width * 0.896
-            upgradeBox.size.height = screenSize.height * 0.493
-            upgradeBox.name = Global.Main.Character_Menu_UpgradeBox.rawValue
-            contentRoot.addChild(upgradeBox)
+        let characterName = UILabel()
+            .addFontAndText(font: "Cartwheel", text: (character.characters?.name!.rawValue)!, size: 28)
+            .shadowText(colorText: UIColor(patternImage: UIImage.gradientImage(bounds: panelTitle.bounds, colors: [.yellow,.orange])), colorShadow: .black, aligment: .center)
+        panelTitle.addSubview(characterName)
+        characterName.translatesAutoresizingMaskIntoConstraints = false
+        characterName.centerXAnchor.constraint(equalTo: panelTitle.centerXAnchor).isActive = true
+        characterName.centerYAnchor.constraint(equalTo: panelTitle.centerYAnchor,constant: -10).isActive = true
+        characterName.layoutIfNeeded()
         
-        // Upgrade Icon Shade
-        let iconShade = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_UpgradeIconShade))
-            iconShade.size = CGSize(width: screenSize.width*0.454, height: screenSize.height*0.255)
-            iconShade.position.y += upgradeBox.size.height/4.5
-            iconShade.alpha = 0.6
-            iconShade.name = Global.Main.Character_Menu_UpgradeIconShade.rawValue
-            upgradeBox.addChild(iconShade)
+        let typeCharacter = UILabel()
+            .addFontAndText(font: "Cartwheel", text: character.characters!.name!.type, size: 18)
+            .shadowText(colorText: UIColor(patternImage: UIImage.gradientImage(bounds: panelTitle.bounds, colors: [.red,.yellow])), colorShadow: .black, aligment: .center)
+        panelTitle.addSubview(typeCharacter)
+        typeCharacter.translatesAutoresizingMaskIntoConstraints = false
+        typeCharacter.topAnchor.constraint(equalTo: characterName.bottomAnchor).isActive = true
+        typeCharacter.centerXAnchor.constraint(equalTo: characterName.centerXAnchor,constant: 0).isActive = true
+        typeCharacter.layoutIfNeeded()
         
-        // Upgrade Icon
-        let icon = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_UpgradeIcon))
-            icon.name = Global.Main.Character_Menu_UpgradeIcon.rawValue
-            icon.size = CGSize(width: screenSize.width*0.287, height: screenSize.height*0.162)
-            icon.position.y += upgradeBox.size.height/4.5
-            upgradeBox.addChild(icon)
+
+        let v1 = partialViewRank(pasteView: panelWood
+                                 ,size: CGSize(width: panelWood.frame.width*0.9, height: max(60,panelWood.frame.height/4)),
+                                 character: character)
         
-        // Icon Sprite (Bullet Display)
+        let txtDamage = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 14, weight: .heavy), text: "DAMAGE", color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        panelWood.addSubview(txtDamage)
+        txtDamage.translatesAutoresizingMaskIntoConstraints = false
+        txtDamage.centerXAnchor.constraint(equalTo: panelWood.centerXAnchor,constant: -panelWood.frame.width/4).isActive = true
+        txtDamage.topAnchor.constraint(equalTo: v1.bottomAnchor,constant: 0).isActive = true
         
-        let iconSprite = bulletMaker.make(level: blevel, char: currToon)
-            iconSprite.name = "projectile"
-            icon.addChild(iconSprite)
+        let txtPrisma = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 14, weight: .heavy), text: (character.characters?.ability!.rawValue)!.uppercased(), color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        panelWood.addSubview(txtPrisma)
+        txtPrisma.translatesAutoresizingMaskIntoConstraints = false
+        txtPrisma.centerXAnchor.constraint(equalTo: panelWood.centerXAnchor,constant: panelWood.frame.width/4).isActive = true
+        txtPrisma.topAnchor.constraint(equalTo: txtDamage.topAnchor,constant: 0).isActive = true
+ 
+        let _ = partialViewProperties(pasteView:panelWood,size: CGSize(width: panelWood.frame.width*0.9, height: max(60,panelWood.frame.height/3)),character:character)
         
-        // Upgrade Arrow
-        let arrow = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_UpgradeArrow))
-            arrow.size = CGSize(width: screenSize.width*0.051, height: screenSize.height*0.031)
-            arrow.setScale(1.5)
-            arrow.position.y -= arrow.size.height
-            upgradeBox.addChild(arrow)
+        showButtonsDown(panelWood: panelWood,character: character)
+
         
-        // Upgrade Button
-        let button = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_UpgradeGreenButton))
-            button.name = Global.Main.Character_Menu_UpgradeGreenButton.rawValue
-            button.size = CGSize(width: upgradeBox.size.width * 0.31, height: upgradeBox.size.height*0.103)
-            button.position.y -= upgradeBox.size.height/3.0
-            upgradeBox.addChild(button)
-        
-        // Price Label
-        let priceLabel = SKLabelNode(fontNamed: "Cartwheel")
-            priceLabel.name = "label"
-            priceLabel.text = "\(String(nextBulletLevel * 100))"
-            priceLabel.fontSize = button.size.width/4.5
-            priceLabel.position.x += button.size.width/5.5
-            priceLabel.position.y -= button.size.height/4.5
-            priceLabel.fontColor = SKColor(red: 254/255, green: 189/255, blue: 62/255, alpha: 1)
-            priceLabel.horizontalAlignmentMode = .right
-            priceLabel.name = "label"
-            button.addChild(priceLabel.shadowNode(nodeName: "pricelabelshadow"))
-        
-        // Close Button
-        let closeButton = SKSpriteNode(texture: global.getMainTexture(main: .Character_Menu_UpgradeCloseButton))
-            closeButton.size = CGSize(width: screenSize.width*0.094, height: screenSize.height*0.049)
-            closeButton.name = Global.Main.Character_Menu_UpgradeCloseButton.rawValue
-            closeButton.anchorPoint = CGPoint(x: 0.75, y: 0.75)
-            closeButton.position.x = upgradeBox.frame.maxX
-            closeButton.position.y = upgradeBox.frame.maxY
-            upgradeBox.addChild(closeButton)
-        
-        // Left Text Area
-        let leftTextArea = SKSpriteNode()
-            leftTextArea.size = CGSize(width: upgradeBox.size.width/4.0, height: upgradeBox.size.width/4.0)
-            leftTextArea.color = .clear
-            leftTextArea.name = "lefttextarea"
-            leftTextArea.position.y = arrow.position.y
-            leftTextArea.position.x -= upgradeBox.size.width/4
-            upgradeBox.addChild(leftTextArea)
-        
-        let leftLevelLabel = SKLabelNode()
-            leftLevelLabel.name = "label"
-            leftLevelLabel.text = "Lv \(String(toonLevel))"
-            leftLevelLabel.fontSize = leftTextArea.size.width/3.0
-            leftLevelLabel.horizontalAlignmentMode = .left
-            leftLevelLabel.fontName = "Cartwheel"
-            leftLevelLabel.position.x -= leftTextArea.size.width/4
-            leftTextArea.addChild(leftLevelLabel.shadowNode(nodeName: "leftlevellabelshadow"))
-        
-        let leftDmgLabel = SKLabelNode()
-            leftDmgLabel.fontName = "GillSans-Bold"
-            leftDmgLabel.text = "DMG: \(String(20 + toonLevel*5))"
-            leftDmgLabel.name = "leftdmglabel"
-            leftDmgLabel.horizontalAlignmentMode = .left
-            leftDmgLabel.fontColor = .brown
-            leftDmgLabel.fontSize = leftTextArea.size.width/6.0
-            leftDmgLabel.position.x -= leftTextArea.size.width/3.0
-            leftDmgLabel.position.y -= leftTextArea.size.height/3.8
-            leftTextArea.addChild(leftDmgLabel)
-        
-        // Right Text Area
-        let rightTextArea = SKSpriteNode()
-        rightTextArea.size = CGSize(width: upgradeBox.size.width/4.0, height: upgradeBox.size.width/4.0)
-            rightTextArea.name = "righttextarea"
-            rightTextArea.color = .clear
-            rightTextArea.position.y = arrow.position.y
-            rightTextArea.position.x += upgradeBox.size.width/4
-            upgradeBox.addChild(rightTextArea)
-        
-        let rightLevelLabel = SKLabelNode()
-                rightLevelLabel.text = "Lv \(String(toonLevel+1))"
-                rightLevelLabel.fontSize = rightTextArea.size.width/3.0
-                rightLevelLabel.name = "label"
-                rightLevelLabel.horizontalAlignmentMode = .left
-                rightLevelLabel.fontName = "Cartwheel"
-                rightLevelLabel.fontColor = .orange
-                rightLevelLabel.position.x -= rightTextArea.size.width/3.0
-                rightTextArea.addChild(rightLevelLabel.shadowNode(nodeName: "rightlevellabelshadow"))
-        
-        let rightDmgLabel = SKLabelNode()
-            rightDmgLabel.fontName = "GillSans-Bold"
-            rightDmgLabel.text = "DMG: \(String(20 + (toonLevel+1)*5))"
-            rightDmgLabel.horizontalAlignmentMode = .left
-            rightDmgLabel.name = "rightdmglabel"
-            rightDmgLabel.fontColor = .brown
-            rightDmgLabel.fontSize = rightTextArea.size.width/6.0
-            rightDmgLabel.position.x -= rightTextArea.size.width/2.5
-            rightDmgLabel.position.y -= rightTextArea.size.height/3.8
-            rightTextArea.addChild(rightDmgLabel)
-        
-        // Action Show Up
-        let scaleAction = SKAction.scale(to: 1.0, duration: 0.15)
-        let fadeIn = SKAction.fadeIn(withDuration: 0.15)
-            contentRoot.run(SKAction.group([scaleAction, fadeIn]))
-        
-            addChild(upgradeSceneRoot)
-        
-        return true
     }
     
-    private func updateUpgradeScene(){
-        
-        let toon = CurrToon(rawValue: currToonIndex)!
-        let currLevelBullet = gameinfo.requestToonBulletLevel(index: currToonIndex)
-        let nextLevelBullet = currLevelBullet + 1
-        guard let currToon = Toon.Character(rawValue: toon.string),
-              let blevel = BulletMaker.Level(rawValue: nextLevelBullet)
-        else{return}
-        
-        
-        
-        let root = self.childNode(withName: "upgrade_rootView")!
-        let contentRoot = root.childNode(withName: "upgrade_contentRoot")!
-        let upgradeBox = contentRoot.childNode(withName: Global.Main.Character_Menu_UpgradeBox.rawValue)!
-        
-        let leftside = upgradeBox.childNode(withName: "lefttextarea")!
-        let leftshadow = leftside.childNode(withName: "leftlevellabelshadow") as! SKEffectNode
-        let leftLabel = leftshadow.childNode(withName: "label") as! SKLabelNode
-        let leftDmgLabel = leftside.childNode(withName: "leftdmglabel") as! SKLabelNode
-        
-        let rightside = upgradeBox.childNode(withName: "righttextarea")!
-        let rightshadow = rightside.childNode(withName: "rightlevellabelshadow") as! SKEffectNode
-        let rightLabel = rightshadow.childNode(withName: "label") as! SKLabelNode
-        let rightDmgLabel = rightside.childNode(withName: "rightdmglabel") as! SKLabelNode
-        
-        let upgradeButton = upgradeBox.childNode(withName: Global.Main.Character_Menu_UpgradeGreenButton.rawValue)
-        let buttonShadow = upgradeButton?.childNode(withName: "pricelabelshadow") as! SKEffectNode
-        let buttonLabel = buttonShadow.childNode(withName: "label") as! SKLabelNode
-        
-        let icon = upgradeBox.childNode(withName: Global.Main.Character_Menu_UpgradeIcon.rawValue)!
-        
-        if let bullet = icon.childNode(withName: "projectile"){
-            bullet.removeFromParent()
+    private func showButtonsDown(panelWood:UIView,character:CharactersDB) {
+       
+        let progress = { (v:UIView) -> UIView in
+            return self.createBarProgress(size:v.frame.size,time: 4,character: character)
         }
         
-            let newBullet = bulletMaker.make(level:  blevel, char: currToon)
-            newBullet.name = "projectile"
-            icon.addChild(newBullet)
-            leftLabel.text = "LV \(String(currLevelBullet))"
-            leftDmgLabel.text = "DMG: \(String(20 + (currLevelBullet)*5))"
-            rightDmgLabel.text = "DMG: \(String(20 + (currLevelBullet+1)*5))"
-            rightLabel.text = "LV \(String(nextLevelBullet))"
-            buttonLabel.text = String(nextLevelBullet * 100)
+        let btnShadow = { (title:String) -> UIButton in
+            
+            let myBtn = UIButton()
+                myBtn.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
+                myBtn.setTitle(title, for: .normal)
+                myBtn.layer.shadowRadius = 2
+            myBtn.layer.shadowOpacity = 0.5
+                myBtn.layer.shadowColor = UIColor.black.cgColor
+                myBtn.setTitleShadowColor(.black, for: .normal)
+                myBtn.titleLabel?.shadowOffset = CGSize(width: 1, height: 1)
+                myBtn.titleLabel?.textAlignment = .center
+                myBtn.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .heavy)
+                myBtn.titleLabel?.numberOfLines = 0
+            
+            return myBtn
+        }
+            
+        let btnUpgrade = btnShadow("UPGRADE\n\(character.characters!.name!.updateBulletCoin)")
         
-        
+            let iconCoin = UIImage(named: "coin")!.resized(to: CGSize(width: panelWood.frame.width*0.05, height: panelWood.frame.width*0.05))
+                btnUpgrade.setImage(iconCoin, for: .normal)
+                btnUpgrade.imageEdgeInsets = UIEdgeInsets(top: 15, left: 0, bottom: 0, right: 0  )
+                btnUpgrade.semanticContentAttribute = .forceRightToLeft
+                btnUpgrade.contentEdgeInsets = UIEdgeInsets(top: -5, left: 0, bottom: 0, right: 0)
+                panelWood.addSubview(btnUpgrade)
+               
+                btnUpgrade.translatesAutoresizingMaskIntoConstraints = false
+                btnUpgrade.centerXAnchor.constraint(equalTo: panelWood.centerXAnchor,constant: -panelWood.frame.width/4).isActive = true
+                btnUpgrade.widthAnchor.constraint(equalToConstant: max(150,panelWood.frame.width/4)).isActive = true
+                btnUpgrade.heightAnchor.constraint(equalToConstant: max(60,(panelWood.frame.width/4)/3)).isActive = true
+                btnUpgrade.bottomAnchor.constraint(equalTo: panelWood.bottomAnchor,constant: -5).isActive = true
+                btnUpgrade.addAction(for: .touchUpInside) {
+           
+                    let progress = progress(btnUpgrade)
+                    panelWood.addSubview(progress)
+                    progress.translatesAutoresizingMaskIntoConstraints = false
+                    progress.bottomAnchor.constraint(equalTo: btnUpgrade.topAnchor).isActive = true
+                    progress.leadingAnchor.constraint(equalTo: btnUpgrade.leadingAnchor).isActive = true
+                    progress.widthAnchor.constraint(equalTo: btnUpgrade.widthAnchor).isActive = true
+                    progress.heightAnchor.constraint(equalToConstant: btnUpgrade.frame.height/3).isActive = true
+                }
+
+    let btnEquip = btnShadow("EQUIPPED")
+        panelWood.addSubview(btnEquip)
+        btnEquip.translatesAutoresizingMaskIntoConstraints = false
+        btnEquip.centerXAnchor.constraint(equalTo: panelWood.centerXAnchor,constant: panelWood.frame.width/4).isActive = true
+        btnEquip.widthAnchor.constraint(equalTo: btnUpgrade.widthAnchor).isActive = true
+        btnEquip.heightAnchor.constraint(equalTo: btnUpgrade.heightAnchor).isActive = true
+        btnEquip.bottomAnchor.constraint(equalTo: panelWood.bottomAnchor,constant: -5).isActive = true
+        btnEquip.addAction(for: .touchUpInside) {
+            do {
+                if try ManagedDB.shared.changePlayerEquip(character: character.characters!) {
+                    self.update(Case: .ToonSelected)
+                    self.gameinfo.requestChangeToon(index: Toon.Character.allCases.firstIndex { $0.rawValue == character.characters?.name?.rawValue}!)
+                }
+            } catch let error {
+                fatalError(error.localizedDescription)
+            }
+        }
     }
     
-    private func closeUpgrade(){
-        let upgradeSceneRoot = self.childNode(withName: "upgrade_rootView")!
-        let bground = upgradeSceneRoot.childNode(withName: "upgrade_background")!
-        let contentRoot = upgradeSceneRoot.childNode(withName: "upgrade_contentRoot")!
-        bground.run(SKAction.fadeAlpha(to: 0.0, duration: 0.1))
+    private func showRectangleProperties(side:Direction,panelWood:UIView,character:CharactersDB) {
         
-        let scaleAction = SKAction.scale(to: 0.0, duration: 0.1)
-        let fadeIn = SKAction.fadeOut(withDuration: 0.1)
-        contentRoot.run(SKAction.group([scaleAction, fadeIn]))
+        let rectangleBck = UIView().cornerRadius(radius: 5)
+            rectangleBck.backgroundColor = UIColor(red: 205/255, green: 157/255, blue: 112/255, alpha: 1).withAlphaComponent(0.8)
+            panelWood.addSubview(rectangleBck)
+            rectangleBck.translatesAutoresizingMaskIntoConstraints = false
+           
+            if side == .Left {
+                rectangleBck.leadingAnchor.constraint(equalTo: panelWood.leadingAnchor,constant: 5).isActive = true
+            } else {
+                rectangleBck.leadingAnchor.constraint(equalTo: panelWood.centerXAnchor,constant: 5).isActive = true
+            }
+                
+            rectangleBck.heightAnchor.constraint(equalToConstant: panelWood.frame.height*0.9).isActive = true
+            rectangleBck.widthAnchor.constraint(equalToConstant: panelWood.frame.width*0.48).isActive = true
+            rectangleBck.centerYAnchor.constraint(equalTo: panelWood.centerYAnchor).isActive = true
+
+            rectangleBck.layoutIfNeeded()
+    
+        let txtBase = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: "BASE:", color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            rectangleBck.addSubview(txtBase)
+            txtBase.translatesAutoresizingMaskIntoConstraints = false
+            txtBase.leadingAnchor.constraint(equalTo: rectangleBck.centerXAnchor,constant: -10).isActive = true
+            txtBase.topAnchor.constraint(equalTo: rectangleBck.topAnchor,constant: 0).isActive = true
         
-        upgradeSceneRoot.run(SKAction.sequence([SKAction.wait(forDuration: 0.15), SKAction.removeFromParent()]))
-        state = .Select
+        let txtValBase = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: "15", color: .white)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            rectangleBck.addSubview(txtValBase)
+            txtValBase.translatesAutoresizingMaskIntoConstraints = false
+            txtValBase.leadingAnchor.constraint(equalTo: txtBase.trailingAnchor,constant: 5).isActive = true
+            txtValBase.topAnchor.constraint(equalTo: txtBase.topAnchor,constant: 0).isActive = true
+        
+        let txtBonus = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: "BONUS:", color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            rectangleBck.addSubview(txtBonus)
+            txtBonus.translatesAutoresizingMaskIntoConstraints = false
+            txtBonus.leadingAnchor.constraint(equalTo: rectangleBck.centerXAnchor,constant: -10).isActive = true
+            txtBonus.centerYAnchor.constraint(equalTo: rectangleBck.centerYAnchor,constant: 0).isActive = true
+        
+        let txtValBonus = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: "18", color: .white)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            rectangleBck.addSubview(txtValBonus)
+            txtValBonus.translatesAutoresizingMaskIntoConstraints = false
+            txtValBonus.leadingAnchor.constraint(equalTo: txtBonus.trailingAnchor,constant: 5).isActive = true
+            txtValBonus.topAnchor.constraint(equalTo: txtBonus.topAnchor,constant: 0).isActive = true
+        
+        let txtTotal = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: "TOTAL:", color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            rectangleBck.addSubview(txtTotal)
+            txtTotal.translatesAutoresizingMaskIntoConstraints = false
+            txtTotal.leadingAnchor.constraint(equalTo: rectangleBck.centerXAnchor,constant: -10).isActive = true
+            txtTotal.bottomAnchor.constraint(equalTo: rectangleBck.bottomAnchor,constant: 0).isActive = true
+        
+        let txtValTotal = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: "\(15+18)", color: .white)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            rectangleBck.addSubview(txtValTotal)
+            txtValTotal.translatesAutoresizingMaskIntoConstraints = false
+            txtValTotal.leadingAnchor.constraint(equalTo: txtTotal.trailingAnchor,constant: 5).isActive = true
+            txtValTotal.bottomAnchor.constraint(equalTo: rectangleBck.bottomAnchor,constant: 0).isActive = true
+        
+        let backIcon = UIImageView(image: UIImage(named: "BulletButton")!)
+            rectangleBck.addSubview(backIcon)
+            backIcon.translatesAutoresizingMaskIntoConstraints = false
+            backIcon.trailingAnchor.constraint(equalTo: rectangleBck.centerXAnchor,constant: -rectangleBck.frame.width*0.05).isActive = true
+            backIcon.centerYAnchor.constraint(equalTo: rectangleBck.centerYAnchor,constant: 0).isActive = true
+            backIcon.widthAnchor.constraint(equalTo: rectangleBck.heightAnchor,constant: -5).isActive = true
+            backIcon.heightAnchor.constraint(equalTo: backIcon.widthAnchor).isActive = true
+           
+           
+        if side == .Right {
+            let inset:CGFloat = UIDevice().isPhone() ? 15 : 5
+            let image = UIImage(named: (character.characters?.ability!.rawValue)!)?.resized(to: backIcon.frame.insetBy(dx: inset, dy: inset).size)
+            let vImage = UIImageView(image: image)
+            backIcon.addSubview(vImage)
+            vImage.translatesAutoresizingMaskIntoConstraints = false
+            vImage.centerXAnchor.constraint(equalTo: backIcon.centerXAnchor).isActive = true
+            vImage.centerYAnchor.constraint(equalTo: backIcon.centerYAnchor).isActive = true
+            
+        } else {
+                
+             let _ = drawBulletIconBullet(charModel: character, viewPaste: backIcon)!
+            
+            let txtLVL = UILabel()
+                .addTextWithFont(font: UIFont.systemFont(ofSize: 18, weight: .heavy), text: "LV \(character.level)", color: .white)
+                .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            backIcon.addSubview(txtLVL)
+            txtLVL.translatesAutoresizingMaskIntoConstraints = false
+            txtLVL.bottomAnchor.constraint(equalTo: backIcon.bottomAnchor,constant: 0).isActive = true
+            txtLVL.centerXAnchor.constraint(equalTo: backIcon.centerXAnchor,constant: 0).isActive = true
+        }
+     
     }
     
+    private func drawBulletIconBullet(charModel:CharactersDB,viewPaste:UIView) -> UIView? {
+        
+         bulletMaker.makeBulletCharacter( char: charModel, view: viewPaste)
+    }
+    
+    private func ShowViewSummons() {
+        
+        showGenericViewTable(skScene: self, items: BuySummons.items, title: "STAR SUMMONS",gameInfo: gameinfo) { v in
+            
+            self.view?.addSubview(v)
+        }
+    }
+    
+    private func ShowTableInfo(character:CharactersDB) {
+        
+        let items = Toon.Character.Table.items.filter { $0.name == character.characters?.name?.rawValue}
+       
+        self.view?.scene?.genericTableView(items: items,gameInfo: gameinfo)
+    }
+    
+    private func createBarProgress(size:CGSize, time:Int,character:CharactersDB) -> UIView {
+        
+        let progress = ProgressView(frame: CGRect(x: 0, y: 0, width: size.width, height: size.height/2),time: time) { _ in
+            
+            self.gameinfo.prepareToChangeScene(scene: .UpdateLeveCharacter, skscene: self,character: character)
+        }
+        
+        return progress
+    }
+    
+    private func partialViewRank(pasteView:UIView,size:CGSize,character:CharactersDB)  -> UIView{
+        
+        let btnShadow = { (title:String,button:String) -> UIButton in
+            
+            let myBtn = UIButton()
+                myBtn.setBackgroundImage(UIImage(named: button), for: .normal)
+                myBtn.setTitle(title, for: .normal)
+                myBtn.layer.shadowRadius = 2
+                myBtn.layer.shadowOpacity = 0.5
+                myBtn.layer.shadowColor = UIColor.black.cgColor
+                myBtn.setTitleShadowColor(.black, for: .normal)
+                myBtn.titleLabel?.shadowOffset = CGSize(width: 1, height: 1)
+                myBtn.titleLabel?.textAlignment = .center
+                myBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .heavy)
+                myBtn.titleLabel?.numberOfLines = 0
+            
+            return myBtn
+        }
+        
+        let color = UIColor(red: 205/255, green: 157/255, blue: 112/255, alpha: 1).withAlphaComponent(0.8)
+        let backView = UIView().addRect(size: CGRect(x: 0, y: 0, width: size.width, height: size.height), fillColor: color, strokeColor: .black,shadow: true)
+            pasteView.addSubview(backView)
+            backView.translatesAutoresizingMaskIntoConstraints = false
+            backView.topAnchor.constraint(equalTo: pasteView.topAnchor, constant: 5).isActive = true
+            backView.centerXAnchor.constraint(equalTo: pasteView.centerXAnchor, constant: 0).isActive = true
+            backView.widthAnchor.constraint(equalToConstant: size.width).isActive = true
+            backView.heightAnchor.constraint(equalToConstant: size.height).isActive = true
+            backView.layoutIfNeeded()
+        
+        let iconInfo = btnShadow("i","BlueButton")
+            iconInfo.titleLabel?.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+            backView.addSubview(iconInfo)
+            iconInfo.translatesAutoresizingMaskIntoConstraints = false
+            iconInfo.centerYAnchor.constraint(equalTo: backView.topAnchor,constant: 0).isActive = true
+            iconInfo.centerXAnchor.constraint(equalTo: backView.leadingAnchor,constant: 0).isActive = true
+            iconInfo.widthAnchor.constraint(equalToConstant: 50).isActive = true
+            iconInfo.heightAnchor.constraint(equalToConstant: 50).isActive = true
+            iconInfo.layoutIfNeeded()
+            iconInfo.addAction(for: .touchUpInside) {
+                self.ShowTableInfo(character: character)
+            }
+        
+        
+        let rank = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 18, weight: .heavy), text: "RANK:", color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            backView.addSubview(rank)
+            rank.translatesAutoresizingMaskIntoConstraints = false
+            rank.leadingAnchor.constraint(equalTo: backView.leadingAnchor,constant: 5).isActive = true
+            rank.topAnchor.constraint(equalTo: backView.topAnchor,constant: 5).isActive = true
+            rank.layoutIfNeeded()
+        
+        let nRank = CGFloat((character.characters?.name!.rank)!)
+        let progress = ProgressView(frame: CGRect(x: 0, y: 0, width: 0, height: 0),progress:5/nRank,label:.init(format: "1/%.0f", nRank))
+            backView.addSubview(progress)
+            progress.translatesAutoresizingMaskIntoConstraints = false
+            progress.leadingAnchor.constraint(equalTo: rank.trailingAnchor,constant: 10).isActive = true
+            progress.topAnchor.constraint(equalTo: rank.topAnchor,constant: 0).isActive = true
+            progress.heightAnchor.constraint(equalTo: rank.heightAnchor,constant: 0).isActive = true
+            progress.trailingAnchor.constraint(equalTo: backView.centerXAnchor,constant: 0).isActive = true
+            progress.layoutIfNeeded()
+        
+        let btnSummon = btnShadow("SUMMON STAR\nSHARDS","GreenButton")
+            btnSummon.contentEdgeInsets = UIEdgeInsets(top: -10, left: 0, bottom: 0, right: 0)
+            backView.addSubview(btnSummon)
+            btnSummon.translatesAutoresizingMaskIntoConstraints = false
+            btnSummon.widthAnchor.constraint(equalToConstant: max(120,backView.frame.width/3)).isActive = true
+            btnSummon.heightAnchor.constraint(equalToConstant: 50).isActive = true
+            btnSummon.topAnchor.constraint(equalTo: rank.topAnchor,constant: 0).isActive = true
+            btnSummon.centerXAnchor.constraint(equalTo: backView.centerXAnchor,constant: backView.frame.width/4+25).isActive = true
+            btnSummon.addAction(for: .touchUpInside) {
+                self.ShowViewSummons()
+            }
+        
+        let iconCard = UIImageView(image: UIImage(named: "cardGold"))
+            backView.addSubview(iconCard)
+            iconCard.translatesAutoresizingMaskIntoConstraints = false
+            iconCard.centerXAnchor.constraint(equalTo: btnSummon.leadingAnchor).isActive = true
+            iconCard.centerYAnchor.constraint(equalTo: btnSummon.centerYAnchor).isActive = true
+            iconCard.widthAnchor.constraint(equalToConstant: 50).isActive = true
+            iconCard.heightAnchor.constraint(equalTo: iconCard.widthAnchor).isActive = true
+        
+        let sizeStart:CGSize = CGSize(width: (pasteView.frame.width/2)/14, height: (pasteView.frame.width/2)/14)
+        
+         rank.drawStart(number: 0, margin: .bottomLeft, size: sizeStart,totalStart: 12)
+        
+        return backView
+    }
+    
+    private func partialViewProperties(pasteView:UIView,size:CGSize,character:CharactersDB)  -> UIView {
+        
+        let backView = UIView().addRect(size: CGRect(x: 0, y: 0, width: size.width, height: size.height), fillColor: .brown.withAlphaComponent(1), strokeColor: .black,shadow: true)
+            backView.layer.shadowOffset = CGSize(width: 2, height: 2)
+            backView.layer.shadowColor = UIColor.darkGray.cgColor
+            backView.layer.shadowRadius = 10
+            backView.layer.cornerRadius = 10
+            backView.layer.opacity = 1
+            backView.layer.shadowOpacity = 1
+            pasteView.addSubview(backView)
+            backView.translatesAutoresizingMaskIntoConstraints = false
+            backView.centerXAnchor.constraint(equalTo: pasteView.centerXAnchor).isActive = true
+            backView.centerYAnchor.constraint(equalTo: pasteView.centerYAnchor).isActive = true
+            backView.widthAnchor.constraint(equalToConstant: size.width).isActive = true
+            backView.heightAnchor.constraint(equalToConstant: size.height).isActive = true
+            backView.layoutIfNeeded()
+        
+        showRectangleProperties(side: .Left,panelWood:backView,character: character)
+        
+        showRectangleProperties(side: .Right,panelWood:backView,character: character)
+    
+        return backView
+    }
 }

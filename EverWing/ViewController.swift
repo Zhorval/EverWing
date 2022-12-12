@@ -321,13 +321,17 @@ class ViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
            
+            let scene = StarUpgrade(size: self.view.bounds.size)
+            let skView = self.view as! SKView
+            skView.presentScene(scene)
+            /*
             let scene = MainScene(size: self.view.bounds.size)
             scene.scaleMode = .aspectFill
             let skview = self.view as! SKView
             skview.isMultipleTouchEnabled = false
             skview.showsNodeCount = true
             skview.presentScene(scene)
-             
+             */
         }
     }
     private func hardReset(filepath: String){

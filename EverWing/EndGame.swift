@@ -11,13 +11,12 @@ class EndGame: SKScene {
         print ("ENDGAME CLEANED")
     }
     
-    let managed = ManagedDB.shared.context
     
     var collectedCoins:Int = 0
     
     var infobar:Infobar?
     
-    let currentToon = AccountInfo().getCurrentToon()
+    let currentToon = AccountInfo().getActualPlayer()
     
     override func didMove(to view: SKView) {
         
@@ -75,7 +74,7 @@ class EndGame: SKScene {
         infobar!.centerYAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
        
            
-        let player = UIImageView(image: UIImage(named: "Alice")!)
+        let player = UIImageView(image: UIImage(named: currentToon.getCharacter().rawValue)!)
         view.addSubview(player)
         
         player.translatesAutoresizingMaskIntoConstraints = false
@@ -129,10 +128,7 @@ class EndGame: SKScene {
         coin.leadingAnchor.constraint(equalTo: valueCoins.trailingAnchor,constant: 30).isActive = true
         coin.widthAnchor.constraint(equalToConstant: UIDevice().isPhone() ? 35 : 50).isActive = true
         coin.heightAnchor.constraint(equalToConstant: UIDevice().isPhone() ? 35 : 50).isActive = true
-        /*-----------------------------------------------------------------------------------------------*/
-
-        
-        /*-----------------------------------------------------------------------------------------------*/
+       
 
         let txtScore = UILabel()
             .addFontAndText(font: "Cartwheel", text: "Score", size: view.frame.width*0.07)

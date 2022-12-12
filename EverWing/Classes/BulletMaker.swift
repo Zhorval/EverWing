@@ -11,14 +11,30 @@ import SpriteKit
 class BulletMaker:NSObject{
     
     deinit{
-        print("bullet maker deinit")
+       // print("bullet maker deinit")
     }
-    enum BulletType {
-        case Type_1
-        case Type_2
-        case Type_3
-        case Type_4
-        case Type_5
+    enum BulletType:Int {
+        case Type_1 = 1
+        case Type_2 = 2
+        case Type_3 = 3
+        case Type_4 = 4
+        case Type_5 = 5
+        
+        var string:String {
+            switch self {
+                
+            case .Type_1:
+                return "_proyectile_1"
+            case .Type_2:
+                return "_proyectile_2"
+            case .Type_3:
+                return "_proyectile_3"
+            case .Type_4:
+                return "_proyectile_4"
+            case .Type_5:
+                return "_proyectile_4"
+            }
+        }
         
     }
     enum Level: Int{
@@ -72,6 +88,7 @@ class BulletMaker:NSObject{
         case Level_48 = 48
         case Level_49 = 49
         case Level_50 = 50
+       
     }
     
      func addBullet(sprite:(SKTexture, CGSize), dx: CGFloat, dy: CGFloat, zPos:CGFloat) -> SKSpriteNode{
@@ -86,13 +103,29 @@ class BulletMaker:NSObject{
         return node
     }
     
-    private func getBulletType(charType: Toon.Character, type:BulletType) -> (SKTexture, CGSize){
+    func addBulletView(image:UIImage, dx: CGFloat, dy: CGFloat,viewPaste:UIView,proyectile:BulletType,size:CGSize){
+                      
+        let node = UIImageView(image: image.resized(to: size))
+      
+        node.clipsToBounds = true
         
+        viewPaste.addSubview(node)
+        
+        node.translatesAutoresizingMaskIntoConstraints = false
+        node.centerXAnchor.constraint(equalTo: viewPaste.centerXAnchor,constant: dx).isActive = true
+        node.centerYAnchor.constraint(equalTo: viewPaste.centerYAnchor,constant: dy).isActive = true
+   }
+   
+    
+    
+    private func getBulletType(charType: Toon.Character, type:BulletType) -> (SKTexture, CGSize){
+       
         switch charType {
-        case .Alpha:
+        default :
             switch type {
             case .Type_1:
-                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_1)
+                let sprite = SKTexture(image: UIImage(named: "Lyra_proyectile_1")!) //global.getMainTexture(main: .Character_Alpha_Projectile_1)
+                
                 let w = screenSize.width * 0.036
                 let h = screenSize.height * 0.034
                 return (sprite, CGSize(width: w, height: h))
@@ -117,149 +150,9 @@ class BulletMaker:NSObject{
                 let h = screenSize.height * 0.1
                 return (sprite, CGSize(width: w, height: h))
             }
-        case .Beta:
-            switch type {
-            case .Type_1:
-                let sprite = global.getMainTexture(main: .Character_Beta_Projectile_1)
-                let w = screenSize.width * 0.041
-                let h = screenSize.height * 0.033
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_2:
-                let sprite = global.getMainTexture(main: .Character_Beta_Projectile_2)
-                let w = screenSize.width * 0.104
-                let h = screenSize.height * 0.083
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_3:
-                let sprite = global.getMainTexture(main: .Character_Beta_Projectile_3)
-                let w = screenSize.width * 0.109
-                let h = screenSize.height * 0.065
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_4:
-                let sprite = global.getMainTexture(main: .Character_Beta_Projectile_4)
-                let w = screenSize.width * 0.157
-                let h = screenSize.height * 0.096
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_5:
-                let sprite = global.getMainTexture(main: .Character_Beta_Projectile_5)
-                let w = screenSize.width * 0.157
-                let h = screenSize.height * 0.1
-                return (sprite, CGSize(width: w, height: h))
-            }
-        case .Celta:
-            switch type {
-            case .Type_1:
-                let sprite = global.getMainTexture(main: .Character_Celta_Projectile_1)
-                let w = screenSize.width * 0.039
-                let h = screenSize.height * 0.0285
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_2:
-                let sprite = global.getMainTexture(main: .Character_Celta_Projectile_2)
-                let w = screenSize.width * 0.111
-                let h = screenSize.height * 0.0625
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_3:
-                let sprite = global.getMainTexture(main: .Character_Celta_Projectile_3)
-                let w = screenSize.width * 0.08
-                let h = screenSize.height * 0.077
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_4:
-                let sprite = global.getMainTexture(main: .Character_Celta_Projectile_4)
-                let w = screenSize.width * 0.157
-                let h = screenSize.height * 0.076
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_5:
-                let sprite = global.getMainTexture(main: .Character_Celta_Projectile_5)
-                let w = screenSize.width * 0.138
-                let h = screenSize.height * 0.098
-                return (sprite, CGSize(width: w, height: h))
-            }
-        case .Delta:
-            switch type {
-            case .Type_1:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_1)
-                let w = screenSize.width * 0.036
-                let h = screenSize.height * 0.035
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_2:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_2)
-                let w = screenSize.width * 0.075
-                let h = screenSize.height * 0.0475
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_3:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_3)
-                let w = screenSize.width * 0.0845
-                let h = screenSize.height * 0.068
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_4:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_4)
-                let w = screenSize.width * 0.094
-                let h = screenSize.height * 0.065
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_5:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_5)
-                let w = screenSize.width * 0.125
-                let h = screenSize.height * 0.068
-                return (sprite, CGSize(width: w, height: h))
-            }
-        case .Alice:
-            switch type {
-            case .Type_1:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_1)
-                let w = screenSize.width * 0.036
-                let h = screenSize.height * 0.035
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_2:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_2)
-                let w = screenSize.width * 0.075
-                let h = screenSize.height * 0.0475
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_3:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_3)
-                let w = screenSize.width * 0.0845
-                let h = screenSize.height * 0.068
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_4:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_4)
-                let w = screenSize.width * 0.094
-                let h = screenSize.height * 0.065
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_5:
-                let sprite = global.getMainTexture(main: .Character_Delta_Projectile_5)
-                let w = screenSize.width * 0.125
-                let h = screenSize.height * 0.068
-                return (sprite, CGSize(width: w, height: h))
-            }
-            
-        default:
-            print("Shold not reach here - BulletMaker Default Choice")
-            switch type {
-            case .Type_1:
-                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_1)
-                let w = screenSize.width * 0.036
-                let h = screenSize.height * 0.034
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_2:
-                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_2)
-                let w = screenSize.width * 0.051
-                let h = screenSize.height * 0.06
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_3:
-                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_3)
-                let w = screenSize.width * 0.0845
-                let h = screenSize.height * 0.064
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_4:
-                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_4)
-                let w = screenSize.width * 0.111
-                let h = screenSize.height * 0.079
-                return (sprite, CGSize(width: w, height: h))
-            case .Type_5:
-                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_5)
-                let w = screenSize.width * 0.152
-                let h = screenSize.height * 0.1
-                return (sprite, CGSize(width: w, height: h))
-            }
+      
         }
+        
     }
     
     internal func make(level:Level, char:Toon.Character) -> SKSpriteNode{
@@ -544,6 +437,65 @@ class BulletMaker:NSObject{
         
         }
         return node
+    }
+    
+    
+    func makeViewBulletCharacter(level:Level, char:Toon.Character,view:UIView) -> UIView{
+    
+        let s1 = UIImage(named: char.rawValue + "_proyectile_1") ?? UIImage(named: "Alice" + "_proyectile_1")!
+        let s2 = UIImage(named: char.rawValue + "_proyectile_2") ?? UIImage(named: "Alice" + "_proyectile_1")!
+        let s3 = UIImage(named: char.rawValue + "_proyectile_3") ?? UIImage(named: "Alice" + "_proyectile_1")!
+        let s5 = UIImage(named: char.rawValue + "_proyectile_5") ?? UIImage(named: "Alice" + "_proyectile_1")!
+       
+        let size1 = CGSize(width: view.frame.width/3, height: view.frame.width/2)
+        let size2 = CGSize(width: view.frame.width/4, height: view.frame.width/3)
+        let size3 = CGSize(width: view.frame.width/5, height: view.frame.width/4)
+        let size4 = CGSize(width: view.frame.width/8, height: view.frame.width/6)
+
+
+        switch level {
+            
+            case .Level_1:
+                addBulletView(image:s1, dx: 0, dy:0, viewPaste: view, proyectile: .Type_1, size: size1)
+            case .Level_2:
+                addBulletView(image:s1, dx: -view.frame.width/8, dy:0, viewPaste: view, proyectile: .Type_1, size: size2)
+                addBulletView(image:s1, dx: view.frame.width/8, dy:0, viewPaste: view, proyectile: .Type_1, size: size2)
+            case .Level_3:
+                addBulletView(image:s1, dx: 0, dy:-view.frame.height/8, viewPaste: view, proyectile: .Type_1, size: size3)
+                addBulletView(image:s1, dx: -view.frame.width/4, dy:0, viewPaste: view, proyectile: .Type_1, size: size3)
+                addBulletView(image:s1, dx: view.frame.width/4, dy:0, viewPaste: view, proyectile: .Type_1, size: size3)
+            case .Level_4:
+                addBulletView(image:s1, dx: view.frame.width/10, dy:-view.frame.height/8, viewPaste: view, proyectile: .Type_1, size: size4)
+                addBulletView(image:s1, dx: -view.frame.width/10, dy:-view.frame.height/8, viewPaste: view, proyectile: .Type_1, size: size4)
+                addBulletView(image:s1, dx: view.frame.width/4, dy:0, viewPaste: view, proyectile: .Type_1, size: size4)
+                addBulletView(image:s1, dx: -view.frame.width/4, dy:0, viewPaste: view, proyectile: .Type_1, size: size4)
+            case .Level_5:
+                addBulletView(image:s2, dx: 0, dy:0, viewPaste: view, proyectile: .Type_2, size: size1)
+            case .Level_6:
+                addBulletView(image:s2, dx: -view.frame.width/8, dy:0, viewPaste: view,proyectile: .Type_2, size: size2)
+                addBulletView(image:s2, dx: view.frame.width/8, dy:0, viewPaste: view,proyectile: .Type_2, size: size2)
+            case .Level_7:
+                 addBulletView(image:s2, dx: 0, dy:-view.frame.height/8, viewPaste: view,proyectile: .Type_2, size: size3)
+                 addBulletView(image:s1, dx: -view.frame.width/4, dy:0, viewPaste: view,proyectile: .Type_1, size: size3)
+                 addBulletView(image:s1, dx: view.frame.width/4, dy:0, viewPaste: view,proyectile: .Type_1, size: size3)
+            case .Level_8:
+                 addBulletView(image:s2, dx: 0, dy:-view.frame.height/6, viewPaste: view,proyectile: .Type_2, size: size3)
+                 addBulletView(image:s1, dx: view.frame.width/6, dy:-view.frame.height/8, viewPaste: view,proyectile: .Type_1, size: size4)
+                 addBulletView(image:s1, dx: -view.frame.width/6, dy:-view.frame.height/8, viewPaste: view,proyectile: .Type_1, size: size4)
+                 addBulletView(image:s1, dx: -view.frame.width/4, dy:0, viewPaste: view,proyectile: .Type_1, size: size4)
+                 addBulletView(image:s1, dx: view.frame.width/4, dy:0, viewPaste: view,proyectile: .Type_1, size: size4)
+             default:break
+        }
+           
+        return view
+    }
+
+   
+    
+    func makeBulletCharacter(char:CharactersDB,view:UIView,isUpgrade:Bool = false) -> UIView {
+        
+        return makeViewBulletCharacter(level: Level(rawValue: Int(!isUpgrade ? char.level : char.level + 1))!, char: char.characters!.name!, view: view)
+
     }
 }
     

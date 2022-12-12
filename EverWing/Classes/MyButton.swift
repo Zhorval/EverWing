@@ -9,6 +9,21 @@
 import Foundation
 import UIKit
 
+extension UIControl {
+    func addAction(for controlEvents:UIControl.Event,_ clousure: @escaping()->()) {
+        
+        @objc class ClousureSleeve:NSObject {
+            let clousure:()->()
+            init(_ clousure: @escaping()->()) { self.clousure = clousure }
+            @objc func invoke() { clousure() }
+            
+        }
+        let sleeve = ClousureSleeve(clousure)
+        addTarget(sleeve, action: #selector(ClousureSleeve.invoke), for: controlEvents)
+        objc_setAssociatedObject(self, "\(UUID())", sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+}
+
 class MyButton<T:BaseProtocol>:UIButton {
     
     let handler:(Bool)->Void
@@ -23,6 +38,22 @@ class MyButton<T:BaseProtocol>:UIButton {
     
     var identifier:Direction?
     
+    var dragonsSell:[T]?
+    
+    
+    
+    init(frame: CGRect,item:[T],handler:@escaping(Bool)->Void) where T == Dragons {
+        
+        print("Contador \(item.count)")
+        self.handler = handler
+        
+        self.dragonsSell = item
+       
+        super.init(frame: frame)
+
+        addTarget(self, action: #selector(tapSellDragonsSelected), for: .touchUpInside)
+        
+    }
     init(frame: CGRect,item:T?,view:UIView,identifier:Direction,handler:@escaping(Bool)->Void) where T == Dragons {
         
         self.data  = item
@@ -49,6 +80,7 @@ class MyButton<T:BaseProtocol>:UIButton {
         heightAnchor.constraint(equalTo: widthAnchor).isActive = true
         layoutIfNeeded()
     }
+    
     /// - Description: This construct is to handle the skill buttons,
     /// - Parameters:
     ///     @ rect:CGRect always .zero
@@ -107,8 +139,8 @@ class MyButton<T:BaseProtocol>:UIButton {
         icon.heightAnchor.constraint(equalToConstant: 35).isActive =  true
         icon.layoutIfNeeded()
         
-        let textIcon = UILabel().shadowText(colorText:.black, colorShadow: .white, aligment: .center)
-        textIcon.text = IconsExtra.items[index].title
+        let textIcon = UILabel().shadowText(colorText:.white, colorShadow: .clear, aligment: .center)
+        textIcon.text = IconsExtra.items[index].title.uppercased()
         textIcon.numberOfLines = 0
         textIcon.font = UIFont.systemFont(ofSize: icon.frame.width*0.5, weight: .bold)
         icon.addSubview(textIcon)
@@ -126,7 +158,7 @@ class MyButton<T:BaseProtocol>:UIButton {
 
         super.init(frame: frame)
     
-        self.setTitle(String(data.gemAmount ?? data.amount).convertDecimal(), for: .normal)
+        self.setTitle(String(Int(data.gemAmount ?? CGFloat(data.amount))).convertDecimal(), for: .normal)
         self.setBackgroundImage(UIImage(named: "BlueButton")!, for: .normal)
         self.titleLabel?.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         addTarget(self, action: #selector(mySelector), for: .touchUpInside)
@@ -140,15 +172,17 @@ class MyButton<T:BaseProtocol>:UIButton {
     @objc func mySelector(sender:UIButton) {
         
         if let data = data as? ProtocolTableViewGenericCell {
-            let amount = data.gemAmount == nil ? data.amount : data.gemAmount
+            let amount:Int = data.gemAmount == nil ? data.amount : Int(data.gemAmount!)
             
             let payWithItem = data.icon
             
-            if hasCoin(amount: Int32(amount!), itemPay: payWithItem) {
+            if hasCoin(amount: Int32(amount), itemPay: payWithItem as! Currency.CurrencyType) {
                 
                 let action:Currency.ActionBuy = data.gemAmount == nil ? .Sell : .Buy
                 
                 handler(preparePay(data: data, action: action))
+            } else {
+                fatalError()
             }
         }
     }
@@ -194,7 +228,7 @@ class MyButton<T:BaseProtocol>:UIButton {
         pointingArrow.trailingAnchor.constraint(equalTo: popup.trailingAnchor,constant: -(CGFloat(index) * view.frame.width/10) - 35 ).isActive = true
         
         if let data = data as? Dragons {
-            guard let txt = getTextPopupPlist(key: data.icons[index].rawValue),
+            guard let txt = getTextPopupPlist(key: data.icons[index] ),
                   let name = txt["name"],
                   let description = txt["description"]  else { return }
             
@@ -244,6 +278,16 @@ class MyButton<T:BaseProtocol>:UIButton {
         } 
         handler(true)
         
+    }
+    
+     @objc func tapSellDragonsSelected(sender:UIButton) {
+        
+        guard let dragons = dragonsSell as? [Dragons] else { fatalError() }
+                  
+        print(dragons)
+        if  dragons.count > 0 {
+            handler(true)
+        }
     }
     private func getTextPopupPlist(key:String) -> Dictionary<String,String>? {
         
@@ -302,28 +346,28 @@ class MyButton<T:BaseProtocol>:UIButton {
             guard let model = try managed.fetch(PlayerDB.fetchRequest()).first else { return false}
 
             switch data.icon {
-                case .Gem:
+                case Currency.CurrencyType.Gem:
                     
-                if action == .Buy {
-                        model.fruit += Int32(data.amount)
-                        guard let gemAmount = data.gemAmount else { return false }
-                        model.gem -= Int32(gemAmount)
-                    } else {
-                        model.gem -= Int32(data.amount)
-                    }
-                case .Coin:
+                    if action == .Buy {
+                            model.fruit += Int32(data.amount)
+                            guard let gemAmount = data.gemAmount else { return false }
+                            model.gem -= Int32(gemAmount)
+                        } else {
+                            model.gem -= Int32(data.amount)
+                        }
+                case Currency.CurrencyType.Coin:
                     if action == .Sell {
                         model.coin -= Int32(data.amount)
                     }
                     
-                case .Eggs:
+                case Currency.CurrencyType.Eggs:
                     model.coin -= Int32(data.gemAmount!)
             
                 default:
                     fatalError()
             }
              try managed.save()
-             print("Preparado el pago listo para handler")
+             print("Preparado el pago listo para handler MYButton class")
              return true
         }catch let error {
             print("Error pay item \(error.localizedDescription)")

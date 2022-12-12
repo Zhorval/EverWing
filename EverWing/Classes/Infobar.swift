@@ -24,7 +24,7 @@ class Infobar:UIView {
         
         view.translatesAutoresizingMaskIntoConstraints = false
         view.leadingAnchor.constraint(equalTo: self.leadingAnchor,constant:x).isActive = true
-        view.topAnchor.constraint(equalTo: self.topAnchor,constant:screenSize.height*0.06).isActive = true
+        view.topAnchor.constraint(equalTo: self.topAnchor,constant: UIDevice().isPhone() ? screenSize.height*0.06 : 10).isActive = true
         view.widthAnchor.constraint(equalToConstant: width).isActive = true
         view.heightAnchor.constraint(equalToConstant: screenSize.width*0.07).isActive = true
         
@@ -74,13 +74,13 @@ class Infobar:UIView {
          
         self.restorationIdentifier = "infobar"
          
-         self.tag = 100
+         self.tag = 0
          
         self.scene = scene
          
          do {
              
-             guard let data =  try ManagedDB.shared.context.fetch(PlayerDB.fetchRequest()).first else { return }
+             guard let data =  try ManagedDB.shared.context.fetch(PlayerDB.fetchRequest()).first else { fatalError() }
              resultDB = data
          } catch let error {
             print(error.localizedDescription)
@@ -126,10 +126,10 @@ class Infobar:UIView {
         
         var v = UIView()
         
-        GameInfo.shared.showGenericViewTable(skScene: scene!, items: T.items, title: title, handler: { view  in
+       /* GameInfo.shared.showGenericViewTable(skScene: scene!, items: T.items, title: title, handler: { view  in
                 
                 v = view
-        })
+        })*/
        
         return v
     }

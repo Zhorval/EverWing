@@ -17,33 +17,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         Thread.sleep(forTimeInterval: 3)
-        
+    
         // Override point for customization after application launch.
         window = UIWindow(frame: screenSize)
         window?.makeKeyAndVisible()
         window?.rootViewController = ViewController()
+  /*
         do{
             let managed = ManagedDB.shared.context
             
-            let d = try managed.fetch(DragonsBuyDB.fetchRequest())
-            for x in d {
-                managed.delete(x)
-            }
+            let _ = try managed.fetch(DragonsBuy.fetchRequest()).map { managed.delete($0)}
+            let _ = try managed.fetch(DragonsDB.fetchRequest()).map { managed.delete($0)}
+            let _ = try managed.fetch(PlayerDB.fetchRequest()).map { managed.delete($0)}
+            let _ = try managed.fetch(CharactersDB.fetchRequest()).map { managed.delete($0)}
             try managed.save()
-        }catch {}
-    
-        if !defaults.bool(forKey: "isPreloadScore") {
-              preloadDataScore()
-        }
-        
-        preloadData() { d in
             
+        }catch let error {
+            fatalError(error.localizedDescription)
         }
-        
-        SJParentValueTransformer<PlayerDataTransformer>.registerTransformer()
+*/
+   
+        if !defaults.bool(forKey: "isPreloadScore") {
+            preloadDataScore()
+            
+            do{
+                try preloadData()
+            } catch let error{
+                print(error.localizedDescription)
+            }
+        }
         
         return true
-        
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -68,35 +72,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-   
-    
     private func preloadDataScore() {
        
         let managed = ManagedDB.shared.context
         
         NSEntityDescription.insertNewObject(forEntityName: "PlayerDB", into: managed).awakeFromInsert()
         NSEntityDescription.insertNewObject(forEntityName: "Settings", into: managed).awakeFromInsert()
+
         do {
             try managed.save()
+        
             defaults.set(true, forKey: "isPreloadScore")
         } catch let error {
             print("Error save default Score \(error)")
         }
     
     }
-    func preloadData(completion:@escaping(_ T:[Dragons])->Void) {
+    
+    private func preloadData() throws  {
         
-      
         let directory = Bundle.main.url(forResource: "property", withExtension: "plist")!
-        
-        var items:[Dragons] = []
         
         guard let data = try? Data(contentsOf: directory) else { fatalError() }
         
         do {
             guard let json = try PropertyListSerialization.propertyList(from: data, options: [],format: nil) as? Dictionary<String,Any>,
-                  let js =  json["sidekicks"] as? Dictionary<String,Any>  else { fatalError()}
-            
+                  let character = json["characters"] as? Dictionary<String,Dictionary<String,String>>,
+                  let js =  json["sidekicks"] as? Dictionary<String,Any>  else { throw ExampleError.invalid}
+                
+                  try preloadCharacters(json: character)
        
             let order = js.keys.sorted(by: {$0 < $1})
             for x in order {
@@ -108,24 +112,82 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let _ = keysSort.enumerated().compactMap{ (i,z) -> Void in
                     
                     let picture = (x + "_T\(i+1)_icon")
-                   
+                    
                     guard let element = val[z]?["element"] as? String,
                           let name = val[z]?["name"] as? String,
                           let rarity = val[z]?["rarity"] as? String,
                           let type = val[z]?["type"] as? String,
                           let class_ = val[z]?["class"] as? String,
                           let skills = val[z]?["skills"] as? Dictionary<String,String> else { return }
-                     
-                    let weakness = skills.values.compactMap { Weakness(rawValue: $0) }
                     
-                    items.append(Dragons(name: name, rarity: Dragons.RarityDragon(rawValue: rarity)!, type: type, class_: class_, picture: Dragons.dragons(name: picture), icons: weakness, element: element))
+                    let weakness = skills.values.compactMap { Weakness(rawValue: $0)?.rawValue }
+                    
+                    let d = Dragons(id:UUID().uuidString,name: name, rarity: Dragons.RarityDragon(rawValue: rarity)!, type: type, class_: class_, picture: picture, icons: weakness, element: Dragons.ElementDragons(rawValue:  element)!, level: 1,percent: 0,discover: nil,like:false,horoscope: Dragons.HoroscopeDragon.allCases.randomElement()!)
+                    
+                    
+                    do {
+                         try SaveDragonsDB(dragon: d)
+                    }catch let error {
+                        print(error.localizedDescription)
+                    }
                 }
             }
-            
-            Dragons.items = items
-            completion(Dragons.items)
         } catch  {
-            fatalError(error.localizedDescription)
+            throw ExampleError.invalid
+        }
+    }
+    
+    private func preloadCharacters(json:Dictionary<String,Dictionary<String,String>>) throws  {
+      
+        for x in json.keys {
+            guard let  name = json[x]?["name"] as? String,
+                  let  title = json[x]?["title"] as? String,
+                  let  description = json[x]?["description"] as? String,
+                  let  shortDescription = json[x]?["shortDescription"] as? String,
+                  let  ability = json[x]?["ability"] as? String  else { throw ExampleError.invalid }
+
+            let character = CharactersModel(id: UUID().uuidString, name: Toon.Character(rawValue: name)! , title: title, description_: description, shortDescription: shortDescription, ability: Toon.Ability(rawValue: ability) ?? .Leader, purchased: name == "Alice")
+           
+            do {
+                
+                try SaveCharactersDB(characters: character)
+                
+            } catch  {
+                throw ExampleError.invalid
+            }
+        }
+    }
+    
+    private func SaveCharactersDB(characters:CharactersModel) throws  {
+        
+        let managed = ManagedDB.shared.context
+                  
+       do {
+           let n = CharactersDB(context: managed)
+                       
+           n.characters = characters
+                  
+           try managed.save()
+           
+       } catch {
+           throw ExampleError.invalid
+       }
+    }
+    
+    private func SaveDragonsDB(dragon:Dragons) throws {
+            
+     let managed = ManagedDB.shared.context
+               
+        do {
+            let n = DragonsDB(context: managed)
+                        
+            n.dragons = dragon
+            
+                   
+            try managed.save()
+            
+        } catch {
+            throw ExampleError.invalid
         }
     }
 }

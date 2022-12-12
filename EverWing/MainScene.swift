@@ -26,6 +26,8 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         case Dragons
         case BuyDragon
         case DragonsMenuScene
+        case UpdateLeveCharacter
+        case StarUpgrade
     }
     
     let gameinfo:GameInfo = GameInfo.shared
@@ -209,8 +211,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
 
         let player = gameinfo.getCurrentToonNode()
         player.position = CGPoint(x: screenSize.midX, y: 250)
-       
-        // Add Character Player
         self.addChild(player)
     }
     
@@ -220,32 +220,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         view?.addSubview(GameInfo.tableInfoBarEggs)
     }
    
-    /*
-    //MARK: SETTER CORE DATA SETTINGS
-    private func setInfoUser(key:String,node:SKSpriteNode){
-       
-
-        if Settings.updateSettings(key: key) {
-            let manager = ManagedDB.shared.context
-
-              do {
-                  
-                  guard let value =  try manager.fetch(Settings.fetchRequest()).first else { return }
-                  
-                  node.texture = value.value(forKey: key) as? Bool == true ? SKTexture(imageNamed: Global.GUIButtons.BlueButton.rawValue) : SKTexture(imageNamed: Global.GUIButtons.BrownButton.rawValue)
-            
-                  let labelNode = node.childNode(withName: key.capitalized) as? SKLabelNode
-                 
-                    labelNode?.text = value.value(forKey: key) as? Bool == true ? "On" : "Off"
-              } catch {
-                  fatalError()
-              }
-           
-        } else {
-            return
-        }
-     }
-     */
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         var pos:CGPoint!
@@ -269,10 +243,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
                 c.run(gameinfo.mainAudio.getAction(type: .ChangeOption))
                 scene?.backgroundBlack(withSpinnerActive: false)
                 scene?.view?.addSubview(gameinfo.showMenuSettings())
-              //  blurScene(blurNode: blurNode)
-              /*  self.scene?.backgroundBlack(withSpinnerActive: false)
-                c.run(gameinfo.mainAudio.getAction(type: .ChangeOption))
-                gameinfo.showMenuSettings(scene: self) */
+             
             }
             else if c.name == "icon_cancel"{
                 
@@ -325,9 +296,12 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
             gameinfo.changeGameState(.Start)
             gameinfo.infobar?.remove()
             eggsClaim.disableAlphaEggsAndSettings()
+            player.position.y = 50
+            /*
             guard let attack = toon.attack(scene: self, gameState: gameinfo.gamestate) else { return }
             player.run(attack)
        //     _ = gameinfo.dragon.map {  gameinfo.addChild($0.dragon) }
+             */
         }
         
         if recognizer.state == .began {
@@ -486,8 +460,8 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
                 player.addChild(aura)
             }
             
-        case .ToonByMagnet:
-            
+        case .ToonByMagnet: break
+            /*
             guard let attack = toon.attack(scene: self, gameState: .Running) else { return }
             
             DispatchQueue.main.asyncAfter(wallDeadline: .now()) { [self] in
@@ -500,6 +474,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
                 ]))
                 self.gameinfo.changeGameState(.Attack)
             }
+             */
         case .ToonByFlower:
             
             let name = "AuraPlayer"

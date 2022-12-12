@@ -22,10 +22,9 @@ protocol GameInfoDelegate{
     func showEffectFxBossAppears(typeBoss:BossType)
     func stopAudio(type:AVAudio.BgroundSoundType)
     func getScene()->SKScene?
-    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene)
+    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene,character:CharactersDB?)
     func prepareToDragonBuyChangeScene<T>(scene:MainScene.Scene,skscene:SKScene,data:T) where T: ProtocolTableViewGenericCell
-//    func showGenericViewTable<T>(skScene:SKScene,items:[T],title:String,handler:@escaping(UIView)->Void) throws where T : ProtocolTableViewGenericCell
-//    func genericViewItem(title:String) -> UIView
+
 }
 
 
@@ -85,6 +84,7 @@ class GameInfo: GameInfoDelegate{
     var cofre:EnemyModel?
     var map:Map?
     var isMapStart: Bool?
+    let accountInfo = AccountInfo()
     static var currentPlayerPosition:CGPoint = .zero
     
     static var tableInfoBarEggs = CustomCollectionViewEggs(frame: CGRect(x: 10, y: 50, width: screenSize.width/2, height: 60),
@@ -169,9 +169,8 @@ class GameInfo: GameInfoDelegate{
     // MARK: CREATE PANEL SETTINGS
     func showMenuSettings() -> UIView {
 
-     //   let view = genericViewItem(title: "SETTINGS")
-        guard let view = mainScene?.genericViewItem(title: "SETTINGS") else { return UIView()}
         
+        guard let view = mainScene?.genericViewItem(title: "SETTINGS") else { return UIView()}
         let getTitleButton =  { (item:Bool) -> [String:Any] in   return item ? ["ON":true] : ["OFF":false]   }
         
         
@@ -439,12 +438,12 @@ class GameInfo: GameInfoDelegate{
                     MainScene.accountInfo.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
                     SKAction.run { [self] in
                       
-                        self.addChild((MainScene.accountInfo.getCurrentToon().getBullet()?.shoot())!)
+                        guard let proyectil = MainScene.accountInfo.getCurrentToon().getBullet()?.shoot() else { return }
                         
-                       /* self.addChild(self.dragon?[0].shoot())
-                        self.addChild(self.dragon?[1].shoot())*/
+                        self.addChild(proyectil)
+                    
                     },
-                    SKAction.wait(forDuration: 0.06)])))
+                    SKAction.wait(forDuration: 0.1)])))
                 }
             ]),withKey: "shoot")
             
@@ -730,9 +729,9 @@ class GameInfo: GameInfoDelegate{
      func requestChangeToon(index: Int){
         MainScene.accountInfo.selectToonIndex(index: index)
     }
-     func requestToonDescription(index id:Int) -> [String]{
+     func requestToonDescription(index id:Int) -> String{
          
-        return MainScene.accountInfo.getToonDescriptionByIndex(index: id)
+         return MainScene.accountInfo.getToonDescriptionByIndex(index: id)
     }
     
      func requestToonName(index id:Int) -> String{
@@ -811,13 +810,16 @@ extension GameInfo {
         case .MainScene:
             let newScene = MainScene(size: skscene.size)
                 skscene.view?.presentScene(newScene)
+        case .StarUpgrade:
+            let newScene = StarUpgrade(size: skscene.size)
+            skscene.view?.presentScene(newScene)
         default: break
             
         }
     }
     
     // MARK: PREPARE SCENE
-    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene){
+    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene,character:CharactersDB? = nil){
         // remove all gestures
         guard let gestures = skscene.view?.gestureRecognizers else { return }
         
@@ -843,6 +845,8 @@ extension GameInfo {
                 }]))
             
         case .Character_Menu:
+            skscene.removeUIViews()
+
             self.prepareToChangeScene()
             skscene.recursiveRemovingSKActions(sknodes: skscene.children)
             skscene.removeAllChildren()
@@ -871,40 +875,33 @@ extension GameInfo {
             let newScene = BuyDragon(size: skscene.size,dragons: BuyEggs.items.randomElement()!)
             skscene.view?.presentScene(newScene)
             
+        case .MainScene:
+            skscene.removeUIViews()
+            self.prepareToChangeScene()
+            skscene.recursiveRemovingSKActions(sknodes: skscene.children)
+            skscene.removeAllChildren()
+            skscene.removeAllActions()
+            
+            let newScene = MainScene(size: skscene.size)
+            skscene.view?.presentScene(newScene)
+            
+        case.UpdateLeveCharacter:
+            skscene.removeUIViews()
+            self.prepareToChangeScene()
+            skscene.removeAllChildren()
+            skscene.removeAllActions()
+            skscene.recursiveRemovingSKActions(sknodes: skscene.children)
+            
+            let newScene = UpgradeCharacter(size: skscene.size,character: character!,gameInfo: self)
+            skscene.view?.presentScene(newScene)
+            
             
         default:
             print("Should not reach here. PrepareToChangeScene from MainScene")
         }
     }
     
-    //MARK: SHOW TABLEVIEW FOR ITEM BUY GEM OR COINS
-    func showGenericViewTable<T>(skScene: SKScene, items: [T], title: String, handler: @escaping (UIView) -> Void)  where T : ProtocolTableViewGenericCell {
-        
-        self.mainScene = skScene
-                
-        let margin = screenSize.size.width * 0.1
-        
-        let eggsPage = mainScene?.genericViewItem(title: title)
-          
-        let inset = eggsPage!.bounds.inset(by: .init(top: margin, left: margin/2, bottom: margin, right: margin/2))
-            
-        let viewCol = UIView(frame: inset)
-            
-        let tableViewEggs = GenericTableView(frame: viewCol.bounds, items: T.items) { (item:T) in
-                
-                UIView.animate(withDuration: 0.1) { [self] in
-                    mainScene?.backgroundBlack(withSpinnerActive: false)
-                    eggsPage?.transform = CGAffineTransform(translationX: screenSize.width, y: 0)
-                } completion: {_ in
-                    self.mainScene?.view?.addSubview((self.mainScene?.showViewBuyAditionalItem(gameInfo: self, scene: skScene, items: item))!)
-                }
-            }
-            
-        viewCol.addSubview(tableViewEggs)
-        eggsPage!.addSubview(viewCol)
-        handler(eggsPage!)
-            
-    }
+    
     
     @objc func tapButtonCancel(sender:UIButton) {
         

@@ -8,7 +8,7 @@
 
 void main()
 {
-    /*
+    
     vec4 color = texture2D(u_texture, v_tex_coord);
     float gradient = 0.0;
     
@@ -28,7 +28,8 @@ void main()
             color = vec4(gradient + color.r, gradient + color.g, gradient + color.b, color.a);
             color.rgb *= color.a; // set background to alpha 0
             gl_FragColor = color;
-        }*/
+        }
+    /*
     vec4 current_color = texture2D(u_texture, v_tex_coord);
 
         // if it's not transparent
@@ -39,5 +40,5 @@ void main()
             // use the current (transparent) color
             gl_FragColor = current_color;
         }
-    
+    */
 }

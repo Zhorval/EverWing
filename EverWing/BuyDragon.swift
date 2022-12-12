@@ -8,19 +8,23 @@
 
 import Foundation
 import SpriteKit
+import CoreData
 
 
+enum ExampleError: Error {
+    case invalid
+    case uncorrect
+}
 
 class BuyDragon:SKScene,ProtocolEffectBlur {
     
-    var blurNode: SKEffectNode = SKEffectNode()
+    lazy var blurNode: SKEffectNode = SKEffectNode()
     
     let gameInfo = GameInfo.shared
     
     var dragons:BuyEggs? = nil
     
-    var dragonFind:(key:String,value:String)? = nil
-    
+    var dragonFind:DragonsDB? = nil
     
     init(size: CGSize,dragons:BuyEggs) {
         
@@ -28,14 +32,20 @@ class BuyDragon:SKScene,ProtocolEffectBlur {
 
         super.init(size: size)
         
-        self.dragonFind = findRandomDragon()!
-
+        do {
+            self.dragonFind =  try findRandomDragon()
+        }catch  ExampleError.invalid {
+            print("Error buy dragon.")
+        } catch  ExampleError.uncorrect {
+            print("Incorrect buy dragon success")
+        } catch let error {
+            print("Error \(error.localizedDescription)")
+        }   
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     
     override func didMove(to view: SKView) {
         
@@ -49,15 +59,32 @@ class BuyDragon:SKScene,ProtocolEffectBlur {
         
         loadEggsAnimation { val in
             self.run(.group([
+               
                 self.gameInfo.mainAudio.getAction(type: .Egg_Hatch_End_Common),
                 .run { [self] in
-                    saveFoundDragon(keyDragon: dragonFind!.key)
 
-                    blurScene(blurNode: self.blurNode)
-                    loadUI()
+                    guard let dragonFind = dragonFind else { fatalError()}
+                    
+                    do {
+                        try ManagedDB.shared.saveFoundDragon(dragon: dragonFind)
+                        
+                        blurScene(blurNode: self.blurNode)
+                        
+                        loadUI()
+                    } catch let error{
+                        print("BuyDragon \(error.localizedDescription) ")
+                        print(error)
+                    }
                 }]))
         }
     }
+    
+
+    
+    
+}
+
+extension BuyDragon {
     
     //MARK: LOAD ANIMATION BEGIN SCREEN
     private func loadEggsAnimation(handle:@escaping(Bool)->Void)  {
@@ -66,7 +93,7 @@ class BuyDragon:SKScene,ProtocolEffectBlur {
             node.name = "rootSceneDragonsBuy"
             node.position = CGPoint(x: screenSize.width/2, y: screenSize.maxY)
       
-        let typeEggs =  prepareEggsCover()
+        guard let typeEggs =  self.dragonFind?.dragons?.rarity.rawValue else { fatalError()}
         node.run(.sequence([
             .move(to: CGPoint(x: screenSize.width/2, y: screenSize.height * 0.35), duration: 0.5),
             .repeat(.sequence([
@@ -114,85 +141,153 @@ class BuyDragon:SKScene,ProtocolEffectBlur {
         
             addChild(node)
     }
-    
-    private func prepareEggsCover() ->String {
-        
-        let array = [Icons.Common,Icons.Bronze,Icons.Silver,Icons.Golden,Icons.Magical,Icons.Ancient]
-        
-        guard let cover = array.randomElement()?.coverEgg else  { return "Nature"}
-        
-        return cover
-      
-    }
+   
     
     //MARK: LOAD SCREEN WHEN FINISH ANIMATION AND MAKE BLUR SCREEN
     private func loadUI() {
         
+        guard let dragons = dragonFind,
+              let scene = scene ,
+            let view = scene.view else { return}
 
-        let txtGetDragon = SKLabelNode(fontNamed: "Cartwheel", andText: "COMMON", andSize: screenSize.size.width * 0.15, fontColor: .green, withShadow: .black)!
-        txtGetDragon.position = CGPoint(x:screenSize.midX,y: screenSize.height*0.9)
-        addChild(txtGetDragon)
         
-        let txtGet = SKLabelNode(fontNamed: "Cartwheel", andText: "GET", andSize: screenSize.size.width * 0.1, fontColor: .green, withShadow: .black)!
-        txtGet.position = CGPoint(x:screenSize.midX,y: screenSize.height*0.85)
-        addChild(txtGet)
-        
-        
-        let btnBuyOneMore = SKScene().createUIButton(bname: "btnBuyOneMore", offsetPosX: screenSize.midX, offsetPosY: screenSize.height*0.18, typeButtom: .GreenButton)
-        btnBuyOneMore.size = CGSize(width: screenSize.width*0.3, height: screenSize.width*0.3/2)
-        
-        let labelOneMore = SKLabelNode(fontNamed: "HelveticaNeue-Bold", andText: "BUY 1 MORE", andSize: btnBuyOneMore.frame.width * 0.1, fontColor: .white, withShadow: .black)!
-        
-        labelOneMore.position = CGPoint(x: 0,y: labelOneMore.fontSize)
-        btnBuyOneMore.addChild(labelOneMore)
-        
-        let labelPrice = SKLabelNode(fontNamed: "Cartwheel", andText: String(dragons?.amount ?? 0).convertDecimal(), andSize: btnBuyOneMore.frame.width * 0.15, fontColor: .yellow, withShadow: .black)!
-        labelPrice.position = CGPoint(x:0,y: -labelPrice.fontSize/2)
-        btnBuyOneMore.addChild(labelPrice)
-        
-        let iconCoin = SKSpriteNode(imageNamed: "coin")
-        iconCoin.size = CGSize(width: btnBuyOneMore.size.height/3, height: btnBuyOneMore.size.height/3)
-        iconCoin.position = CGPoint(x: iconCoin.size.width*1.5,y: -labelPrice.fontSize/2 )
-        btnBuyOneMore.addChild(iconCoin)
-
-        addChild(btnBuyOneMore)
-        
-        let txtNameDragon = SKLabelNode(fontNamed: "Cartwheel", andText: dragonFind!.1, andSize: screenSize.size.width * 0.15, fontColor: .green, withShadow: .black)!
-        txtNameDragon.position = CGPoint(x:screenSize.midX,y: screenSize.height*0.3)
-        addChild(txtNameDragon)
-        
-        let txtDescriptionDragon = SKLabelNode(fontNamed: "Cartwheel", andText: "Monster Killer", andSize: screenSize.size.width * 0.08, fontColor: .green, withShadow: .black)!
-        txtDescriptionDragon.position = CGPoint(x:screenSize.midX,y: screenSize.height*0.4)
-        addChild(txtDescriptionDragon)
-        
-        let iconSkill = SKSpriteNode(imageNamed: "Nature_Weakness")
-        iconSkill.size = CGSize(width: screenSize.width*0.1, height: screenSize.width*0.1)
-        iconSkill.position = CGPoint(x:screenSize.width-50,y: screenSize.height*0.33)
-        addChild(iconSkill)
-        
-        let iconHoroscopo = SKSpriteNode(imageNamed: "pisces")
-        iconHoroscopo.size = CGSize(width: screenSize.width*0.1, height: screenSize.width*0.1)
-        iconHoroscopo.position = CGPoint(x:50,y: screenSize.height*0.33)
-        addChild(iconHoroscopo)
-        
-        addChild(self.raySunRotating(point: CGPoint(x: screenSize.midX, y: screenSize.midY),size: CGSize(width: screenSize.width, height: screenSize.width)))
-        
-        
-        let imgDragon = SKSpriteNode(imageNamed: dragonFind!.0 + "_T1_icon")
-            imgDragon.size = CGSize(width: screenSize.width/2, height: screenSize.width/2)
-            imgDragon.position = CGPoint(x:screenSize.width/2,y: screenSize.height*0.6)
-        
-        addChild(imgDragon)
-        
+        let txtGetDragon = UILabel(frame: .zero)
+            .addFontAndText(font: "Cartwheel", text: "\(dragons.dragons!.rarity.rawValue)", size: screenSize.size.width * 0.15)
+            .shadowText(colorText: (dragons.dragons?.rarity.color)!, colorShadow: .black, aligment: .center)
        
+        view.addSubview(txtGetDragon)
+        txtGetDragon.translatesAutoresizingMaskIntoConstraints = false
+        txtGetDragon.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        txtGetDragon.topAnchor.constraint(equalTo: view.topAnchor,constant: 50).isActive = true
         
-        let btnOk = SKScene().createUIButton(bname: "btnOkay", offsetPosX: screenSize.midX, offsetPosY: screenSize.height*0.05, typeButtom: .BlueButton)
-        btnOk.size = CGSize(width: screenSize.width*0.3, height: screenSize.width*0.3/2)
+        let txtGet = UILabel(frame: .zero)
+            .addFontAndText(font: "Cartwheel", text: "GET", size: screenSize.size.width * 0.1)
+            .shadowText(colorText: .green, colorShadow: .black, aligment: .center)
         
-        let labelBtnOkay = SKLabelNode(fontNamed: "Cartwheel", andText: "Okay", andSize: btnOk.frame.width/4 * 0.9, fontColor: .white, withShadow: .black)!
-        btnOk.addChild(labelBtnOkay)
+        view.addSubview(txtGet)
+        txtGet.translatesAutoresizingMaskIntoConstraints = false
+        txtGet.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        txtGet.topAnchor.constraint(equalTo: txtGetDragon.bottomAnchor,constant: 0).isActive = true
         
-        addChild(btnOk)
+        let imgDragon = UIImageView(image:UIImage(named: dragonFind!.dragons!.picture)!)
+        view.addSubview(imgDragon)
+        
+        imgDragon.translatesAutoresizingMaskIntoConstraints = false
+        imgDragon.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        imgDragon.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        imgDragon.widthAnchor.constraint(equalToConstant: screenSize.width/2).isActive = true
+        imgDragon.heightAnchor.constraint(equalTo: imgDragon.widthAnchor).isActive = true
+        imgDragon.layoutIfNeeded()
+        
+        let txtNameDragon =  UILabel()
+            .addFontAndText(font: "Cartwheel", text: dragons.dragons!.name, size: screenSize.size.width * 0.15)
+            .shadowText(colorText: .green, colorShadow: .black, aligment: .center)
+        view.addSubview(txtNameDragon)
+        
+        txtNameDragon.translatesAutoresizingMaskIntoConstraints = false
+        txtNameDragon.topAnchor.constraint(equalTo: imgDragon.bottomAnchor).isActive = true
+        txtNameDragon.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
+        let txtDescriptionDragon =  UILabel()
+            .addFontAndText(font: "Cartwheel", text: "Monster Killer",size: screenSize.size.width * 0.06)
+            .shadowText(colorText: .green, colorShadow: .black, aligment: .center)
+        view.addSubview(txtDescriptionDragon)
+        
+        txtDescriptionDragon.translatesAutoresizingMaskIntoConstraints = false
+        txtDescriptionDragon.topAnchor.constraint(equalTo: txtNameDragon.bottomAnchor).isActive = true
+        txtDescriptionDragon.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+       
+        let iconSkill = UIImageView(image:UIImage(named:"\(dragons.dragons!.element)_Weakness"))
+        view.addSubview(iconSkill)
+        
+        iconSkill.translatesAutoresizingMaskIntoConstraints = false
+        iconSkill.trailingAnchor.constraint(equalTo: imgDragon.leadingAnchor,constant: -25).isActive = true
+        iconSkill.centerYAnchor.constraint(equalTo: imgDragon.centerYAnchor).isActive = true
+        iconSkill.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        iconSkill.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        iconSkill.layoutIfNeeded()
+        
+        let iconHoroscopo = UIImageView(image:UIImage(named:(Dragons.HoroscopeDragon.allCases.randomElement()?.rawValue.lowercased())!))
+        iconHoroscopo.layer.backgroundColor = UIColor.white.cgColor
+        iconHoroscopo.layer.cornerRadius = iconSkill.frame.width/2
+        view.addSubview(iconHoroscopo)
+        
+        iconHoroscopo.translatesAutoresizingMaskIntoConstraints = false
+        iconHoroscopo.leadingAnchor.constraint(equalTo: imgDragon.trailingAnchor,constant: 25).isActive = true
+        iconHoroscopo.centerYAnchor.constraint(equalTo: imgDragon.centerYAnchor).isActive = true
+        iconHoroscopo.widthAnchor.constraint(equalTo: iconSkill.widthAnchor).isActive = true
+        iconHoroscopo.heightAnchor.constraint(equalTo: iconSkill.heightAnchor).isActive = true
+        
+                
+        let btnBuyOneMore = UIButton()
+        btnBuyOneMore.setBackgroundImage(UIImage(named: "GreenButton"), for: .normal)
+        btnBuyOneMore.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .heavy)
+        btnBuyOneMore.setTitle("BUY 1 MORE", for: .normal)
+        btnBuyOneMore.titleEdgeInsets = UIEdgeInsets(top: -15, left: 0, bottom: 0, right: 0  )
+        view.addSubview(btnBuyOneMore)
+        
+        btnBuyOneMore.translatesAutoresizingMaskIntoConstraints = false
+        btnBuyOneMore.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        btnBuyOneMore.topAnchor.constraint(equalTo: txtDescriptionDragon.bottomAnchor,constant: 0).isActive = true
+        btnBuyOneMore.widthAnchor.constraint(equalToConstant: max(150,screenSize.width*0.3)).isActive = true
+        btnBuyOneMore.heightAnchor.constraint(equalToConstant: max(60,screenSize.width*0.3/2)).isActive = true
+        btnBuyOneMore.layoutIfNeeded()
+        btnBuyOneMore.addAction(for: .touchUpInside) {
+            
+            /**********************REVISAR ESTS DOS LINEAS DESBORDAMIENTO MEMRIA********************************/
+            let _ = view.subviews.filter{$0.tag == 1000}.map { $0.removeFromSuperview()}
+          
+            self.removeBackgroundBlack(removeBlur: self.blurNode)
+/**********************************************************************************/
+            self.gameInfo.mainScene = self
+            
+            let random = BuyEggs.items.filter { $0.picture.rawValue == self.dragons!.picture.rawValue}.first!
+            
+            let viewAditional = self.showViewBuyAditionalItem(scene: self, items: random,gameInfo: self.gameInfo)
+            viewAditional.tag = 1000
+            view.addSubview(viewAditional)
+        }
+        
+        let amount = self.dragons?.gemAmount ?? self.dragons?.amount 
+    
+        let labelPrice = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 18, weight: .heavy), text: "\(amount)".convertDecimal(), color: .white)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        btnBuyOneMore.addSubview(labelPrice)
+        
+        labelPrice.translatesAutoresizingMaskIntoConstraints = false
+        labelPrice.centerXAnchor.constraint(equalTo: btnBuyOneMore.centerXAnchor).isActive = true
+        labelPrice.centerYAnchor.constraint(equalTo: btnBuyOneMore.titleLabel!.bottomAnchor,constant: 10).isActive = true
+        labelPrice.layoutIfNeeded()
+
+        let icon = self.dragons?.icon as! Currency.CurrencyType
+        let iconCoin = UIImageView(image: UIImage(named:(icon.rawValue.lowercased())))
+        btnBuyOneMore.addSubview(iconCoin)
+        
+        iconCoin.translatesAutoresizingMaskIntoConstraints = false
+        iconCoin.leadingAnchor.constraint(equalTo: labelPrice.trailingAnchor,constant: 20).isActive = true
+        iconCoin.centerYAnchor.constraint(equalTo: btnBuyOneMore.centerYAnchor,constant: 0).isActive = true
+        iconCoin.widthAnchor.constraint(equalTo: iconHoroscopo.heightAnchor).isActive = true
+        iconCoin.heightAnchor.constraint(equalTo: iconHoroscopo.widthAnchor,constant: 0).isActive = true
+        
+        
+        let btnOk = UIButton()
+        btnOk.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
+        btnOk.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .heavy)
+        btnOk.setTitle("OKAY", for: .normal)
+        view.addSubview(btnOk)
+        
+        btnOk.translatesAutoresizingMaskIntoConstraints = false
+        btnOk.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        btnOk.topAnchor.constraint(equalTo: btnBuyOneMore.bottomAnchor,constant: 0).isActive = true
+        btnOk.widthAnchor.constraint(equalToConstant: max(150,screenSize.width*0.3)).isActive = true
+        btnOk.heightAnchor.constraint(equalToConstant: max(60,screenSize.width*0.3/2)).isActive = true
+        
+        btnOk.addAction(for: .touchUpInside) {
+            let scene = MainScene(size: self.size)
+            view.presentScene(scene)
+        }
+        addChild(self.raySunRotating(point: CGPoint(x: screenSize.midX, y: screenSize.midY),size: CGSize(width: screenSize.width, height: screenSize.width)))
     }
     
     //MARK: LOAD BACKGROUND SCREEN
@@ -205,98 +300,24 @@ class BuyDragon:SKScene,ProtocolEffectBlur {
         addChild(bg)
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        var pos:CGPoint!
-        
-        for touch in touches{
-            
-            pos = touch.location(in: self)
-        }
-        
-        let childs = self.nodes(at: pos)
-        for c in childs {
-            
-            if c.name == "btnOkay" {
-                
-                let scene = MainScene(size: self.size)
-                self.view?.presentScene(scene)
-                
-            } else if c.name == "btnBuyOneMore" {
-                
-                guard let buyAgain =  BuyEggs.items.filter({ $0.self == dragons.self}).first else { return }
-                gameInfo.mainScene = self
-                
-                view?.addSubview(self.showViewBuyAditionalItem(gameInfo: gameInfo, scene: self, items: buyAgain))
-            }
-        }
-    }
     
     //MARK: FIND RANDOM DRAGON
-    private func findRandomDragon() ->(String,String)? {
+    private func findRandomDragon() throws -> DragonsDB? {
         
-            let directory = Bundle.main.url(forResource: "property", withExtension: "plist")!
-            
-            guard let data = try? Data(contentsOf: directory) else { return nil }
-            
+        
         do {
-            guard let json = try PropertyListSerialization.propertyList(from: data, options: [],format: nil) as? Dictionary<String,Any>,
-                  let js =  json["sidekicks"] as? Dictionary<String,Any>  else { return nil }
+            guard let findTypeEggs = self.dragons?.picture as? Icons.IconsEggs else { return nil}
             
-            guard let key = js.keys.randomElement(),
-                  let dict = js[key] as? Dictionary<String,Dictionary<String,String>> ,
-                  let name = dict["names"]?.first?.value else { return nil}
+            let fetch = NSFetchRequest<DragonsDB>(entityName: "DragonsDB")
+           
+            return  try ManagedDB.shared.context.fetch(fetch).filter{($0.dragons?.rarity == Dragons.RarityDragon(rawValue: findTypeEggs.chooseDragon.rawValue)) && ($0.dragons!.picture.contains("T1") == true)}.randomElement()
             
-                return (key,name)
-            
-        }catch let error{
-            print("Error not found dragon in PLIST - \(error.localizedDescription)")
+        } catch  {
+            throw ExampleError.invalid
         }
-        return nil
+       
     }
     
-    //MARK: FIND THE DRAGON BY KEY DICTIONARY PLIST
-    private func findDragonByKey(key:String) -> Dictionary<String,Dictionary<String,String>>? {
-        
-        let directory = Bundle.main.url(forResource: "property", withExtension: "plist")!
-        
-        guard let data = try? Data(contentsOf: directory) else { return nil }
-            
-        do {
-            guard let json = try PropertyListSerialization.propertyList(from: data, options: [],format: nil) as? Dictionary<String,Any>,
-                  let js =  json["sidekicks"] as? Dictionary<String,Any> ,
-                  let dragon = js[key] as? Dictionary<String,Dictionary<String,String>>  else { fatalError()}
-            
-                return dragon
-            
-        }catch let error{
-            print("Error not found dragon in PLIST - \(error.localizedDescription)")
-            return nil
-        }
-    }
     
-    //MARK: SAVE THE FOUND DRAGON IN THE DB
-    private func saveFoundDragon(keyDragon key:String)  {
-        
-        guard let dragon = findDragonByKey(key: key),
-              let name =  dragon["names"]?.first else { fatalError() }
-        
-         let managed = ManagedDB.shared.context
-        do {
-            
-            
-            let newDragon = DragonsBuyDB(context: managed)
-            newDragon.name = name.value
-            newDragon.picture = key + "_T1_icon"
-            newDragon.power = 0
-            newDragon.level = 1
-            newDragon.discover = Date()
-            
-            try managed.save()
-            
-            print("Save db buydragon.swift",name.value)
-        } catch let error {
-            print("Error save DB dragons \(error)")
-        }
-    }
+    
 }

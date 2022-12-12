@@ -14,13 +14,53 @@ protocol ProtocolEffectBlur {
     var blurNode:SKEffectNode { get set }
 }
 
+
+
+
 extension SKScene {
     
+    
+    /// - Description: Create the generic view for displaying all collections
+    /// - Parameters : @width: CGFloat   width for view
+    ///               @typeGrid: Enum TypeGridCollection Only display toon in th view main
+    /// - Returns:    The view created
+     func templateMainGeneric(typeGrid:TypeGridCollection,hasCancelBtn:Bool) -> UIView {
+        
+        let mainView = UIView(frame: typeGrid.frame)
+        
+        mainView.backgroundColor = .red
+        
+        mainView.setBackgroundImage(img: UIImage(named: typeGrid.picture)!)
+        
+        mainView.tag = (view?.subviews.last?.tag ?? 1) + 1
+        
+        self.view?.addSubview(mainView)
+        
+        if hasCancelBtn {
+            
+            let btnCancel = UIButton(frame: CGRect(x: mainView.frame.width - mainView.frame.width*0.1,
+                                                   y: -mainView.frame.width*0.07 ,
+                                                   width: mainView.frame.width*0.15,
+                                                   height: mainView.frame.width*0.15))
+            
+            btnCancel.setImage(UIImage(named: "CancelButton"), for: .normal)
+            btnCancel.addTarget(self, action: #selector(tapButtonCancel), for: .touchUpInside)
+            mainView.addSubview(btnCancel)
+        }
+     
+        return mainView
+    }
     
     // MARK: SCENE ADD CIGaussianBlur EFFECT
     // PARAMS:  @blurNode:SKEffectNode variable with contructor from protocol ProtocolEffectBlur
     
     func blurScene(blurNode:SKEffectNode) {
+        
+        if let  blur = childNode(withName: "blurNode") {
+            blur.removeAllActions()
+            blur.removeAllChildren()
+            blur.removeFromParent()
+        }
         
         blurNode.name = "blurNode"
         let blur = CIFilter(name: "CIGaussianBlur",    parameters: ["inputRadius": 50])
@@ -75,12 +115,23 @@ extension SKScene {
         bgBlack.name = "backgroundBlack"
         
         if spinner {
+            let shape = SKShapeNode()
+            shape.path = UIBezierPath(roundedRect: CGRect(x: -75, y: -75, width: 150, height: 150), cornerRadius: 64).cgPath
+            shape.position = CGPoint(x: frame.midX, y: frame.midY)
+            shape.fillColor = UIColor.black
+            shape.strokeColor = UIColor.white
+            shape.lineWidth = 10
+            bgBlack.addChild(shape)
+            
             let progressCircle = SKSpriteNode(imageNamed: "progressCircle")
-            progressCircle.position = CGPoint(x: screenSize.midX, y: screenSize.midY)
+            progressCircle.size = CGSize(width: shape.frame.width*0.8, height: shape.frame.width*0.8)
+            progressCircle.position = .zero
+            progressCircle.run(.sequence([.repeatForever(.rotate(byAngle: .pi/2, duration: 5)),.removeFromParent()]))
+            shape.addChild(progressCircle)
             
-            progressCircle.run(.sequence([.rotate(byAngle: .pi/2, duration: 2),.removeFromParent()]))
-            bgBlack.addChild(progressCircle)
-            
+            let label = SKLabelNode(fontNamed: "Cartwheel", andText: "PLEASE WAIT...", andSize: 30, fontColor: .white, withShadow: .white)!
+            label.position = CGPoint(x: frame.midX, y: frame.height * 0.1)
+            bgBlack.addChild(label)
         }
         
         self.addChild(bgBlack)
@@ -106,7 +157,7 @@ extension SKScene {
     
     func removeBackgroundBlack(removeBlur:SKEffectNode?) {
         
-        removeUIViews()
+      //  removeUIViews()
         let actions = ActionButton.allCases.filter {$0.getNameView != "nodeMain"}
         
         actions.forEach { name in
@@ -123,10 +174,6 @@ extension SKScene {
     }
     
     func removeUIViews(){
-        
-        enumerateChildNodes(withName: "toon") { n, obj in
-            n.removeFromParent()
-        }
         
         guard let views = view?.subviews else { return }
         
@@ -145,7 +192,6 @@ extension SKScene {
                     recursiveRemovingSKActions(sknodes: childNode.children)
                 }
             }
-            
         }
     }
     
@@ -160,68 +206,78 @@ extension SKScene {
         
         return button
     }
-    
-    func showViewBuyAditionalItem<T>(gameInfo:GameInfo,scene:SKScene,items:T) -> UIView  where T:ProtocolTableViewGenericCell{
+   
+    func showViewBuyAditionalItem<T>(scene:SKScene,items:T,gameInfo:GameInfo) -> UIView  where T:ProtocolTableViewGenericCell{
         
         let bg = genericViewItem(title: items.title)
         
         let image =  UIImageView()
-        image.image = UIImage(named: items.picture.rawValue)!
-        bg.addSubview(image)
         
+        if T.self != BuySummons.self {
+            image.image = UIImage(named: items.picture.rawValue)!
+        } else {
+            let name = items.picture.rawValue + "_Card"
+            image.image = UIImage(named: name)!
+        }
+        
+        bg.addSubview(image)
         image.translatesAutoresizingMaskIntoConstraints = false
         image.centerXAnchor.constraint(equalTo: bg.centerXAnchor).isActive = true
         image.topAnchor.constraint(equalTo: bg.topAnchor,constant: 50).isActive = true
-        image.widthAnchor.constraint(equalToConstant: bg.frame.width*0.25).isActive = true
-        image.heightAnchor.constraint(equalToConstant: bg.frame.width*0.3).isActive = true
+
+        if T.self != BuySummons.self {
+            image.widthAnchor.constraint(equalToConstant: bg.frame.width*0.25).isActive = true
+            image.heightAnchor.constraint(equalToConstant: bg.frame.width*0.3).isActive = true
+        } else {
+            image.widthAnchor.constraint(equalToConstant: bg.frame.width*0.8).isActive = true
+            image.heightAnchor.constraint(equalToConstant: bg.frame.height*0.85).isActive = true
+        }
         
-        let sun = bg.raySunRotating(view: image)
-        bg.insertSubview(sun, aboveSubview: bg)
+        image.layoutIfNeeded()
+        
+        if T.self != BuySummons.self {
+            let sun = bg.raySunRotating(view: image)
+            bg.insertSubview(sun, aboveSubview: bg)
+        }
         
         if  T.self is BuyEggs.Type {
                 bg.addSubview(rectDragonRarityChange(item: items, bg: bg))
-        } else {
+            
+        } else if T.self is BuySummons.Type {
+                bg.addSubview(addTextInsideCard(item: items, bg: bg))
+              
+        }  else {
             let value = "Buy \(String(items.amount).convertDecimal()) Dragonfruits?"
             let text = UILabel()
                 .addFontAndText(font: "Cartwheel", text: value, size: bg.frame.width*0.08)
                 .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
             text.adjustsFontSizeToFitWidth = true
             bg.addSubview(text)
-            
             text.translatesAutoresizingMaskIntoConstraints = false
             text.centerXAnchor.constraint(equalTo: bg.centerXAnchor).isActive = true
             text.centerYAnchor.constraint(equalTo: bg.centerYAnchor).isActive = true
         }
         
-        let typeItem = UILabel()
-            .addFontAndText(font: "Cartwheel", text: String(items.icon.rawValue+"s"), size: bg.frame.width*0.07)
-            .shadowText(colorText: .brown, colorShadow: .black, aligment: .center)
-        bg.addSubview(typeItem)
-        
-        typeItem.translatesAutoresizingMaskIntoConstraints = false
-        typeItem.centerXAnchor.constraint(equalTo: bg.centerXAnchor).isActive = true
-        typeItem.bottomAnchor.constraint(equalTo: bg.bottomAnchor,constant: -bg.frame.height*0.2).isActive = true
-        
         let  frame =  CGRect(x: 0, y: 0, width: 500, height: 100)
         let button = MyButton(frame: frame,data: items) { successPay in
             
             if successPay {
-                
                 gameInfo.infobar = Infobar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.width*0.2),scene: gameInfo.mainScene!)
                 gameInfo.mainScene?.view?.addSubview(gameInfo.infobar!)
                 gameInfo.mainScene?.run(gameInfo.mainAudio.getAction(type: .Result_Coin))
                 
                 DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                   
                     if  items is BuyEggs {
                         gameInfo.prepareToDragonBuyChangeScene(scene: .BuyDragon, skscene: gameInfo.mainScene!, data: items)
                     } else if items is BuyFruit {
-                        
                         let route:MainScene.Scene = gameInfo.mainScene?.name == "MainScene" ? .MainScene : .DragonsMenuScene
-                        
                         gameInfo.prepareToDragonBuyChangeScene(scene: route, skscene: gameInfo.mainScene!, data: items)
+                    } else if items is BuySummons  {
+                        gameInfo.prepareToDragonBuyChangeScene(scene: .StarUpgrade, skscene: gameInfo.mainScene!, data: items)
                     }
-                    
                 }
+            
             }
         }
         bg.addSubview(button)
@@ -232,7 +288,9 @@ extension SKScene {
         button.widthAnchor.constraint(equalToConstant: bg.frame.width*0.4).isActive = true
         button.heightAnchor.constraint(equalToConstant: (bg.frame.width*0.4)/3).isActive = true
         
-        let iconTypePay =  UIImageView(image: UIImage(named: "gem")!)
+        let icon = (items.icon) as! Currency.CurrencyType
+        
+        let iconTypePay =  UIImageView(image: UIImage(named: icon.rawValue.lowercased())!)
         button.addSubview(iconTypePay)
         
         iconTypePay.translatesAutoresizingMaskIntoConstraints = false
@@ -240,6 +298,16 @@ extension SKScene {
         iconTypePay.leadingAnchor.constraint(equalTo: button.trailingAnchor,constant: -iconTypePay.frame.width/2).isActive = true
         iconTypePay.widthAnchor.constraint(equalTo: button.heightAnchor).isActive = true
         iconTypePay.heightAnchor.constraint(equalTo: button.heightAnchor).isActive = true
+        
+        
+        let typeItem = UILabel()
+            .addFontAndText(font: "Cartwheel", text: String(icon.rawValue+"s"), size: bg.frame.width*0.07)
+            .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+        bg.addSubview(typeItem)
+        
+        typeItem.translatesAutoresizingMaskIntoConstraints = false
+        typeItem.centerXAnchor.constraint(equalTo: bg.centerXAnchor).isActive = true
+        typeItem.bottomAnchor.constraint(equalTo: button.topAnchor).isActive = true
         
         return bg
     }
@@ -250,17 +318,67 @@ extension SKScene {
         let _ = self.children.filter{$0.name == "backgroundBlack"}.map { $0.removeFromParent() }
     }
     
-    func genericViewItem(title:String) -> UIView  {
-      
-        let width  = screenSize.size.width*0.8
-        let height = screenSize.size.height*0.65
+    func genericTableView<T:ProtocolTableViewGenericCell>(items:[T],gameInfo:GameInfo)  {
+    
+    guard let scene = scene else { fatalError() }
+
+    //   removeUIViews()
+    
+    scene.backgroundBlack(withSpinnerActive: false)
+    
+        switch [T].Element {
+            case  is BuyFruit.Type:
+                    showGenericViewTable(skScene:scene,items: items,title: "GET DRAGONFRUIT",gameInfo:gameInfo) { v in scene.view?.addSubview(v) }
+            case  is BuyEggs.Type:
+                    showGenericViewTable(skScene:scene,items: items,title: "BUY EGGS",gameInfo:gameInfo)  { v in scene.view?.addSubview(v) }
+            case is BuyCoins.Type:
+                    showGenericViewTable(skScene:scene,items: items,title: "BUY COINS",gameInfo:gameInfo) { v in scene.view?.addSubview(v) }
+            case is BuyGem.Type:
+                    showGenericViewTable(skScene:scene,items: items,title: "BUY GEM",gameInfo:gameInfo) { v in scene.view?.addSubview(v) }
+            case  is Toon.Character.Table.Type:
+                    showGenericViewTable(skScene:scene,items: items,title: "START RANK",gameInfo:gameInfo) { v in scene.view?.addSubview(v) }
+            default: break
+        }
+}
+    
+    //MARK: SHOW TABLEVIEW FOR ITEM BUY GEM OR COINS
+    func showGenericViewTable<T>(skScene: SKScene, items: [T], title: String,gameInfo:GameInfo,handler: @escaping (UIView) -> Void)  where T : ProtocolTableViewGenericCell {
         
-        let view = UIView(frame: CGRect(x: screenSize.width*0.1, y: screenSize.height/4, width: width,height: height))
+                
+        let margin = screenSize.size.width * 0.1
+        
+        let v = self.genericViewItem(title: title)
+          
+        let inset = v.bounds.inset(by: .init(top: margin, left: margin/2, bottom: margin, right: margin/2))
+            
+        let viewCol = UIView(frame: inset)
+            
+        let tableViewEggs = GenericTableView(frame: viewCol.bounds, items: items) { (item:T) in
+                
+                UIView.animate(withDuration: 0.1) { 
+                    v.transform = CGAffineTransform(translationX: screenSize.width, y: 0)
+                } completion: { _ in
+                    self.view?.addSubview(self.showViewBuyAditionalItem(scene: skScene, items: item , gameInfo: gameInfo))
+                }
+            }
+            
+        viewCol.addSubview(tableViewEggs)
+        v.addSubview(viewCol)
+        handler(v)
+            
+    }
+    
+    func genericViewItem(title:String) -> UIView  {
+
+        let width  = screenSize.size.width*0.9
+        let height = screenSize.size.height*0.65
+
+        let view = UIView(frame: CGRect(x: screenSize.width*0.05, y: screenSize.height/4, width: width,height: height))
             view.setBackgroundImage(img: UIImage(named: "bgSettings")!)
         
         let iconCancel = UIButton(frame: CGRect(x: (view.frame.width)-width/10, y: -width/10, width: width/5, height: width/5))
             iconCancel.setImage(UIImage(named: "CancelButton"), for: .normal)
-        iconCancel.addTarget(self, action: #selector(self.tapButtonCancel), for: .touchUpInside)
+            iconCancel.addTarget(self, action: #selector(self.tapButtonCancel), for: .touchUpInside)
             view.addSubview(iconCancel)
         
         let bgTie = UIImageView(image:UIImage(named: "bgGetDragonFruit")!)
@@ -268,14 +386,14 @@ extension SKScene {
     
         bgTie.translatesAutoresizingMaskIntoConstraints = false
         bgTie.centerXAnchor.constraint(equalTo: view.centerXAnchor,constant: 0).isActive = true
-        bgTie.bottomAnchor.constraint(equalTo: view.topAnchor,constant: bgTie.frame.height).isActive = true
-    
-        bgTie.widthAnchor.constraint(equalToConstant: view.frame.width*0.8).isActive = true
+        bgTie.centerYAnchor.constraint(equalTo: view.topAnchor,constant: 0).isActive = true
+        bgTie.widthAnchor.constraint(equalToConstant: view.frame.width*0.7).isActive = true
         bgTie.heightAnchor.constraint(equalToConstant: view.frame.width*0.2).isActive = true
+        bgTie.layoutIfNeeded()
         
-        let label = UILabel(frame: bgTie.bounds)
+        let label = UILabel(frame: bgTie.frame)
            
-            label.font = UIFont(name: "Cartwheel", size: bgTie.frame.width*0.14)
+            label.font = UIFont(name: "Cartwheel", size: bgTie.frame.width*0.1)
             label.text = title
         
             let gradient = UIImage.gradientImage(bounds: label.bounds, colors: [.orange, .yellow])
@@ -290,68 +408,152 @@ extension SKScene {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.centerXAnchor.constraint(equalTo: bgTie.centerXAnchor,constant: 0).isActive = true
         label.centerYAnchor.constraint(equalTo: bgTie.centerYAnchor,constant: -10).isActive = true
-    
+        label.widthAnchor.constraint(equalToConstant: bgTie.frame.width*0.65).isActive = true
+        label.layoutIfNeeded()
+        label.adjustsFontSizeToFitWidth = true
+
         return view
+    }
+    
+    func addTextInsideCard<T:ProtocolTableViewGenericCell>(item:T,bg:UIView) -> UIView{
+        
+        let infoCard:[String:[(String,String)]] = [
+            Icons.IconsSummons.silver.rawValue:[("Chance for Common:","85%"),("Chance for Rare:","13%"),("Chance for Epic:","2%")],
+            Icons.IconsSummons.mega_silver.rawValue:[("Chance for Common: ","85%"),("Chance for Rare:","13%"),("Chance for Epic:","2%")],
+            Icons.IconsSummons.golden.rawValue:[("Chance for Common:","0%"),("Chance for Rare:","94%"),("Chance for Epic:","6%")],
+            Icons.IconsSummons.mega_golden.rawValue:[("Chance for Common:","0%"),("Chance for Rare:","94%"),("Chance for Epic:","6%")]
+        ]
+        let title = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 24, weight: .heavy), text: item.name, color: .clear)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        bg.addSubview(title)
+        title.translatesAutoresizingMaskIntoConstraints = false
+        title.topAnchor.constraint(equalTo: bg.topAnchor,constant: 50).isActive = true
+        title.centerXAnchor.constraint(equalTo: bg.centerXAnchor).isActive = true
+        
+        let subTitle = UILabel()
+            .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .heavy), text: item.title, color: .clear)
+            .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+        bg.addSubview(subTitle)
+        subTitle.translatesAutoresizingMaskIntoConstraints = false
+        subTitle.topAnchor.constraint(equalTo: title.bottomAnchor,constant: 10).isActive = true
+        subTitle.centerXAnchor.constraint(equalTo: title.centerXAnchor).isActive = true
+
+        let card = item.picture.rawValue.contains("silver") ? "silver_Card_Star" : "golden_Card_Star"
+        let iconCard =  UIImageView(image: UIImage(named: card))
+        bg.addSubview(iconCard)
+        
+        iconCard.translatesAutoresizingMaskIntoConstraints = false
+        iconCard.topAnchor.constraint(equalTo: subTitle.bottomAnchor,constant: 50).isActive = true
+        iconCard.centerXAnchor.constraint(equalTo: subTitle.centerXAnchor).isActive = true
+        iconCard.widthAnchor.constraint(equalToConstant: bg.frame.width*0.2).isActive = true
+        iconCard.heightAnchor.constraint(equalToConstant: bg.frame.width*0.25).isActive = true
+
+        for x in 0..<infoCard[item.picture.rawValue]!.count {
+            let title = infoCard[item.picture.rawValue]![x].0
+            let value = infoCard[item.picture.rawValue]![x].1
+            
+            let t = UILabel()
+                .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .thin), text: title, color: .clear)
+                .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+            bg.addSubview(t)
+            t.translatesAutoresizingMaskIntoConstraints = false
+            t.topAnchor.constraint(equalTo: bg.centerYAnchor,constant: CGFloat(x * 40)).isActive = true
+            t.trailingAnchor .constraint(equalTo: bg.centerXAnchor,constant: 60).isActive = true
+            
+            let v = UILabel()
+                .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .heavy), text: value, color: .clear)
+                .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
+            bg.addSubview(v)
+            v.translatesAutoresizingMaskIntoConstraints = false
+            v.centerYAnchor.constraint(equalTo: t.centerYAnchor).isActive = true
+            v.leadingAnchor .constraint(equalTo: t.trailingAnchor,constant: 10).isActive = true
+        }
+        
+        return title
     }
     
     func rectDragonRarityChange<T:ProtocolTableViewGenericCell>(item:T,bg:UIView) -> UIView {
     
-        let infoEggs:[Icons:[(String,String)]] = [
-        .Common:[("Common","100%")],
-        .Bronze:[("Common","85%"),("Rare","13%"),("Epic","2%")],
-        .Silver:[("Rare","82%"),("Epic","12%"),("Legendary","6%")],
-        .Golden:[("Rare","70%"),("Epic","18%"),("Legendary","11%"),("Mythic","1%")],
-        .Magical:[("Rare","53%"),("Epic","25%"),("Legendary","18%"),("Mythic","4%")],
-        .Ancient:[("Legendary","86%"),("Mythic","14%")]
+        let randomNumber = Int(random(min: 0, max: 100))
+      
+        let infoEggs:[String:[(String,String)]] = [
+            Icons.IconsEggs.Common(randomNumber).rawValue:[("Common","100%")],
+            Icons.IconsEggs.Bronze(randomNumber).rawValue:[("Common","85%"),("Rare","13%"),("Epic","2%")],
+            Icons.IconsEggs.Silver(randomNumber).rawValue:[("Rare","82%"),("Epic","12%"),("Legendary","6%")],
+            Icons.IconsEggs.Golden(randomNumber).rawValue:[("Rare","70%"),("Epic","18%"),("Legendary","11%"),("Mythic","1%")],
+            Icons.IconsEggs.Magical(randomNumber).rawValue:[("Rare","53%"),("Epic","25%"),("Legendary","18%"),("Mythic","4%")],
+            Icons.IconsEggs.Ancient(randomNumber).rawValue:[("Legendary","86%"),("Mythic","14%")]
     ]
         
         let addColors =  {(idx:Int) -> UIColor in
             switch idx{
-                case 0:  return UIColor(red: 255/255, green: 102/255, blue: 102/255, alpha: 1)
-                case 1: return UIColor(red: 102/255, green: 178/255, blue: 102/255, alpha: 1)
-                case 2: return UIColor(red: 0/255, green: 153/255, blue: 76/255, alpha: 1)
-                case 3: return UIColor(red: 204/255, green: 0/255, blue: 204/255, alpha: 1)
-                case 4: return UIColor(red: 204/255, green: 204/255, blue: 0/255, alpha: 1)
-                case 5: return UIColor(red: 153/255, green: 76/255, blue: 0/255, alpha: 1)
-                default: return UIColor(red: 153/255, green: 76/255, blue: 0/255, alpha: 1)
+                case 0: return .green
+                case 1: return .cyan
+                case 2: return UIColor(red: 214/255, green: 163/255, blue: 245/255, alpha: 1)
+                case 3: return UIColor(red: 191/255, green: 202/255, blue: 93/255, alpha: 1)
+                case 4: return .orange
+                case 5: return .purple
+                default: return .clear
             }
         }
     
         let node = UIView(frame: CGRect(x: bg.frame.width*0.1, y: bg.frame.height*0.4, width: bg.frame.width*0.8, height: bg.frame.height*0.30)).cornerRadius(radius: 10)
         node.backgroundColor = .gray.withAlphaComponent(0.5)
-    
-        let titleHeader = "Dragon Rarity\t\t\t\tChance"
+        bg.addSubview(node)
+        
         let title = UILabel(frame: CGRect(x: 0, y:0, width: node.frame.width, height: node.frame.width*0.1))
                 .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
-                
-                title.textAlignment = .center
-                title.font = UIFont.systemFont(ofSize: node.frame.height*0.1, weight: .bold)
-                title.text = titleHeader
-                title.adjustsFontSizeToFitWidth = true
-            
+                .addFontAndText(font: "Cartwheel", text: "Dragon Rarity", size: node.frame.height*0.15)
         node.addSubview(title)
-    
         
-    let _ = infoEggs[item.picture]?.enumerated().map { (idx,obj) in
-            let positionY =  node.frame.height * CGFloat(idx+1)/CGFloat(infoEggs.count)
-            let color = addColors(idx)
+        title.translatesAutoresizingMaskIntoConstraints = false
+        title.bottomAnchor.constraint(equalTo: node.topAnchor).isActive = true
+        title.leadingAnchor.constraint(equalTo: node.leadingAnchor).isActive = true
+        title.layoutIfNeeded()
+        
+        let subTitle = UILabel(frame: CGRect(x: 0, y:0, width: node.frame.width, height: node.frame.width*0.1))
+                .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
+                .addFontAndText(font: "Cartwheel", text: "Chance", size: node.frame.height*0.15)
+        node.addSubview(subTitle)
+        
+        subTitle.translatesAutoresizingMaskIntoConstraints = false
+        subTitle.bottomAnchor.constraint(equalTo: node.topAnchor).isActive = true
+        subTitle.trailingAnchor.constraint(equalTo: node.trailingAnchor).isActive = true
+       
+        if let idx = (item as? BuyEggs)?.picture.rawValue {
             
-            let type = UILabel(frame: CGRect(x: node.frame.width*0.1, y: positionY, width: node.frame.width/2, height: node.frame.width*0.1))
-            .addFontAndText(font: "Cartwheel", text: obj.0, size: node.frame.width*0.08)
-            .shadowText(colorText: color, colorShadow: .black, aligment: .left)
-        type.adjustsFontSizeToFitWidth = true
-
-        let percent =  UILabel(frame: CGRect(x: node.frame.midX, y: positionY, width: node.frame.width*0.28, height: node.frame.width*0.1))
-            .addFontAndText(font: "Cartwheel", text: obj.1, size: node.frame.width*0.08)
-            .shadowText(colorText: color, colorShadow: .black, aligment: .right)
-            percent.adjustsFontSizeToFitWidth = true
-            node.addSubview(type)
-            node.addSubview(percent)
+            let _ = infoEggs[idx]?.enumerated().map { (idx,obj) in
+                let color =  addColors(idx)
+                let type = UILabel()
+                    .addFontAndText(font: "Cartwheel", text: obj.0 , size: node.frame.width*0.1)
+                    .shadowText(colorText: color, colorShadow: .black, aligment: .left)
+                type.adjustsFontSizeToFitWidth = true
+                node.addSubview(type)
+                
+                type.translatesAutoresizingMaskIntoConstraints = false
+                type.leadingAnchor.constraint(equalTo: node.leadingAnchor,constant: 10).isActive = true
+                type.topAnchor.constraint(equalTo: node.topAnchor,constant: node.frame.height/5*CGFloat(idx)+10).isActive = true
+                type.widthAnchor.constraint(equalToConstant: node.frame.width/2).isActive = true
+                type.layoutIfNeeded()
+                
+                 let percent =  UILabel()
+                 .addFontAndText(font: "Cartwheel", text: obj.1, size: node.frame.width*0.1)
+                 .shadowText(colorText: color, colorShadow: .black, aligment: .right)
+                 percent.adjustsFontSizeToFitWidth = true
+                 node.addSubview(percent)
+                 
+                 percent.translatesAutoresizingMaskIntoConstraints = false
+                 percent.trailingAnchor.constraint(equalTo: node.trailingAnchor,constant: -10).isActive = true
+                 percent.topAnchor.constraint(equalTo: node.topAnchor,constant: node.frame.height/5*CGFloat(idx)+10).isActive = true
+                 percent.widthAnchor.constraint(equalToConstant: node.frame.width/2).isActive = true
+                 percent.layoutIfNeeded()
+            }
+        } else {
+            return bg
         }
     
     return node
   }
-    
-    
 
 }

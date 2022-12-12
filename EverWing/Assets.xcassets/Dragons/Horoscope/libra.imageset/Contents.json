@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "libra.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "libra.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

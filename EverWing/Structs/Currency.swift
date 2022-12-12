@@ -112,7 +112,6 @@ class Currency{
                  CurrencyType.Clover,CurrencyType.Magnet:
             
                 actions = SKTextureAtlas().loadAtlas(name: type.name + "_Animation", prefix: nil)
-            // global.getTextures(textures: Global.Animation(rawValue: type.rawValue + "_Animation")!)
            
             case CurrencyType.Eggs:
                 let random =  EggsCurrencyType.allCases.randomElement()!.name
