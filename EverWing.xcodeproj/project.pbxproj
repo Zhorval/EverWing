@@ -117,6 +117,8 @@
 		6ED7D3512844D418004FBE77 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7D3502844D418004FBE77 /* CGPoint.swift */; };
 		6ED7D35628456F44004FBE77 /* snow_roar.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7D35528456E0A004FBE77 /* snow_roar.m4a */; };
 		6ED7D35828457274004FBE77 /* gem_collect.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7D3572845726B004FBE77 /* gem_collect.m4a */; };
+		6EDC73C729488FE2003DD7A9 /* wheel.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EDC73C629488F81003DD7A9 /* wheel.m4a */; };
+		6EDC73C929489464003DD7A9 /* gacha.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EDC73C829489458003DD7A9 /* gacha.m4a */; };
 		6EDE7E062900A36800FBB5A8 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDE7E052900A36800FBB5A8 /* String.swift */; };
 		6EE854ED282A5CD60069E0BF /* ballMilfred.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EE854EC282A5CD60069E0BF /* ballMilfred.sks */; };
 		6EE854EF282AC3240069E0BF /* boss_tree_attack.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EE854EE282AC30E0069E0BF /* boss_tree_attack.m4a */; };
@@ -244,6 +246,8 @@
 		6ED7D3502844D418004FBE77 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		6ED7D35528456E0A004FBE77 /* snow_roar.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = snow_roar.m4a; sourceTree = "<group>"; };
 		6ED7D3572845726B004FBE77 /* gem_collect.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gem_collect.m4a; sourceTree = "<group>"; };
+		6EDC73C629488F81003DD7A9 /* wheel.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = wheel.m4a; sourceTree = "<group>"; };
+		6EDC73C829489458003DD7A9 /* gacha.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gacha.m4a; sourceTree = "<group>"; };
 		6EDE7E052900A36800FBB5A8 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		6EE854EC282A5CD60069E0BF /* ballMilfred.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ballMilfred.sks; sourceTree = "<group>"; };
 		6EE854EE282AC30E0069E0BF /* boss_tree_attack.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = boss_tree_attack.m4a; sourceTree = "<group>"; };
@@ -393,6 +397,8 @@
 		6E18F67727D942B800354BC1 /* SoundEffects */ = {
 			isa = PBXGroup;
 			children = (
+				6EDC73C829489458003DD7A9 /* gacha.m4a */,
+				6EDC73C629488F81003DD7A9 /* wheel.m4a */,
 				6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */,
 				6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */,
 				6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */,
@@ -575,6 +581,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EDC73C929489464003DD7A9 /* gacha.m4a in Resources */,
+				6EDC73C729488FE2003DD7A9 /* wheel.m4a in Resources */,
 				6ECFF8D328F58D580023907A /* buy_dragonfruit.m4a in Resources */,
 				6EAB087528EED3DA006AB933 /* egg_hatch_end_common.m4a in Resources */,
 				6EAB087628EED3DA006AB933 /* egg_hatch_start.m4a in Resources */,
@@ -767,7 +775,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -823,7 +831,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -844,7 +852,7 @@
 				INFOPLIST_FILE = EverWing/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "EverWing Arcade";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = pcb.everwings.com;
@@ -870,7 +878,7 @@
 				INFOPLIST_FILE = EverWing/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "EverWing Arcade";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = pcb.everwings.com;
