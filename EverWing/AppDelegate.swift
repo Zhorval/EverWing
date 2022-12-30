@@ -18,26 +18,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Thread.sleep(forTimeInterval: 3)
     
+
         // Override point for customization after application launch.
         window = UIWindow(frame: screenSize)
         window?.makeKeyAndVisible()
         window?.rootViewController = ViewController()
-  /*
+  
         do{
             let managed = ManagedDB.shared.context
             
-            let _ = try managed.fetch(DragonsBuy.fetchRequest()).map { managed.delete($0)}
-            let _ = try managed.fetch(DragonsDB.fetchRequest()).map { managed.delete($0)}
-            let _ = try managed.fetch(PlayerDB.fetchRequest()).map { managed.delete($0)}
-            let _ = try managed.fetch(CharactersDB.fetchRequest()).map { managed.delete($0)}
+            let _ = try managed.fetch(DragonsBuy.fetchRequest()).compactMap { managed.delete($0)}
+            let _ = try managed.fetch(DragonsDB.fetchRequest()).compactMap { managed.delete($0)}
+            let _ = try managed.fetch(PlayerDB.fetchRequest()).compactMap { managed.delete($0)}
+            let _ = try managed.fetch(CharactersDB.fetchRequest()).compactMap { managed.delete($0)}
             try managed.save()
             
         }catch let error {
-            fatalError(error.localizedDescription)
+            print("Fatal Appdelegate",error)
         }
-*/
+
    
-        if !defaults.bool(forKey: "isPreloadScore") {
+        if defaults.bool(forKey: "isPreloadScore") {
             preloadDataScore()
             
             do{
@@ -115,16 +116,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     guard let element = val[z]?["element"] as? String,
                           let name = val[z]?["name"] as? String,
-                          let rarity = val[z]?["rarity"] as? String,
+                          let rarity = (val[z]?["rarity"] as? String)?.replaceWhiteSpace(),
                           let type = val[z]?["type"] as? String,
                           let class_ = val[z]?["class"] as? String,
                           let skills = val[z]?["skills"] as? Dictionary<String,String> else { return }
                     
                     let weakness = skills.values.compactMap { Weakness(rawValue: $0)?.rawValue }
-                    
+                
                     let d = Dragons(id:UUID().uuidString,name: name, rarity: Dragons.RarityDragon(rawValue: rarity)!, type: type, class_: class_, picture: picture, icons: weakness, element: Dragons.ElementDragons(rawValue:  element)!, level: 1,percent: 0,discover: nil,like:false,horoscope: Dragons.HoroscopeDragon.allCases.randomElement()!)
-                    
-                    
+                   
                     do {
                          try SaveDragonsDB(dragon: d)
                     }catch let error {
@@ -146,7 +146,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                   let  shortDescription = json[x]?["shortDescription"] as? String,
                   let  ability = json[x]?["ability"] as? String  else { throw ExampleError.invalid }
 
-            let character = CharactersModel(id: UUID().uuidString, name: Toon.Character(rawValue: name)! , title: title, description_: description, shortDescription: shortDescription, ability: Toon.Ability(rawValue: ability) ?? .Leader, purchased: name == "Alice")
+            let character = Characters(id: UUID().uuidString, name: Toon.Character(rawValue: name)! , title: title, description_: description, shortDescription: shortDescription, ability: Toon.Ability(rawValue: ability) ?? .Leader, purchased: name == "Alice")
            
             do {
                 
@@ -158,7 +158,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    private func SaveCharactersDB(characters:CharactersModel) throws  {
+    private func SaveCharactersDB(characters:Characters) throws  {
         
         let managed = ManagedDB.shared.context
                   
@@ -169,6 +169,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                   
            try managed.save()
            
+          
        } catch {
            throw ExampleError.invalid
        }
@@ -193,3 +194,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 
+extension String {
+    func replaceWhiteSpace() -> String{
+        
+        replacingOccurrences(of: " ", with: "_")
+    }
+}
