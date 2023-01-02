@@ -14,12 +14,12 @@
     </entity>
     <entity name="EggsDB" representedClassName="EggsDB" syncable="YES" codeGenerationType="class"/>
     <entity name="PlayerDB" representedClassName="PlayerDB" syncable="YES" codeGenerationType="class">
-        <attribute name="coin" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="coin" optional="YES" attributeType="Integer 32" defaultValueString="10000" usesScalarValueType="YES"/>
         <attribute name="dragonL" optional="YES" attributeType="String"/>
         <attribute name="dragonR" optional="YES" attributeType="String"/>
-        <attribute name="fruit" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="gem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="player" optional="YES" attributeType="String"/>
+        <attribute name="fruit" optional="YES" attributeType="Integer 32" defaultValueString="750" usesScalarValueType="YES"/>
+        <attribute name="gem" optional="YES" attributeType="Integer 32" defaultValueString="750" usesScalarValueType="YES"/>
+        <attribute name="player" optional="YES" attributeType="String" defaultValueString="Alice"/>
     </entity>
     <entity name="Settings" representedClassName="Settings" syncable="YES" codeGenerationType="class">
         <attribute name="fast" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
