@@ -77,37 +77,39 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
                 
             case .eggs,.menu: break
             case.evolve:
-               
+                
                 Dragons.items  = try ManagedDB.findDragonsEvolve(item: item!)
                 
             case .main,.sell:
-              
+                
                 Dragons.items  =  try ManagedDB.shared.getAllDragonsBuy()
                 
             case .index:
-                Dragons.items  =  try ManagedDB.shared.context.fetch(DragonsDB.fetchRequest()).map { $0.dragons!}
+                Dragons.items  =  try ManagedDB.shared.context.fetch(DragonsDB.fetchRequest()).map { $0.dragons!  }
             }
-        } catch  {}
-        
+        }
+        catch  { }
+            
             return  CustomCollectionViewEggs(frame: view.frame, items: Dragons.items, view: view, typeGridCollection: type) { [self] dragon in
                 
                 switch type {
-                    case .eggs,.menu: break
-                    case .main:  showPanelDragonCircle(item: dragon)
-                    case .index: DetailDragonSelectCollection(dragon:dragon)
-                    case .sell:  select(dragon)
-                    case .evolve: CreateEvolveDragons(dragon: dragon)
+                case .eggs,.menu: break
+                case .main:  showPanelDragonCircle(item: dragon)
+                case .index: DetailDragonSelectCollection(dragon:dragon)
+                case .sell:  select(dragon)
+                case .evolve: CreateEvolveDragons(dragon: dragon)
                 }
             }  handlerDeselect: { dragon in
                 switch type {
-                    case .eggs,.main,.evolve,.index,.menu: break
-                    case .sell:  deSelect(dragon)
+                case .eggs,.main,.evolve,.index,.menu: break
+                case .sell:  deSelect(dragon)
                 }
             }
-            handlerTapAudio: { [self] in
-                run(gameinfo.mainAudio.getAction(type: .ChangeOption))
-            }
+        handlerTapAudio: { [self] in
+            run(gameinfo.mainAudio.getAction(type: .ChangeOption))
+        }
     }
+    
  
     
   
@@ -333,7 +335,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
        
         var date:String = ""
         if dragon.discover != nil {
-            date = dragon.discover!.toString()
+            date = dragon.discover!.description
         }
         let txtDiscover = UILabel()
             .addTextWithFont(font: .systemFont(ofSize: 20, weight: .bold), text: "Discover\n\(date)", color: .white)
@@ -454,7 +456,7 @@ extension DragonsMenuScene {
         mainView.tag = 1
       
         do {
-            if  let player = try ManagedDB.shared.getCharacterPlayer().name?.rawValue  {
+            let player = try ManagedDB.shared.getCharacterPlayer().rawValue
                 
                 let atlas = SKTextureAtlas().loadAtlas(name: "\(player)_Idle", prefix: nil).map { UIImage(named: $0.description.components(separatedBy: "'")[1])!}
                 
@@ -470,7 +472,7 @@ extension DragonsMenuScene {
                 uiView.centerYAnchor.constraint(equalTo: view!.topAnchor,constant:screenSize.height*0.35).isActive = true
                 uiView.widthAnchor.constraint(equalToConstant: max(160,mainView.frame.width*0.3)).isActive = true
                 uiView.heightAnchor.constraint(equalToConstant: max(160/1.37,mainView.frame.width*0.3)/1.37).isActive = true
-            }
+            
             
         }catch let error {
         
@@ -1112,7 +1114,7 @@ extension DragonsMenuScene {
         subtitle.leadingAnchor.constraint(equalTo: shape.leadingAnchor,constant: 10).isActive = true
         subtitle.topAnchor.constraint(equalTo: name.bottomAnchor,constant:10).isActive = true
      
-        if isFeedBtn == .Feed  && item.getLevel()  {
+        if isFeedBtn == .Feed  && (item.getLevel() != 0)  {
             
             item.setMaxLevel()
         }
@@ -1136,7 +1138,7 @@ extension DragonsMenuScene {
         barProgress.heightAnchor.constraint(equalToConstant: shape.frame.width/4.3).isActive = true
         barProgress.layoutIfNeeded()
 
-        let barProgresPercent  = round(item.getPercent(width: barProgress.frame.width))
+      /*  let barProgresPercent  = round(item.getPercent(width: barProgress.frame.width))
         
         let progress = UIImageView(image: UIImage(named: "progress"))
         shape.addSubview(progress)
@@ -1157,7 +1159,7 @@ extension DragonsMenuScene {
         textPrgress.translatesAutoresizingMaskIntoConstraints = false
         textPrgress.centerXAnchor.constraint(equalTo: barProgress.centerXAnchor,constant: 0).isActive = true
         textPrgress.centerYAnchor.constraint(equalTo: barProgress.centerYAnchor,constant:0).isActive = true
-
+*/
         return header
     }
     
@@ -1173,7 +1175,7 @@ extension DragonsMenuScene {
             let textValFruit = isFeedBtn == .Feed ? item.calculateFruit() : item.rarity.valueFruitDragon
             
             let txtValueFruit = UILabel()
-                .addFontAndText(font: "Cartwheel", text: textValFruit, size: button.frame.height/2)
+                .addFontAndText(font: "Cartwheel", text: "\(textValFruit)", size: button.frame.height/2)
                 .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
             button.addSubview(txtValueFruit)
             
@@ -1193,7 +1195,7 @@ extension DragonsMenuScene {
             
             let btnSell = UIButton(frame: CGRect(x: 0, y: 0, width: button.frame.width, height: button.frame.height))
             btnSell.setBackgroundImage(img: UIImage(named: "GreenButton")!)
-            btnSell.restorationIdentifier = isFeedBtn == .Feed ? "\(item.getValueFruit())" : item.rarity.valueFruitDragon
+            btnSell.restorationIdentifier = isFeedBtn == .Feed ? "\(item.getValueFruit())" : "\(item.rarity.valueFruitDragon)"
             btnSell.addAction(for: .touchUpInside) {
                 if isFeedBtn == .Feed && (ManagedDB.SaveDragonByName(item:item) == true) {
                     self.tapButtonCancel(sender: btnSell)

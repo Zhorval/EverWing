@@ -21,14 +21,14 @@ class ManagedDB {
     
     private var persistentContainer: NSPersistentContainer = {
         
-            DragonsTransformer.register()
+        
             CharactersTransformer.register()
-
-
-            let container = NSPersistentContainer(name: "Model")
+            DragonsTransformer.register()
+         
+            let container = NSPersistentContainer(name: "DataModel")
             container.loadPersistentStores { description, error in
                 if let error = error {
-                     fatalError("Unable to load persistent stores: \(error)")
+                    fatalError("Unable to load persistent stores: \(error.localizedDescription)")
                 }
             }
             return container
@@ -46,7 +46,7 @@ class ManagedDB {
         
         do{
             let fetch = NSFetchRequest<DragonsDB>(entityName: "DragonsDB")
-            guard let result = try  shared.context.fetch(fetch).filter({ $0.dragons?.picture == newDragonFind}).first?.dragons else {
+            guard let result = try  shared.context.fetch(fetch).filter({ $0.dragons!.picture == newDragonFind}).first?.dragons else {
                 throw ExampleError.invalid
                 
             }
@@ -65,7 +65,7 @@ class ManagedDB {
         
         do {
             let fetch = NSFetchRequest<DragonsBuy>(entityName: "DragonsBuy")
-            let data = Array(try shared.context.fetch(fetch).filter({ ($0.dragons?.level == 10) && ($0.dragons?.percent == 100) && ($0.dragons?.picture == oldDragon.picture)})[0..<2])
+            let data = Array(try shared.context.fetch(fetch).filter({ ($0.dragons!.level == 10) && ($0.dragons!.percent == 100) && ($0.dragons!.picture == oldDragon.picture)})[0..<2])
             
             
             for x in 0..<data.count {
@@ -94,8 +94,8 @@ class ManagedDB {
             let fetch = NSFetchRequest<DragonsBuy>(entityName: "DragonsBuy")
             
             let total =   try shared.context.fetch(fetch).filter {
-                ($0.dragons!.name == item.name) && ($0.dragons?.level == item.level) && ($0.dragons!.percent == item.percent)}
-            .map {$0.dragons!}
+                ($0.dragons!.name == item.name) && ($0.dragons!.level == item.level) && ($0.dragons!.percent == item.percent)}
+                .compactMap {$0.dragons}
             
             if total.count > 1 {
                 return total
@@ -113,13 +113,10 @@ class ManagedDB {
        
         do {
             let objc = try shared.context.fetch(DragonsBuy.fetchRequest())
-          
             
                let _ = try objc.compactMap { dragonbuy in
-               
-                   guard let d = dragonbuy.dragons else { throw ExampleError.invalid }
                    
-                      if (items.filter({ $0.id == d.id}).first != nil) {
+                   if (items.filter({ $0.id == dragonbuy.dragons!.id}).first != nil) {
                          
                           print("Borrado",shared.compareDragonsSides(item: dragonbuy))
                           
@@ -138,15 +135,14 @@ class ManagedDB {
         let managed = ManagedDB.shared.context
         
         do {
-            guard let playerObj = try managed.fetch(PlayerDB.fetchRequest()).first,
-                  let idItem = item.dragons?.id else { return false}
+            guard let playerObj = try managed.fetch(PlayerDB.fetchRequest()).first else { return false}
             
-            if playerObj.dragonL != nil && playerObj.dragonL!.id == idItem {
+            if playerObj.dragonL != nil && playerObj.dragonL! ==  item.dragons!.name {
                 
                 print("Borrado L")
                 playerObj.dragonL =  nil
            
-            } else if playerObj.dragonR != nil && playerObj.dragonR!.id == idItem {
+            } else if playerObj.dragonR != nil && playerObj.dragonR! ==  item.dragons!.name {
                 
                 print("Borrado R")
                 playerObj.dragonR =  nil
@@ -214,15 +210,17 @@ class ManagedDB {
            
             switch side {
                 case .Right:
-                    return dragon.dragonR
+                    return  try? shared.getAllDragonsBuy().filter { $0.name == dragon.dragonR }.first
                 case .Left:
-                    return dragon.dragonL
+                    return try? shared.getAllDragonsBuy().filter { $0.name == dragon.dragonL }.first
                 }
             
         } catch  {
             return nil
         }
     }
+    
+   
     /// #Description: Save change side dragons or save new dragon
     /// #Parameters: @dragon:Dragons   Object type Dragons
     /// #            @side:Direction:  The side where the dragon is stored
@@ -237,12 +235,12 @@ class ManagedDB {
            
             switch side {
                 case .Left:
-                    if data.dragonR?.id == dragon.id {
+                    if data.dragonR == dragon.name {
                         data.dragonR = nil
                     }
                     data.setValue(dragon, forKey: "dragonL")
                 case .Right:
-                    if data.dragonL?.id == dragon.id {
+                    if data.dragonL == dragon.name {
                         data.dragonL = nil
                     }
                     data.setValue(dragon, forKey: "dragonR")
@@ -315,7 +313,7 @@ class ManagedDB {
         do{
             let arr = try ManagedDB.shared.context.fetch(DragonsBuy.fetchRequest())
             
-            completion(arr.filter({ $0.dragons?.name == name}).first != nil)
+            completion(arr.filter({ $0.dragons!.name == name}).first != nil)
         } catch  {
             print("Error query DB")
         }
@@ -353,7 +351,7 @@ class ManagedDB {
     //MARK: GET NAME SELECT PLAYER
     /// #Description: Get name player selected
     /// #Returns: CharactersModel
-    func getCharacterPlayer() throws-> CharactersModel {
+    func getCharacterPlayer() throws-> Toon.Character {
         
         let managed  = ManagedDB.shared.context
         do{
@@ -361,10 +359,10 @@ class ManagedDB {
             guard let player = try managed.fetch(PlayerDB.fetchRequest()).first,
                   let name = player.player else { throw ExampleError.invalid}
             
-            return name
+            return Toon.Character(rawValue: name)!
             
         } catch {
-            throw ExampleError.invalid
+            return .Alice
         }
     }
     
@@ -376,12 +374,14 @@ class ManagedDB {
         let managed  = ManagedDB.shared.context
 
         do{
-            
-            guard let character = try managed.fetch(CharactersDB.fetchRequest()).filter({ $0.characters?.name == name}).first else { throw ExampleError.invalid}
+           
+            guard let character = try managed.fetch(CharactersDB.fetchRequest()).filter({ $0.characters.name == name}).first else { throw ExampleError.invalid}
             
             return character
             
-        }catch  {
+        }catch let error {
+            print("Error \(error)")
+            fatalError()
             throw ExampleError.invalid
         }
     }
@@ -389,7 +389,7 @@ class ManagedDB {
     /// #Description: Change player equip when tap button Equip CharacterMenu
     ///  #Parameters: character:CharacterModel
     ///  #returns: Bool
-    func changePlayerEquip(character:CharactersModel) throws -> Bool {
+    func changePlayerEquip(character:Characters) throws -> Bool {
         
         let managed = ManagedDB.shared.context
         do {
@@ -397,7 +397,7 @@ class ManagedDB {
             
             guard let result = try managed.fetch(fetch).first else { throw ExampleError.invalid}
             
-            result.player = character
+            result.player = character.name.rawValue
           
             try managed.save()
             
@@ -411,11 +411,11 @@ class ManagedDB {
     /// #DESCRIPTION: ADD LEVEL CHARACTERMODEL
     /// #PARAMETERS: --
     /// #RETURNS : BOOL SUCCESS
-    static func addLevelCharacter(char:CharactersModel) throws -> Bool {
+    static func addLevelCharacter(char:Characters) throws -> Bool {
         
         do {
            
-            guard let result = try  shared.context.fetch(CharactersDB.fetchRequest()).filter({ $0.characters?.id == char.id}).first  else { fatalError()}
+            guard let result = try  shared.context.fetch(CharactersDB.fetchRequest()).filter({ $0.characters == char}).first  else { fatalError()}
             
             result.level += 1
                        
@@ -437,7 +437,7 @@ class ManagedDB {
             let buyDragon = DragonsBuy(context: managed)
             
                 buyDragon.dragons = dragon.dragons
-                buyDragon.dragons?.id = UUID().uuidString
+                buyDragon.dragons!.id = UUID().uuidString
                 buyDragon.purchased = true
             
                 try managed.save()
@@ -454,10 +454,9 @@ class ManagedDB {
         
         do{
          
-            guard let data =  try shared.context.fetch(DragonsBuy.fetchRequest()).filter({ $0.dragons!.id == item.id}).first,
-                  let dragon = data.dragons else { return false}
+            guard let data =  try shared.context.fetch(DragonsBuy.fetchRequest()).filter({ $0.dragons!.id == item.id}).first else { return false}
             
-            return dragon.like
+            return data.dragons!.like
             
         }catch {
                 fatalError()
@@ -470,13 +469,12 @@ class ManagedDB {
      static func createDragonLike(item:Dragons)->Bool {
         do{
          
-            guard let data =  try shared.context.fetch(DragonsBuy.fetchRequest()).filter({ $0.dragons!.id == item.id}).first,
-                  let dragon = data.dragons else { fatalError()}
+            guard let data =  try shared.context.fetch(DragonsBuy.fetchRequest()).filter({ $0.dragons!.id == item.id}).first else { fatalError()}
             
-            dragon.like = !getValDragonLike(item: item)
+            data.dragons!.like = !getValDragonLike(item: data.dragons!)
             try shared.context.save()
             
-            return dragon.like
+            return data.dragons!.like
             
         }catch {
                 fatalError()

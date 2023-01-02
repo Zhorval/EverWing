@@ -215,11 +215,11 @@ class EggsClaim:SKSpriteNode {
             panelEggs.addChild(buttonTap)
             buttonTap.run(.upDown(3,0.5))
        
-            let eggs = SKSpriteNode(imageNamed: eggsTotal[idx].priority.rawValue)
+         /*   let eggs = SKSpriteNode(imageNamed: eggsTotal[idx].priority.rawValue)
             eggs.position = CGPoint(x: shape.frame.midX, y: shape.frame.height*0.7)
             eggs.size  = CGSize(width: shape.frame.height*0.5, height: shape.frame.height*0.7)
             panelEggs.addChild(eggs)
-            
+            */
             
             let buttonClaim = SKSpriteNode(texture: SKTexture(imageNamed: "BlueButton"), color: .clear, size: CGSize(width: shape.frame.width*0.8, height: shape.frame.width * 0.25))
             buttonClaim.anchorPoint = CGPoint(x: 0.5, y: 0)
@@ -336,6 +336,4 @@ class EggsClaim:SKSpriteNode {
         infoEggsClaim.alpha = 0
         btnSettings.alpha = 0
     }
-    
-    
 }

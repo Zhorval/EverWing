@@ -14,12 +14,9 @@ class EndGame: SKScene {
     
     var collectedCoins:Int = 0
     
-    var infobar:Infobar?
-    
-    let currentToon = AccountInfo().getActualPlayer()
-    
+    weak var infobar:Infobar?
+
     override func didMove(to view: SKView) {
-        
         
         scene?.name = "EndGame"
         guard let path = Bundle.main.path(forResource: "userinfo", ofType: "plist") else {
@@ -38,7 +35,7 @@ class EndGame: SKScene {
         }
         
         
-       
+        
         let newCoinAmount = collectedCoins + dataCoin
         
         virtualPlist.setValue(newCoinAmount, forKey: "Coin")
@@ -74,7 +71,7 @@ class EndGame: SKScene {
         infobar!.centerYAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
        
            
-        let player = UIImageView(image: UIImage(named: currentToon.getCharacter().rawValue)!)
+        let player = UIImageView(image: UIImage(named: (ManagedDB.shared.getDataPlayer()?.player)!)!)
         view.addSubview(player)
         
         player.translatesAutoresizingMaskIntoConstraints = false
@@ -209,8 +206,8 @@ class EndGame: SKScene {
     
     @objc func playButton(sender:UIButton) {
         
-        let scene = MainScene(size: self.size)
-           self.view?.presentScene(scene)
+        GameInfo.shared.prepareToChangeScene(scene: .MainScene, skscene: self)
+    
     }
     
     @objc func storeButton(sender:UIButton) {
@@ -218,24 +215,7 @@ class EndGame: SKScene {
         presentReviewRequest()
     }
     
-    /*
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if let touch = touches.first {
-            let location = touch.location(in: self)
-            let node = self.nodes(at: location)
-            if node.first?.name == "playBtn" {
-            
-                 let scene = MainScene(size: self.size)
-                    self.view?.presentScene(scene)
-            }
-            else if node.first?.name == "storeBtn" {
-                presentReviewRequest()
-                
-            }
-        }
-    }
-    */
+    
     /// Present review App Store
     private func presentReviewRequest() {
         let twoSecondsFromNow = DispatchTime.now() + 1.0

@@ -862,8 +862,9 @@ extension GenericTableView {
             
             var rectangleView:UIView {
                 
-                let view = UIView().addRect(size: CGRect(x: 5, y: 0, width: contentSize.width*0.95, height: contentSize.width*0.2), fillColor: .brown.withAlphaComponent(0.5), strokeColor: .brown.withAlphaComponent(0.5))
-                
+                let view = UIView(frame: CGRect(x: 5, y: 0, width: contentSize.width*0.95, height: contentSize.width*0.2))
+                    /*.addRect(size: CGRect(x: 5, y: 0, width: contentSize.width*0.95, height: contentSize.width*0.2), fillColor: .brown.withAlphaComponent(0.5), strokeColor: .brown.withAlphaComponent(0.5))
+                */
                 return view
             }
             
@@ -881,7 +882,7 @@ extension GenericTableView {
                     backRect.widthAnchor.constraint(equalToConstant: backRect.frame.width).isActive = true
                     backRect.heightAnchor.constraint(equalToConstant: backRect.frame.height).isActive = true
               
-                let iconCharacter = UIImageView(image: UIImage(named: "character_cards_\(character.characters!.name!.rawValue)")!)
+                let iconCharacter = UIImageView(image: UIImage(named: "character_cards_\(character.characters.name.rawValue)")!)
                     backRect.addSubview(iconCharacter)
                     iconCharacter.translatesAutoresizingMaskIntoConstraints = false
                     iconCharacter.leadingAnchor.constraint(equalTo: backRect.leadingAnchor,constant:15).isActive = true
@@ -890,7 +891,7 @@ extension GenericTableView {
                     iconCharacter.heightAnchor.constraint(equalToConstant: contentSize.width*0.25).isActive = true
                 
                 let txtName = UILabel()
-                    .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .heavy), text: character.characters!.name!.rawValue.uppercased(), color: .clear)
+                    .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .heavy), text: (character.characters.name.rawValue.uppercased()), color: .clear)
                     .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
                     backRect.addSubview(txtName)
                     txtName.translatesAutoresizingMaskIntoConstraints = false
@@ -898,7 +899,7 @@ extension GenericTableView {
                     txtName.topAnchor.constraint(equalTo: backRect.topAnchor,constant: 10).isActive = true
                 
                 let txtDescription = UILabel()
-                    .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: character.characters!.title!, color: .clear)
+                    .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: (character.characters.title!), color: .clear)
                     .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
                     backRect.addSubview(txtDescription)
                     txtDescription.translatesAutoresizingMaskIntoConstraints = false
@@ -923,7 +924,7 @@ extension GenericTableView {
                     iconAbility.heightAnchor.constraint(equalTo:iconCharacter.widthAnchor).isActive = true
                 
                 let txtAbility = UILabel()
-                    .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .heavy), text: character.characters!.ability!.rawValue.uppercased(), color: .clear)
+                    .addTextWithFont(font: UIFont.systemFont(ofSize: 20, weight: .heavy), text: (character.characters.ability!.rawValue.uppercased()), color: .clear)
                     .shadowText(colorText: .white, colorShadow: .black, aligment: .center)
                     backRectAbility.addSubview(txtAbility)
                     txtAbility.translatesAutoresizingMaskIntoConstraints = false
@@ -931,7 +932,7 @@ extension GenericTableView {
                     txtAbility.topAnchor.constraint(equalTo: backRectAbility.topAnchor,constant: 10).isActive = true
                 
                 let txtDesAbility = UILabel()
-                    .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: character.characters!.shortDescription!, color: .clear)
+                    .addTextWithFont(font: UIFont.systemFont(ofSize: 16, weight: .heavy), text: (character.characters.shortDescription!), color: .clear)
                     .shadowText(colorText: .yellow, colorShadow: .black, aligment: .center)
                     backRectAbility.addSubview(txtDesAbility)
                     txtDescription.numberOfLines = 0
@@ -946,6 +947,7 @@ extension GenericTableView {
             }
         }
         return nil
+        
     }
 }
 

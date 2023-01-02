@@ -12,7 +12,6 @@ protocol GameInfoDelegate{
     
     var currentBullet:Int { get set }
     var mainAudio:AVAudio {get}
-    var getGameState:GameState { get }
     var isMapStart:Bool? { get set}
     func addChild(_ sknode: SKNode)
     func changeGameState(_ state: GameState)
@@ -22,7 +21,7 @@ protocol GameInfoDelegate{
     func showEffectFxBossAppears(typeBoss:BossType)
     func stopAudio(type:AVAudio.BgroundSoundType)
     func getScene()->SKScene?
-    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene,character:CharactersDB?)
+    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene)
     func prepareToDragonBuyChangeScene<T>(scene:MainScene.Scene,skscene:SKScene,data:T) where T: ProtocolTableViewGenericCell
 
 }
@@ -30,10 +29,10 @@ protocol GameInfoDelegate{
 
 
 
-class GameInfo: GameInfoDelegate{
-    
+final class GameInfo: GameInfoDelegate{
     
     static let shared = GameInfo()
+    
     
     deinit {
         print ("GameInfo Class deinitiated!")
@@ -42,49 +41,48 @@ class GameInfo: GameInfoDelegate{
    
     // Main Variables
     weak var mainScene:SKScene?
-    //   private var accountInfo:AccountInfo = AccountInfo()
     
     var currentLevel:Int  = 1 {
         willSet {
             wavesForNextLevel = wavesForNextLevel + currentLevel
             currentBullet += 1
-            
         }
     }
     
     var currentBullet =  1 {
         willSet {
             self.addChild(showInfoBulletScreen(level: newValue,isStartGame: false))
-            MainScene.accountInfo.getCurrentToon().changeTextureProjectile(level: newValue)
+          //  accountInfo.getCurrentToon().changeTextureProjectile(level: newValue)
         }
     }
     
     private var currentGold:Int  = 0 // tracking local current in-game
     private var currentHighscore:Int = 0
-    private var timer:Timer?
+    private var timer:Timer? {
+        willSet {
+            print("timer cambiado")
+        }
+    }
     var infobar:Infobar?
     let DMG = 10
     
     // Secondary Variables
     private var wavesForNextLevel:Int = 3
     var gamestate:GameState = .NoState
-    var getGameState: GameState {
-        gamestate
-    }
+    
     private var timePerWave:Double  = 6// time to call each wave
     
     // Public Variables
     let mainAudio:AVAudio = AVAudio()
+    
     var regular_enemies:EnemyModel?
-    var dragon:[DragonsModel]?
-    var boss:EnemyModel?
-    var fireball_enemy:EnemyModel?
-    var armored:EnemyModel?
-    var buitre:EnemyModel?
-    var cofre:EnemyModel?
+    
+    let accountInfo:AccountInfo = AccountInfo()
+    
     var map:Map?
+    
     var isMapStart: Bool?
-    let accountInfo = AccountInfo()
+    
     static var currentPlayerPosition:CGPoint = .zero
     
     static var tableInfoBarEggs = CustomCollectionViewEggs(frame: CGRect(x: 10, y: 50, width: screenSize.width/2, height: 60),
@@ -94,25 +92,12 @@ class GameInfo: GameInfoDelegate{
   
     
      init(){
-        // Models
-        fireball_enemy = EnemyModel(type: .Fireball)
-        regular_enemies = EnemyModel(type: .Regular)
-  /*      dragon = [
-                DragonsModel(type: .Roa),
-                DragonsModel(type: .Bubbles)
-                ]*/
-        boss    =  EnemyModel(type: .Boss)
-        armored =  EnemyModel(type: .Armored)
-        cofre   =  EnemyModel(type: .Cofre)
-        buitre  =  EnemyModel(type: .Buitre)
-         
-        // delegates
-         regular_enemies?.delegate = self
-         boss?.delegate = self
-         fireball_enemy?.delegate = self
-         cofre?.delegate = self
-         armored?.delegate = self
-         buitre?.delegate = self
+             print("LLamo init gameinfo \(gamestate)")
+             // Models
+           
+             regular_enemies = EnemyModel(type: .Regular)
+             // delegates
+             regular_enemies?.delegate = self
     }
     
     
@@ -122,17 +107,18 @@ class GameInfo: GameInfoDelegate{
         var loadStatus:(Bool, String) = (true, "No errors")
         
         guard let mainScene = scene else { fatalError() }
+       
         self.mainScene = mainScene
         
         mainAudio.play(type: audio)
         
-        if !MainScene.accountInfo.load(){
-            return (false, "MainScene.accountInfo error")
+        if !accountInfo.load(){
+            return (false, "accountInfo error")
         }
+        
         infobar = Infobar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.width*0.2),scene: mainScene)
         
         mainScene.view?.addSubview(infobar!)
-        
         
         loadStatus = self.createWalls()
         
@@ -168,7 +154,6 @@ class GameInfo: GameInfoDelegate{
    
     // MARK: CREATE PANEL SETTINGS
     func showMenuSettings() -> UIView {
-
         
         guard let view = mainScene?.genericViewItem(title: "SETTINGS") else { return UIView()}
         let getTitleButton =  { (item:Bool) -> [String:Any] in   return item ? ["ON":true] : ["OFF":false]   }
@@ -242,6 +227,7 @@ class GameInfo: GameInfoDelegate{
     @objc func tapSettingsBtn(sender:UIButton) {
        
         var title = ""
+        
         mainScene?.run(mainAudio.getAction(type: .ChangeOption))
         
         do {
@@ -343,6 +329,7 @@ class GameInfo: GameInfoDelegate{
     //  This function is called every second.
     
     @objc private func running(){
+        
         guard let mainScene = mainScene else {
             return
         }
@@ -350,19 +337,18 @@ class GameInfo: GameInfoDelegate{
         switch randomInt(min: 0, max: 100) {
             
             case 0..<10:
-                fireball_enemy?.spawn(scene: mainScene,typeBoss: nil,baseHP: nil)
-            case 10..<80:
-                let hp = armored?.RegularBaseHP
-                self.armored?.spawn(scene: mainScene,typeBoss: nil,baseHP: hp)
+                regular_enemies?.enemyType = .Fireball
+            case 10..<20:
+                regular_enemies?.enemyType = .Armored
+            case 20..<80:
+                regular_enemies?.enemyType = .Regular
             case 80..<100:
-                let hp = cofre?.RegularBaseHP
-                self.cofre?.spawn(scene: mainScene,typeBoss: nil,baseHP: hp)
+                regular_enemies?.enemyType = .Cofre
             case 90..<100:
-                let hp = buitre?.RegularBaseHP
-                self.buitre?.spawn(scene: mainScene, typeBoss: nil, baseHP: hp)
+                regular_enemies?.enemyType = .Buitre
             default: break
         }
-        
+        regular_enemies?.spawn(scene: mainScene, typeBoss: nil, baseHP: nil)
     }
     
     private func updateGameState(){
@@ -373,7 +359,9 @@ class GameInfo: GameInfoDelegate{
         
         switch gamestate {
         case .Start:
-          
+            
+            loadBackground(scene: mainscene,isStartMap: true)
+
             
             // Show infobar level bullet
             mainscene.addChild(showInfoBulletScreen(level: currentBullet))
@@ -384,8 +372,6 @@ class GameInfo: GameInfoDelegate{
             }]))
             
             
-            
-            loadBackground(scene: mainscene,isStartMap: true)
             // Cloud action
             let moveDownCloud = SKAction.moveTo(y: -screenSize.height*1.5, duration: 1)
             
@@ -426,34 +412,32 @@ class GameInfo: GameInfoDelegate{
             mainscene.run(SKAction.sequence([SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_1.rawValue + "0"), SKAction.wait(forDuration: 0.4), SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_2.rawValue + "1"), SKAction.wait(forDuration: 0.4), SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_1.rawValue + "2"), SKAction.wait(forDuration: 0.4), SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_2.rawValue + "3")]))
             
         
-            mainscene.run(SKAction.sequence([
+            mainscene.run(SKAction.sequence([ 
                 buildingsAction,
-                SKAction.wait(forDuration: 2),
-                SKAction.run{
-                    self.changeGameState(.Spawning)
-                },
-                
-                SKAction.wait(forDuration: 0.2),
-                SKAction.run {
-                    MainScene.accountInfo.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
-                    SKAction.run { [self] in
-                      
-                        guard let proyectil = MainScene.accountInfo.getCurrentToon().getBullet()?.shoot() else { return }
-                        
-                        self.addChild(proyectil)
+                SKAction.wait(forDuration: 3),
+               
+                SKAction.run { [weak self] in
+                    self?.accountInfo.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
+                    SKAction.run { [weak self] in
+
+                        guard let proyectil = self?.accountInfo.getCurrentToon().getBullet()?.shoot() else { return }
+
+                        self?.addChild(proyectil)
                     
                     },
                     SKAction.wait(forDuration: 0.1)])))
+                },
+                SKAction.run{
+                    self.changeGameState(.Spawning)
                 }
             ]),withKey: "shoot")
             
         case .WaitingState:
             
             regular_enemies?.increaseDifficulty()
-            fireball_enemy?.increaseDifficulty()
-            armored?.increaseDifficulty()
-            boss?.increaseDifficulty()
+         
             changeGameState(.Spawning)
+            
             getCurrentToon().addLevel()
             
          
@@ -461,14 +445,9 @@ class GameInfo: GameInfoDelegate{
           
             guard let mainScene = mainScene else { return  }
 
-            timer?.invalidate()
-            
-            for x in mainScene.children {
-                guard let _ = x as? Enemy else { continue}
-                regular_enemies?.enemyModel?.enumerateChildNodes(withName: "Enemy*", using: { node, obj in
-                    self.regular_enemies?.explode(sknode: node as? Enemy, scene: mainScene)
-                })
-            }
+            mainScene.run(.sequence([  mainAudio.getAction(type: .Magnet), mainAudio.getAction(type: .Jade_Attack)]))
+
+            mainScene.physicsWorld.speed = 4
     
         case .Spawning:
             
@@ -477,7 +456,6 @@ class GameInfo: GameInfoDelegate{
             let action = SKAction.sequence([SKAction.run({
                 let hp = self.regular_enemies!.RegularBaseHP * CGFloat(self.currentLevel)
                 self.regular_enemies?.spawn(scene: mainscene,typeBoss: nil,baseHP: hp)
-              
             })])
             
             //totalWaves
@@ -486,15 +464,20 @@ class GameInfo: GameInfoDelegate{
             let spawnAction = SKAction.repeat(.sequence([action,.wait(forDuration: 1.3)]), count: wavesForNextLevel)
             let endAction = SKAction.run(didFinishSpawningEnemy)
             
-            
             mainscene.run(SKAction.sequence([spawnAction, endAction]))
             
         case .BossEncounter:
             // use this state to cancel the timer - invalidate
+            print("BossEncounter")
             timer?.invalidate()
-            showMessageAlertBoss()
-            currentLevel += 1
-            getCurrentToon().getBullet()?.setBulletLevel(level: currentLevel)
+            showMessageAlertBoss() { [weak self] _ in
+                self?.currentLevel += 1
+                self?.getCurrentToon().getBullet()?.setBulletLevel(level: self?.currentLevel ?? 1)
+                self?.regular_enemies?.enemyType =  .Boss
+                self?.regular_enemies?.spawn(scene: mainscene, typeBoss: BossType.allCases.randomElement()!, baseHP: 1000)
+            }
+            
+            print("Fin Bossencounter")
         
         case .Running: break
         default:
@@ -514,8 +497,7 @@ class GameInfo: GameInfoDelegate{
         icon.position = CGPoint(x: screenSize.maxX-50 , y: screenSize.height*0.8)
         icon.zPosition = 100
         
-        let iconBullet = BulletMaker().make(level: BulletMaker.Level(rawValue: level)!, char: MainScene.accountInfo.getCurrentToon().getCharacter())
-    
+        let iconBullet = BulletMaker().make(level: BulletMaker.Level(rawValue: level)!, char: accountInfo.getCurrentToon().getCharacter())
         
         if !isStartGame  {
             let shield = getCurrentToon().liveShield(duration: 10,size: icon.size.width / 2 * 1.1) 
@@ -537,34 +519,25 @@ class GameInfo: GameInfoDelegate{
     }
 
     /// Show message begin boss appears
-    private func showMessageAlertBoss() {
-        
-        guard let mainScene = mainScene,
-              let typeBoss = BossType.allCases.randomElement(),
-              let boss = boss else { return }
-        
-        mainScene.childNode(withName: "Boss_Shadow")?.removeFromParent()
-        
+    private func showMessageAlertBoss(completion:@escaping(Bool)->Void) {
+      
+        guard let typeBoss = BossType.allCases.randomElement() else { return }
 
-        let shadow = SKSpriteNode(texture: typeBoss.getTextureShadow(),size: CGSize(width: screenSize.width*0.6, height: screenSize.width*0.62))
+        let image = UIImage(named:typeBoss.rawValue)?.maskWithColor(color: .black)
+        let shadow = SKSpriteNode(texture: SKTexture(image: image!),size: CGSize(width: screenSize.width*0.6, height: screenSize.width*0.62))
             shadow.name = "Boss_Shadow"
+            shadow.alpha = 0.8
             shadow.position = CGPoint(x: 0.5, y: 1)
             shadow.position = CGPoint(x: screenSize.midX, y: screenSize.height - shadow.size.height)
-            shadow.run(.sequence([.wait(forDuration: 6),.fadeOut(withDuration: 1),.run {
+            shadow.run(.sequence([.wait(forDuration: 8),.fadeOut(withDuration: 1),.run {
             shadow.removeFromParent()
         }]))
-        
-        mainScene.run(.sequence([.run {
+      
             self.addChild(shadow)
-            self.addMessageBossAppear(type: typeBoss)
+            self.addMessageBossAppear(type: typeBoss) { finnish in
+                completion(finnish)
+            }
             self.showMessageLateralDangerBossAppear()
-        }]))
-        
-        DispatchQueue.main.asyncAfter(deadline: .now()+8) {
-            
-             let hp = boss.BossBaseHP * CGFloat(self.currentLevel)
-             self.boss?.spawn(scene: mainScene, typeBoss: typeBoss, baseHP: hp)
-        }
     }
     
     // Show effect Fx when appear Boss
@@ -681,12 +654,12 @@ class GameInfo: GameInfoDelegate{
     }
     
     // Show message Boss type before appears
-    private func addMessageBossAppear(type:BossType) {
+    private func addMessageBossAppear(type:BossType,completion:@escaping(Bool)->Void) {
         
         let messageTypeBoss = SKSpriteNode(color: .black.withAlphaComponent(0.5), size: CGSize(width: 250, height: 75))
         messageTypeBoss.position = CGPoint(x: screenSize.width/2, y: screenSize.height-100)
         
-        guard let nameBoss = boss?.bossType.rawValue else { return }
+        guard let nameBoss = regular_enemies?.bossType.rawValue else { return }
         let label = SKLabelNode(fontNamed: "Cartwheel", andText: nameBoss, andSize: 30, fontColor: .yellow, withShadow: .white)!
         label.position = CGPoint(x: 0, y: -2)
         label.text = nameBoss
@@ -703,54 +676,57 @@ class GameInfo: GameInfoDelegate{
         
         addChild(messageTypeBoss)
         
-        messageTypeBoss.run(.wait(forDuration: 5)) {
-            messageTypeBoss.removeFromParent()
-        }
+        messageTypeBoss.run(.sequence([
+            .wait(forDuration: 7),
+            .fadeOut(withDuration: 0.5),
+            .removeFromParent(),
+            .run{  completion(true) }
+        ]))
     }
     
     func getCurrentToon() -> Toon{
-        return MainScene.accountInfo.getCurrentToon()
+        return accountInfo.getCurrentToon()
     }
      func getCurrentToonNode() -> SKSpriteNode{
-         return MainScene.accountInfo.getCurrentToon().getNode()
+         return accountInfo.getCurrentToon().getNode()
     }
     
      func requestCurrentToonIndex() -> Int{
-        return MainScene.accountInfo.getCurrentToonIndex()
+         return accountInfo.getCurrentToonIndex()
     }    
     
      func getCurrentToonBullet() -> Projectile{
-         return MainScene.accountInfo.getCurrentToon().getBullet()!
+         return accountInfo.getCurrentToon().getBullet()!
     }
     
      func getToonBulletEmmiterNode(x px:CGFloat, y py:CGFloat) -> SKEmitterNode?{
-         return MainScene.accountInfo.getCurrentToon().getBullet()!.generateTouchedEnemyEmmiterNode(x: px, y: py)
+         return accountInfo.getCurrentToon().getBullet()!.generateTouchedEnemyEmmiterNode(x: px, y: py)
     }
      func requestChangeToon(index: Int){
-        MainScene.accountInfo.selectToonIndex(index: index)
+         accountInfo.selectToonIndex(index: index)
     }
      func requestToonDescription(index id:Int) -> String{
          
-         return MainScene.accountInfo.getToonDescriptionByIndex(index: id)
+         return accountInfo.getToonDescriptionByIndex(index: id)
     }
     
      func requestToonName(index id:Int) -> String{
-        return MainScene.accountInfo.getNameOfToonByIndex(index: id)
+         return accountInfo.getNameOfToonByIndex(index: id)
     }
     
      func requestToonTitle(index id:Int) -> String{
-        return MainScene.accountInfo.getTitleOfToonByIndex(index: id)
+         return accountInfo.getTitleOfToonByIndex(index: id)
     }
     
      func requestToonBulletLevel(index id:Int) -> Int{
-        return MainScene.accountInfo.getBulletLevelOfToonByIndex(index: id)
+         return accountInfo.getBulletLevelOfToonByIndex(index: id)
     }
     
      func requestUpgradeBullet() -> (Bool, String){
-        let (success, response) = MainScene.accountInfo.upgradeBullet()
+         let (success, response) = accountInfo.upgradeBullet()
         
         if success {
-          //  infobar.updateGoldBalanceLabel(balance: MainScene.accountInfo.getGoldBalance())
+          //  infobar.updateGoldBalanceLabel(balance: accountInfo!?.getGoldBalance())
         }
         return (success, response)
     }
@@ -810,23 +786,25 @@ extension GameInfo {
         case .MainScene:
             let newScene = MainScene(size: skscene.size)
                 skscene.view?.presentScene(newScene)
-        case .StarUpgrade:
-            let newScene = StarUpgrade(size: skscene.size)
-            skscene.view?.presentScene(newScene)
+        case .StarUpgrade: break
+         /*   let newScene = StarUpgrade(size: skscene.size)
+            skscene.view?.presentScene(newScene)*/
         default: break
             
         }
     }
     
     // MARK: PREPARE SCENE
-    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene,character:CharactersDB? = nil){
+    func prepareToChangeScene(scene:MainScene.Scene,skscene:SKScene){
         // remove all gestures
         guard let gestures = skscene.view?.gestureRecognizers else { return }
         
         for gesture in gestures{
             skscene.view?.removeGestureRecognizer(gesture)
         }
-        
+
+        mainScene?.removeAllActions()
+        mainScene?.removeAllChildren()
         mainAudio.stop()
         switch scene {
         case .EndScene:
@@ -892,8 +870,8 @@ extension GameInfo {
             skscene.removeAllActions()
             skscene.recursiveRemovingSKActions(sknodes: skscene.children)
             
-            let newScene = UpgradeCharacter(size: skscene.size,character: character!,gameInfo: self)
-            skscene.view?.presentScene(newScene)
+     /*       let newScene = UpgradeCharacter(size: skscene.size,character: character!,gameInfo: self)
+            skscene.view?.presentScene(newScene)*/
             
             
         default:

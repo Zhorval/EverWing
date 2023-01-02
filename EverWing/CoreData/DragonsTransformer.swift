@@ -60,7 +60,7 @@ final class DragonsTransformer: NSSecureUnarchiveFromDataTransformer {
     }
 
     override class var allowedTopLevelClasses: [AnyClass] {
-        return [Dragons.self]
+        return [Dragons.self,NSArray.self]
     }
 
     override func transformedValue(_ value: Any?) -> Any? {

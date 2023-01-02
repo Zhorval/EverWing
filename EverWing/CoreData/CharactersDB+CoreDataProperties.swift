@@ -18,7 +18,8 @@ extension CharactersDB {
     }
 
     @NSManaged public var characters: Characters
-    @NSManaged public var level: Int32
+    @NSManaged public var level: Int64
+    @NSManaged public var purchased:Bool
 
 }
 

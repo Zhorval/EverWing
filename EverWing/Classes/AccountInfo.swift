@@ -17,28 +17,29 @@ class AccountInfo{
         print("AccountInfo Deinitiated")
     }
     
-    
     private struct Data{
-        var player:PlayerDB? = nil
         var characters:[Toon] = []
         
         init(){
             
-            player = ManagedDB.shared.getDataPlayer()
-            
+            print("Cargo character Accountinfo")
             characters =  Toon.Character.allCases.map { Toon(char: $0)}
         }
     }
     
-    private var level:Int
+    private var level:Int = 0
     private var currentToonIndex:Int = 0
-    private var gold:Int
-    private let data:Data
-    
+    private var gold:Int = 0
+    private var data:Data?
+    var delegate: GameInfoDelegate?
+
+   
     init(){
+        
         level = 0
+        
         gold = 0
-        data = Data()
+        
         currentToonIndex = 0 //self.data.characters.firstIndex(where: {$0.getCharacter() ==  self.data.player?.player?.name})!
       
     }
@@ -47,7 +48,11 @@ class AccountInfo{
 
         level =  0
         
-        gold =   Int(data.player?.coin ?? 0)
+        data = Data()
+
+       
+        gold =   Int(ManagedDB.shared.getDataPlayer()?.coin ?? 0)
+        
         
         return true
     }
@@ -57,7 +62,7 @@ class AccountInfo{
     }
     
      func getCurrentToon() -> Toon{
-         return data.characters[currentToonIndex]
+         return (data?.characters[currentToonIndex])!
     }
     
      func getCurrentToonIndex() -> Int{
@@ -68,19 +73,19 @@ class AccountInfo{
             currentToonIndex = index
     }
     func getActualPlayer() -> Toon {
-        Toon(char: Toon.Character(rawValue: (data.player?.player?.name?.rawValue)!)!)
+        return  Toon(char: Toon.Character(rawValue: (ManagedDB.shared.getDataPlayer()?.player)!)!)
     }
     
     
     func getTotalCharacter() -> Int {
-        data.characters.count
+        (data?.characters.count)!
     }
     
      func upgradeBullet() -> (Bool, String){
          
-         let level = data.characters[currentToonIndex].getBulletLevel()
+         let level = data?.characters[currentToonIndex].getBulletLevel()
        
-         let cost = (level + 1) * 100
+         let cost = (level! + 1) * 100
 
         if gold < cost {
             return (false, "Not enough gold balance: \(getGoldBalance())")
@@ -106,25 +111,21 @@ class AccountInfo{
     }
     
      func getToonDescriptionByIndex(index: Int) -> String{
-         return data.characters[index].getToonDescription()
+         return data!.characters[index].getToonDescription()
     }
      func getNameOfToonByIndex(index: Int) -> String{
-         return data.characters[index].getToonName()
+         return data!.characters[index].getToonName()
     }
      func getTitleOfToonByIndex(index: Int) -> String{
         
-         return data.characters[index].getToonTitle()
+         return data!.characters[index].getToonTitle()
     }
      func getBulletLevelOfToonByIndex(index: Int) -> Int{
-         return data.characters[index].getBulletLevel()
+         return data!.characters[index].getBulletLevel()
     }
     
     func getToonByIndex(index:Int)-> Toon {
         
-        return data.characters[index]
+        return data!.characters[index]
     }
-     func prepareToChangeScene(){
-       //  data.characters.removeAll()
-    }
-    
 }
