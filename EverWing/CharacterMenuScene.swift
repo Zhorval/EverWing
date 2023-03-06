@@ -205,7 +205,7 @@ class CharacterMenuScene:SKScene,ProtocolTaskScenes{
             leftRoot.addChild(iconBadge)
         
         // Projectile Sprite
-        let projectile = bulletMaker.make(level: .Level_1, char: .Alpha)
+        let projectile = bulletMaker.make(level: .Level_1, char: .Alice)
             projectile.position = CGPoint(x: iconBadge.position.x, y: -iconBadge.size.height/3)
             projectile.name = "projectile"
             projectile.setScale(2)

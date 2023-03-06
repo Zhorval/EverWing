@@ -10,11 +10,12 @@ import SpriteKit
 
 class Fireball:Enemy {
     
-    private var target:SKSpriteNode?
+    private var target:SKNode?
     
-    convenience init(target:SKSpriteNode, speed:CGVector){
+    convenience init(target:SKNode, speed:CGVector){
         self.init(hp: 10)
         self.target = target
+        
         velocity = speed
         name = "Enemy_Fireball"
         size = CGSize(width: screenSize.size.width/5, height: screenSize.height/5)
@@ -83,8 +84,8 @@ class Fireball:Enemy {
         track.run(SKAction.sequence([scaleAction, blink, sblink]))
         self.addChild(track)
         
-        let hide = SKAction.hide()//SKAction.fadeOut(withDuration: 0)
-        let show = SKAction.unhide() //SKAction.fadeIn(withDuration: 0.1)
+        let hide = SKAction.hide()
+        let show = SKAction.unhide()
         let scaleline = SKAction.scaleX(to: 5, duration: 1.5)
         let lineaction = SKAction.sequence([hide, SKAction.wait(forDuration: 0.3), show, scaleline])
         let line = SKSpriteNode()
@@ -116,9 +117,8 @@ class Fireball:Enemy {
         auranode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: screenSize.width/8, height: screenSize.width/4), center: CGPoint(x: 0, y: -10))
         auranode.physicsBody!.isDynamic = true
         auranode.physicsBody!.affectedByGravity = false
-        auranode.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
-        auranode.physicsBody!.contactTestBitMask = PhysicsCategory.Player
-        auranode.physicsBody!.collisionBitMask = 0
+        auranode.physicsBody!.category = [.Enemy]
+        auranode.physicsBody!.contactTestBitMask = PhysicsCategory.Player.rawValue
         auranode.physicsBody!.fieldBitMask = GravityCategory.None 
         auranode.physicsBody!.velocity.dy = 0
 

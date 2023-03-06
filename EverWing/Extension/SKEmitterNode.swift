@@ -12,7 +12,7 @@ import SpriteKit
 
 extension SKEmitterNode {
     
-    func contactEnemy(node:SKSpriteNode)->SKEmitterNode? {
+    func contactEnemy(node:SKNode)->SKEmitterNode? {
         
         guard let emiter =  SKEmitterNode(fileNamed: "Death") else { return nil}
         emiter.position = emiter.convert(node.position, to: node) 
@@ -28,8 +28,8 @@ extension SKEmitterNode {
             ball.physicsBody = SKPhysicsBody(circleOfRadius: ball.particleSize.width)
             ball.physicsBody!.isDynamic = false
             ball.physicsBody!.affectedByGravity = true
-            ball.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
-            ball.physicsBody!.contactTestBitMask = PhysicsCategory.Player
+            ball.physicsBody!.category = [.Enemy]
+            ball.physicsBody!.contactTestBitMask = PhysicsCategory.Player.rawValue
             ball.physicsBody!.fieldBitMask = GravityCategory.Player
             ball.physicsBody!.collisionBitMask = 0
         
@@ -48,7 +48,7 @@ extension SKEmitterNode {
             emitter.physicsBody = SKPhysicsBody(circleOfRadius: 20)
             emitter.physicsBody?.isDynamic = true
             emitter.physicsBody?.affectedByGravity = false
-            emitter.physicsBody?.categoryBitMask = PhysicsCategory.Enemy
+            emitter.physicsBody?.category = [.Enemy]
             emitter.physicsBody?.contactTestBitMask =  0
             emitter.physicsBody?.collisionBitMask =  0
             emitter.physicsBody?.velocity = CGVector(dx: sideEffectX ? -50 : 50, dy: -100)

@@ -8,27 +8,23 @@
 
 import Foundation
 
-struct PhysicsCategory {
-    static let None       : UInt32  = 0
-    static let ImuneLegacy: UInt32  = UInt32.max
-    /// Physics for the item Player
-    static let Player     : UInt32  = 1 << 1
-    /// Physics for the all item Enemy
-    static let Enemy      : UInt32  = 1 << 2
-    /// Physics for the projectile player
-    static let Projectile : UInt32  = 1 << 3
-    /// Physics for the item coin
-    static let Currency   : UInt32  = 1 << 4
-    /// Physics for the outline of the screen
-    static let Wall       : UInt32  = 1 << 5
-    /// Physics for the item imune
-    static let Imune      : UInt32  = 1 << 7
-    /// Physics for the item sprite
-    static let Gif        : UInt32  = 1 << 8
-    /// Physics for the effect lateral screen of the Boss
-    static let BossFX     : UInt32  = 1 << 9
-    /// Physics for the Boss hand ball
-    static let BallFX     : UInt32  = 1 << 10
+struct PhysicsCategory :OptionSet {
+    
+    let rawValue: UInt32
+    init(rawValue: UInt32) { self.rawValue = rawValue }
+    
+    static let None             = PhysicsCategory(rawValue: UInt32.min)
+    static let ImuneLegacy      = PhysicsCategory(rawValue: UInt32.max)
+    static let Player           = PhysicsCategory(rawValue: 1 << 1)
+    static let Enemy            = PhysicsCategory(rawValue: 1 << 2)
+    static let Projectile       = PhysicsCategory(rawValue: 1 << 3)
+    static let Currency         = PhysicsCategory(rawValue: 1 << 4)
+    static let Wall             = PhysicsCategory(rawValue: 1 << 5)
+    static let Imune            = PhysicsCategory(rawValue: 1 << 6)
+    static let BallFX           = PhysicsCategory(rawValue: 1 << 7)
+    static let WallFX           = PhysicsCategory(rawValue: 1 << 8)
+  
+    
 }
 
 struct GravityCategory{

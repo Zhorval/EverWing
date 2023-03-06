@@ -13,7 +13,6 @@ import GameplayKit
 
 
 class Enemy: SKSpriteNode,ProcotolHP{
-    
    
     var delegate: GameInfoDelegate?
     
@@ -21,14 +20,13 @@ class Enemy: SKSpriteNode,ProcotolHP{
     
     typealias B = BossType
     
-    var actionsDead:[SKTexture]   {
-         bossType.getTextures(type: bossType, prefix: nil)
-    }
+    var actionsDead:[SKTexture] = []
     
     var bossShadow:SKTexture {
-        bossType.getTextureShadow()
+        SKTexture(cgImage: bossType.shadow)
     }
     
+    var enemys:[Enemy] = []
     // Shared Variables
     var enemyType: EnemyType = T.Regular
     var enemyModel:Enemy?
@@ -86,9 +84,9 @@ class Enemy: SKSpriteNode,ProcotolHP{
         
         self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
         self.physicsBody!.isDynamic = true
-        self.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
+        self.physicsBody!.category = [.Enemy]
         self.physicsBody!.affectedByGravity = false
-        self.physicsBody!.collisionBitMask = PhysicsCategory.Player
+        self.physicsBody!.collisionBitMask = PhysicsCategory.Player.rawValue
         self.physicsBody?.allowsRotation = false
         self.physicsBody!.velocity =  speed
         self.physicsBody!.fieldBitMask = GravityCategory.None // Not affect by magnetic
@@ -148,8 +146,8 @@ extension Enemy {
                 att.physicsBody = SKPhysicsBody(circleOfRadius: (self.size.width/2))
                 att.physicsBody!.isDynamic = true
                 att.physicsBody!.affectedByGravity = true
-                att.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
-                att.physicsBody?.collisionBitMask = PhysicsCategory.Player | PhysicsCategory.Imune
+                att.physicsBody!.category = [.Enemy]
+                att.physicsBody?.collisionBitMask = PhysicsCategory.Player.rawValue | PhysicsCategory.Imune.rawValue
                 att.physicsBody?.fieldBitMask =  GravityCategory.Player
                 
                 att.run(SKAction.sequence([
@@ -159,7 +157,6 @@ extension Enemy {
                 ]))
                 
                 scene.addChild(att)
-               
             
         }]),count: randomInt(min: 2, max: 4)))
     }
@@ -262,9 +259,7 @@ extension Enemy {
         
         self.run(SKAction.fadeIn(withDuration: delay))
         self.physicsBody?.categoryBitMask =  category //PhysicsCategory.Enemy
-        self.physicsBody?.contactTestBitMask =  PhysicsCategory.Wall
+        self.physicsBody?.contactTestBitMask =  PhysicsCategory.Wall.rawValue
         self.physicsBody?.linearDamping =  1
-  
-        
     }
 }

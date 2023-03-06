@@ -16,8 +16,14 @@ protocol ProtocolCurrency {
     var name:String { get }
 }
 
+
+
 class Currency{
     
+    
+    var pathImages:String {
+        "base1.png"
+    }
     
     enum EggsCurrencyType:String,CaseIterable,Hashable,ProtocolCurrency,ProtocolCollection {
         
@@ -67,6 +73,32 @@ class Currency{
         case Gem  /// Revisar si sale el icono de la gema en pantalla
         case Fruit
         
+        var pathImages:String {
+            "base1.png"
+        }
+        
+        var pictureIcon:[CGImage]? {
+        
+        
+            switch self {
+            case .None:     return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 129, y: 573, width: 34, height: 44))]
+            case .Coin:     return [
+                            UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 129, y: 573, width: 34, height: 44)),
+                            UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 36, y: 523, width: 18, height: 38)),
+                            UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 63, y: 523, width: 18, height: 28)),
+                            ]
+            case .Clover:   return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 169, y: 50, width: 42, height: 38))]
+            case .Amethyst: return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 288, y: 567, width: 36, height: 45))]
+            case .Ruby:     return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 362, y: 567, width: 36, height: 45))]
+            case .Diamond:  return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 362, y: 567, width: 36, height: 45))]
+            case .Magnet:   return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 477, y: 365, width: 41, height: 41))]
+            case .Mushroom: return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 263, y: 406, width: 46, height: 35))]
+            case .Flower:   return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 283, y: 335, width: 51, height: 48))]
+            case .Eggs:     return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 362, y: 567, width: 36, height: 45))] // revisar el icono de los tres no es el correcto
+            case .Gem:      return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 362, y: 567, width: 36, height: 45))] //
+            case .Fruit:    return [UIImage(named: pathImages)!.cgImage!.cropImage(to: CGRect(x: 362, y: 567, width: 36, height: 45))] //
+            }
+        }
         
         var currency:Int {
             switch self {
@@ -87,73 +119,18 @@ class Currency{
         
     }
     
-    private var actions:[SKTexture]
-    var audioPlayer:AVAudioPlayer?
-    var type:ProtocolCurrency
+    var type:CurrencyType
     
-    init<T:ProtocolCurrency>(type: T, avaudio: AVAudio? = nil){
+    init(type: CurrencyType, avaudio: AVAudio? = nil){
        
         self.type = type
-        
-        switch self.type {
-            case  CurrencyType.Coin:
-                actions = global.getTextures(textures: .Gold_Animation)
-           
-            case CurrencyType.Amethyst,
-                 CurrencyType.Ruby,
-                 CurrencyType.Diamond,
-                 CurrencyType.Clover,CurrencyType.Magnet:
-            
-                actions = SKTextureAtlas().loadAtlas(name: type.name + "_Animation", prefix: nil)
-            // global.getTextures(textures: Global.Animation(rawValue: type.rawValue + "_Animation")!)
-           
-            case CurrencyType.Eggs:
-                let random =  EggsCurrencyType.allCases.randomElement()!.name
-                actions = [SKTexture(imageNamed:  random)]
-            default:
-                actions = [SKTexture(imageNamed:  EggsCurrencyType.allCases.randomElement()!.name)]
-        }
-        
-    }
-    
-    
-    
-     func changeTypeCoin<T:ProtocolCurrency>(type:T) {
-        
-        self.type = type
-        
-        switch self.type{
-            case Currency.CurrencyType.Coin:
-                actions = global.getTextures(textures: .Gold_Animation)
-            case Currency.CurrencyType.Clover:
-                actions = [SKTexture(imageNamed: "Clover")]
-            case Currency.CurrencyType.Amethyst:
-                actions = global.getTextures(textures: .Amethyst_Animation)
-            case Currency.CurrencyType.Diamond:
-                actions = global.getTextures(textures: .Diamond_Animation)
-            case Currency.CurrencyType.Ruby:
-                actions = global.getTextures(textures: .Ruby_Animation)
-            case Currency.CurrencyType.Magnet:
-                actions = global.getTextures(textures: .Magnet_Animation)
-            case Currency.CurrencyType.Mushroom:
-                actions = global.getTextures(textures: .Mushroom_Animation)
-            case Currency.CurrencyType.Flower:
-                 actions = global.getTextures(textures: .Flower_Animation)
-            case Currency.CurrencyType.Eggs:
-                self.type = Currency.EggsCurrencyType.allCases.randomElement()!
-                actions = [SKTexture(imageNamed: self.type.name)]
-            case Currency.CurrencyType.None:
-                actions = []
-            default:
-                actions = []
-        }
-        
+      
     }
     
      func createCoin(posX:CGFloat, posY:CGFloat, width w: CGFloat, height h: CGFloat, createPhysicalBody:Bool, animation: Bool) -> SKSpriteNode{
 
-        let c = SKSpriteNode(texture: actions.first)
-        //c.size = CGSize(width: 30, height: 30)
+        let c = SKSpriteNode(texture: SKTexture(cgImage: type.pictureIcon!.first!))
+         
         c.size = CGSize(width: w, height: h)
         c.position = CGPoint(x: posX, y: posY)
         c.name = type.name.lowercased()
@@ -162,16 +139,15 @@ class Currency{
             //c.physicsBody =  SKPhysicsBody(texture: c.texture!, size: c.size)
             c.physicsBody = SKPhysicsBody(circleOfRadius: w/2)
             c.physicsBody!.isDynamic = true // allow physic simulation to move it
-            c.physicsBody!.categoryBitMask = PhysicsCategory.Currency
-            c.physicsBody!.contactTestBitMask = PhysicsCategory.Player
-            c.physicsBody!.collisionBitMask = PhysicsCategory.None
+            c.physicsBody!.category = [.Currency]
+     //     c.physicsBody!.contactTestBitMask = PhysicsCategory.Player
+    //      c.physicsBody!.collisionBitMask = PhysicsCategory.None
             c.physicsBody!.fieldBitMask = GravityCategory.Player // Pullable by player
         }
         
-        if (animation && !actions.isEmpty){
-            c.run(SKAction.repeatForever(SKAction.animate(with: actions, timePerFrame: 0.1)))
-            self.changeTypeCoin(type: CurrencyType.Coin)
-
+         if (animation && !type.pictureIcon!.isEmpty){
+             c.run(SKAction.repeatForever(SKAction.animate(with:  type.pictureIcon!.compactMap {SKTexture(cgImage: $0)}, timePerFrame: 0.01)))
+             type = .Coin
         }
         return c
     }

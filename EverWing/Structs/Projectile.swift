@@ -69,9 +69,9 @@ class Projectile {
         bulletnode.physicsBody = SKPhysicsBody(circleOfRadius: 3)
         bulletnode.physicsBody!.affectedByGravity = false
         bulletnode.physicsBody!.collisionBitMask = 0
-        bulletnode.physicsBody!.categoryBitMask = PhysicsCategory.Projectile
+        bulletnode.physicsBody!.category = [.Projectile]
         bulletnode.physicsBody!.fieldBitMask = GravityCategory.None // Not affect by Magnetic Force
-        bulletnode.physicsBody!.contactTestBitMask = PhysicsCategory.Enemy
+        bulletnode.physicsBody!.contactTestBitMask = PhysicsCategory.Enemy.rawValue
         bulletnode.physicsBody!.allowsRotation = false
         bulletnode.physicsBody!.velocity = CGVector(dx: 0, dy: screenSize.height)
     }

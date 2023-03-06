@@ -161,9 +161,9 @@ class Pinky:Enemy{
         root.physicsBody = SKPhysicsBody(circleOfRadius: body.size.width/2)
         root.physicsBody!.isDynamic = true
         root.physicsBody!.affectedByGravity = false
-        root.physicsBody!.categoryBitMask = PhysicsCategory.Imune
+        root.physicsBody!.category = [.Imune]
         root.physicsBody!.friction = 0
-        root.physicsBody!.collisionBitMask = PhysicsCategory.Wall
+        root.physicsBody!.collisionBitMask = PhysicsCategory.Wall.rawValue
         root.physicsBody!.restitution = 1
         root.physicsBody!.allowsRotation = false
         root.physicsBody!.linearDamping = 0
@@ -182,7 +182,7 @@ class Pinky:Enemy{
         setAnimation()
         
         self.run(SKAction.sequence([SKAction.wait(forDuration: delay), SKAction.run {
-            self.root.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
+            self.root.physicsBody!.category = [.Enemy]
             if self.name == PinkyType.Original.rawValue{
                 self.move(dir: .Random, node: self)
             }else {
@@ -298,7 +298,7 @@ class Pinky:Enemy{
     }*/
     
     func multiply(){
-        root.physicsBody!.contactTestBitMask = PhysicsCategory.None
+        root.physicsBody!.contactTestBitMask = PhysicsCategory.None.rawValue
         
         
         if self.life == 0 {

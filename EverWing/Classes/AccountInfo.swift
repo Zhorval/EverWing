@@ -54,9 +54,7 @@ class AccountInfo{
         currentToonIndex = 0
         gold = 0
         experience = 0.0
-        
-        characters = [Toon(char: .Alpha), Toon(char: .Beta), Toon(char: .Celta), Toon(char: .Delta),Toon(char: .Jade),Toon(char: .Arcana),Toon(char: .Alice)]
-      //  characters =  Toon.Character.allCases.map { Toon(char: $0)}
+        characters =  Toon.Character.allCases.map { Toon(char: $0)}
         highscore = 0
         data = Data()
         

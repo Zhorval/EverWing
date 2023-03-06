@@ -89,6 +89,37 @@ class BulletMaker:NSObject{
     private func getBulletType(charType: Toon.Character, type:BulletType) -> (SKTexture, CGSize){
         
         switch charType {
+            
+        default:
+            switch type {
+            case .Type_1:
+                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_1)
+                let w = screenSize.width * 0.036
+                let h = screenSize.height * 0.034
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_2:
+                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_2)
+                let w = screenSize.width * 0.051
+                let h = screenSize.height * 0.06
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_3:
+                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_3)
+                let w = screenSize.width * 0.0845
+                let h = screenSize.height * 0.064
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_4:
+                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_4)
+                let w = screenSize.width * 0.111
+                let h = screenSize.height * 0.079
+                return (sprite, CGSize(width: w, height: h))
+            case .Type_5:
+                let sprite = global.getMainTexture(main: .Character_Alpha_Projectile_5)
+                let w = screenSize.width * 0.152
+                let h = screenSize.height * 0.1
+                return (sprite, CGSize(width: w, height: h))
+            }
+        }
+            /*
         case .Alpha:
             switch type {
             case .Type_1:
@@ -260,9 +291,10 @@ class BulletMaker:NSObject{
                 return (sprite, CGSize(width: w, height: h))
             }
         }
+             */
     }
     
-    internal func make(level:Level, char:Toon.Character) -> SKSpriteNode{
+     func make(level:Level, char:Toon.Character) -> SKSpriteNode{
         let node = SKSpriteNode()
         
         let s1 = getBulletType(charType: char, type: .Type_1)

@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: screenSize)
         window?.makeKeyAndVisible()
         window?.rootViewController = ViewController()
-        if !defaults.bool(forKey: "isPreloadScore") {
+        if defaults.bool(forKey: "isPreloadScore") {
             preloadDataScore()
         }
         
@@ -109,7 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             for x in order {
                 guard let val = js[x] as? Dictionary<String,Dictionary<String,String>> else { return }
                 for (i,d) in val["names"]!.enumerated() {
-                    items.append(contentsOf: [Dragons(name: x+"_T\(i+1)", picture: Dragons.dragons(name: d.value))])
+                 //   items.append(contentsOf: [Dragons(name: x+"_T\(i+1)", picture: Dragons.dragons(name: d.value))])
                     
                 }
             }

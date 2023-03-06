@@ -25,10 +25,13 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         case BuyDragon
     }
     
-    let gameinfo:GameInfo = GameInfo()
+    lazy var gameinfo:GameInfo = GameInfo()
     static let accountInfo = AccountInfo()
     var isPlayerMoved:Bool = false
     var blurNode = SKEffectNode()
+    private var activateShootBoss = false
+  
+
     override func didMove(to view: SKView) {
         
         removeUIViews()
@@ -36,8 +39,11 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         
         self.view?.addGestureRecognizer(gestureRecognizer)
         self.view?.scene?.name = "MainScene"
+       
         // For Debug Use only
         view.showsPhysics = true
+        view.showsNodeCount = true
+        view.showsFields = true
         
         // Setting up delegate for Physics World & Set up gravity
         physicsWorld.contactDelegate = self
@@ -46,10 +52,8 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         
         loadBackground()
         loadgameinfo()
-        loadGameEggs()
+   //     loadGameEggs()
         gameinfo.infobar.alpha = 1
-
-        
     }
     
     func loadBackground(){
@@ -203,7 +207,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         }
 
         let player = gameinfo.getCurrentToonNode()
-        player.position = CGPoint(x: screenSize.midX, y: 250)
+        player.position = CGPoint(x: screenSize.midX, y: 220)
        
         // Add Character Player
         self.addChild(player)
@@ -313,6 +317,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         default:break
         }
     }
+    
     @objc func handlePanFrom(recognizer : UIPanGestureRecognizer) {
         
         let toon = gameinfo.getCurrentToon()
@@ -324,7 +329,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
             gameinfo.changeGameState(.Start)
             guard let attack = toon.attack(scene: self, gameState: gameinfo.gamestate) else { return }
             player.run(attack)
-       //     _ = gameinfo.dragon.map {  gameinfo.addChild($0.dragon) }
         }
         
         if recognizer.state == .began {
@@ -374,38 +378,63 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         
         let toon = gameinfo.getCurrentToon()
         let player = gameinfo.getCurrentToonNode()
-      
-        
-        self.gameinfo.dragon?[0].dragon.position = CGPoint(x: player.position.x-75, y: player.position.y-50)
-        self.gameinfo.dragon?[1].dragon.position = CGPoint(x: player.position.x+75, y: player.position.y-50)
-        
        
         toon.updateProjectile(node:player)
-        self.gameinfo.dragon?[0].updateProjectile(node: player,direcction: .Left)
-        self.gameinfo.dragon?[1].updateProjectile(node: player,direcction: .Right)
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
+        
         var contactType:ContactType = .None
-        var higherNode:SKSpriteNode?
-        var lowerNode:SKSpriteNode?
+        var higherNode:SKNode?
+        var lowerNode:SKNode?
+        
+        let contactCategory: PhysicsCategory = [contact.bodyA.category,contact.bodyB.category]
         
         
-        
-        guard ((contact.bodyA.node as? SKSpriteNode) != nil) && ((contact.bodyB.node as? SKSpriteNode) != nil) else { return }
         
         if contact.bodyA.categoryBitMask > contact.bodyB.categoryBitMask{
-            higherNode = contact.bodyA.node as! SKSpriteNode?
-            lowerNode = contact.bodyB.node as! SKSpriteNode?
+            higherNode = contact.bodyA.node
+            lowerNode = contact.bodyB.node
         }
         else if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask{
-            higherNode = contact.bodyB.node as! SKSpriteNode?
-            lowerNode = contact.bodyA.node as! SKSpriteNode?
+            higherNode = contact.bodyB.node
+            lowerNode = contact.bodyA.node
         }
-        else{  return }
+        else {  return }
+
+        switch contactCategory {
+            case [.BallFX,.WallFX]:
+                contactType = .BallHitIce
+           
+            case [.Projectile,.Enemy]:
+                contactType = .EnemyGotHit
+            
+            case [.Player,.Enemy]:
+                contactType = .HitByEnemy
+            
+            case [.Player,.BallFX]:
+                    contactType = .HitByEnemy
+            
+            case [.Player,.Currency]:
+                contactType = .PlayerGetCoin
+
+            
+            default: return
+        }
+        guard let h_node = higherNode, let l_node = lowerNode else { return }
+   /*
+        
+        if contact.bodyA.categoryBitMask > contact.bodyB.categoryBitMask{
+            higherNode = contact.bodyA.node
+            lowerNode = contact.bodyB.node
+        }
+        else if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask{
+            higherNode = contact.bodyB.node
+            lowerNode = contact.bodyA.node
+        }
+        else {  return }
         
         guard let h_node = higherNode, let l_node = lowerNode else { return }
-
         
         if (h_node.physicsBody!.categoryBitMask == PhysicsCategory.Imune) && l_node.name!.contains("Regular") {
             contactType = .Immune
@@ -449,11 +478,11 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
             // Handle case where bullet hit enemy's attack
              return
         }
-        
+        */
         contactUpdate(lowNode: l_node, highNode: h_node, contactType: contactType)
     }
   
-    func contactUpdate(lowNode: SKSpriteNode, highNode: SKSpriteNode, contactType:ContactType){
+    func contactUpdate(lowNode: SKNode, highNode: SKNode, contactType:ContactType){
         var regular = gameinfo.regular_enemies
         var boss = gameinfo.boss
         var armored = gameinfo.armored
@@ -461,8 +490,49 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         var buitre = gameinfo.buitre
         let toon = gameinfo.getCurrentToon()
         let player = gameinfo.getCurrentToonNode()
-       
+    
         switch contactType{
+            
+        case .BallHitIce:
+           
+           
+            lowNode.removeFromParent()
+            boss?.bossType  = .Spike
+            guard let breakIce = boss?.bossType.effectfxProjectile?.first,
+                    let smallBall = boss?.bossType.ballHand else { fatalError() }
+            
+            smallBall.physicsBody = SKPhysicsBody(circleOfRadius: smallBall.size.width/2)
+            smallBall.physicsBody?.category = [.BallFX]
+            smallBall.physicsBody?.contactTestBitMask = PhysicsCategory.Player.rawValue
+            smallBall.physicsBody?.isDynamic = false
+            smallBall.setScale(0.5)
+            
+            for x in 0...12 {
+                    let small = smallBall.copy() as! SKSpriteNode
+                        small.position = highNode.position
+                
+                    let ice = breakIce.copy() as! SKSpriteNode
+                        ice.name = "Ice_\(x)"
+                        ice.position = highNode.position
+                
+                    let angle = 2 * .pi / 12 * CGFloat(x * 2)
+                    let angleAngle = -(.pi/2) / 12 * CGFloat(x)
+                    
+                    let X = 190 * cos(angle)
+                    let Y = 190 * sin(angle)
+                
+                    ice.run(.sequence([.playSoundFileNamed(AVAudio.SoundType.BallToIce.rawValue, waitForCompletion: false),
+                                       .applyTorque(100, duration: 0.5),
+                                       .move(by: CGVector(dx: X, dy: Y), duration: 0.5),
+                                       .removeFromParent(),.run {
+                                           small.run(.sequence([
+                                            .move(by: CGVector(dx: -X, dy: Y), duration: 0.5),
+                                                        .removeFromParent()]))
+                                       }]))
+                 
+                addChild(ice)
+                addChild(small)
+            }
             
         case .HitByEggs:
             run(gameinfo.mainAudio.getAction(type: .Gem))
@@ -476,7 +546,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
                 print("Error HitEggs")
             }
         
-        case .ToonByMushroom:
+        case .ToonByMushroom: break
             let name = "Shield"
             if (player.childNode(withName: name) == nil) {
                 let aura = toon.showAuraShield(atlas: name,gameState: .Running)
@@ -484,20 +554,10 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
             }
             
         case .ToonByMagnet:
+                
+            ToonByMagnetContact(player: player,regular:regular)
             
-            guard let attack = toon.attack(scene: self, gameState: .Running) else { return }
-            
-            DispatchQueue.main.asyncAfter(wallDeadline: .now()) { [self] in
-                physicsWorld.speed = 2
-                player.run(.group([
-                    
-                    gameinfo.mainAudio.getAction(type: .Magnet),
-                    attack,
-                    self.gameinfo.mainAudio.getAction(type: .Jade_Attack)
-                ]))
-                self.gameinfo.changeGameState(.Attack)
-            }
-        case .ToonByFlower:
+        case .ToonByFlower: break
             
             let name = "AuraPlayer"
             if (player.childNode(withName: name) == nil) {
@@ -522,10 +582,6 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
                 .run {
                     self.gameinfo.currentBullet -= 1
                 }]))
-            
-            
-          
-       
             
         case .BallEnemyByToon:
             
@@ -575,9 +631,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
        
             /// Contact with enemy
         case .HitByEnemy:
-            // particle effect testing
             
-         //   gameinfo.mainAudio.stop()
             guard let hitparticle = SKEmitterNode().contactEnemy(node: lowNode) else { return }
             self.addChild(hitparticle)
             self.run(gameinfo.mainAudio.getAction(type: .Player_Death))
@@ -638,7 +692,7 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
     }
   
     // MARK: ADD LABEL COIN WHEN PLAYER GET ITEM
-    func addLabelAddCoin(sknode:SKSpriteNode,currency:Int) {
+    func addLabelAddCoin(sknode:SKNode,currency:Int) {
         
         let label = SKLabelNode(fontNamed: "Cartwheel", andText: "+\(currency)", andSize: 30, fontColor: .yellow, withShadow:.black )
         label?.position = sknode.position
@@ -666,15 +720,15 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         case .EndScene:
             self.physicsWorld.speed = 0.4
             
-            self.run(SKAction.sequence([SKAction.wait(forDuration: 4), SKAction.run {
+            self.run(SKAction.sequence([SKAction.wait(forDuration: 4), SKAction.run { [unowned self] in
             self.gameinfo.prepareToChangeScene()
             self.recursiveRemovingSKActions(sknodes: self.children)
             self.removeAllChildren()
             self.removeAllActions()
             self.removeUIViews()
                 
-            let scene = EndGame(size: self.size)
-                scene.collectedCoins = self.gameinfo.getCurrentGold()
+            let scene = GameOver(size: self.size)
+                scene.gameinfo = gameinfo
                 self.view?.presentScene(scene)
                 }]))
             
@@ -710,12 +764,45 @@ class MainScene:SKScene, SKPhysicsContactDelegate,ProtocolEffectBlur{
         default:
             print("Should not reach here. PrepareToChangeScene from MainScene")
         }
-        // switch scene
-        
-        
     }
-   
-   
+}
+
+extension MainScene {
+    
+    func  ToonByMagnetContact(player:SKNode,regular:EnemyModel?) {
+        
+        
+        player.removeAction(forKey: "shoot")
+
+        gameinfo.getCurrentToonNode().physicsBody = nil
+
+        gameinfo.changeGameState(.Attack)
+        
+        player.run(gameinfo.getCurrentToon().attack(scene: self, gameState: .Attack)!)
+
+
+        let startAction = SKAction.repeat(.sequence([.run { [unowned self] in
+                player.run(.group([
+                    self.gameinfo.mainAudio.getAction(type: .Magnet),
+                    self.gameinfo.mainAudio.getAction(type: .Jade_Attack)
+                ]))
+            self.gameinfo.changeGameState(.Attack)
+
+            
+        },.wait(forDuration: 0.1)]), count: 10)
+        
+        startAction.duration = 10
+        startAction.timingMode = .easeIn
+        
+        let endAction = SKAction.run { [weak self] in
+
+            self?.run(self!.gameinfo.activeShootToon())
+            
+            self?.gameinfo.getCurrentToon().addPhysics()
+        }
+     
+        run(.sequence([startAction,.wait(forDuration: 1),endAction]))
+    }
 }
 
 

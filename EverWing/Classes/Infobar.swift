@@ -129,13 +129,7 @@ class Infobar:SKSpriteNode{
        return infoGetClover
     }
    
-    /// Add timer screen
-      func addTime() {
-          if timer != nil {
-              timer = nil
-          }
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(running), userInfo: nil, repeats: true)
-    }
+    
     
  
     /// Print label time

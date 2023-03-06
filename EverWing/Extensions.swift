@@ -31,6 +31,7 @@ enum ContactType{
     case EnemyGotHit
     case PlayerGetCoin
     case PlayerGetGem
+    case BallHitIce
     case HitByDragon
     case HitByEggs
     case Immune
@@ -38,11 +39,11 @@ enum ContactType{
 }
 
 
-extension SKSpriteNode {
+extension SKNode {
     
     func destroy(){
         
-        self.physicsBody?.categoryBitMask = PhysicsCategory.None
+        self.physicsBody?.category = [.None]
         self.removeAllActions()
         self.removeFromParent()
     }
@@ -174,19 +175,7 @@ extension SKScene{
     }
 }
 
-extension SKLabelNode{
-    func shadowNode(nodeName:String) -> SKEffectNode{
-        
-        let myShader = SKShader(fileNamed: "monogradient")
-        
-        let effectNode = SKEffectNode()
-        effectNode.shader = myShader
-        effectNode.shouldEnableEffects = true
-        effectNode.addChild(self)
-        effectNode.name = nodeName
-        return effectNode
-    }
-}
+
 
 extension Bool {
     mutating func toggle() {

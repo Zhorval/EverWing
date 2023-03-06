@@ -326,6 +326,7 @@ class ViewController: UIViewController {
             let skview = self.view as! SKView
             skview.isMultipleTouchEnabled = false
             skview.showsNodeCount = true
+            skview.showsFields = true
             skview.presentScene(scene)
         }
     }

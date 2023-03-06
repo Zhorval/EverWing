@@ -25,7 +25,7 @@ struct AVAudio {
         case Player_Death     = "player_death.m4a"
         case Clover           = "getClover.m4a"
         case Owl              = "owl.m4a"
-        case Boss_Tree_Attack = "boss_tree_attack.m4a"
+        case Mildred_Attack   = "boss_tree_attack.m4a"
         case Meteor_Warn      = "meteor_warn.m4a"
         case Meteor_Flames    = "meteor_flames.m4a"
         case Boss_King_Burp   = "boss_king_burp.m4a"
@@ -73,12 +73,16 @@ struct AVAudio {
     }
     
     func getAction(type: SoundType) -> SKAction{
-          .playSoundFileNamed(type.rawValue, waitForCompletion: true)
+        .sequence([.changeVolume(by: 1, duration: 0.5),.playSoundFileNamed(type.rawValue, waitForCompletion: true)])
     }
     
     func load() -> Bool{
         
         return true
+    }
+    
+    func pause(){
+        bground_1_player?.pause()
     }
     
     func stop(){

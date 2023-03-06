@@ -254,7 +254,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
              .shadowText(colorText: UIColor(patternImage: gradient), colorShadow: .black,aligment: .center)
          view.addSubview(title)
          
-        let collection = CustomCollectionViewEggs(frame: rectDragons,items: Dragons.items,view:view, isCollection: true)
+        let collection = CustomCollectionViewEggs(frame: rectDragons,items: Dragons.items,view:view, typeGridCollection: .index)
         { (select: Dragons) in
             self.DetailDragonSelectCollection(dragon:select)
         } handlerDeselect:   { _ in
@@ -323,7 +323,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         
         view.addSubview(subtitle)
         
-        let collection = CustomCollectionViewEggs(frame: rectDragons,items: Dragons.items,view:view, isCollection: false) { _ in
+        let collection = CustomCollectionViewEggs(frame: rectDragons,items: Dragons.items,view:view, typeGridCollection: .sell) { _ in
                                 textSeleted += 9
                              } handlerDeselect:   { _ in
                                  textSeleted -= 9
@@ -603,7 +603,7 @@ class DragonsMenuScene:SKScene,ProtocolTaskScenes,ProtocolEffectBlur {
         shape.addSubview(name)
         
         let valueName = UILabel(frame: CGRect(x: shape.frame.width*0.5, y: -shape.frame.height*0.35, width: shape.frame.width/2, height: shape.frame.width/2))
-            .addTextWithFont(font: .systemFont(ofSize: 18, weight: .bold), text: dragon.picture.name, color: .white)
+            .addTextWithFont(font: .systemFont(ofSize: 18, weight: .bold), text: dragon.picture, color: .white)
         valueName.textAlignment = .right
         shape.addSubview(valueName)
         

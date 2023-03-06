@@ -40,13 +40,12 @@ class ArmoredEnemy:Enemy {
     }
     
   private func initialSetupArmored() {
-      
         
       self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
         self.physicsBody?.isDynamic = true
-        self.physicsBody?.categoryBitMask = PhysicsCategory.Enemy
+        self.physicsBody?.category = [.Enemy]
         self.physicsBody?.affectedByGravity = false
-        self.physicsBody?.collisionBitMask = PhysicsCategory.Player
+     //   self.physicsBody?.collisionBitMask = PhysicsCategory.Player
         self.physicsBody?.allowsRotation = false
         self.physicsBody?.fieldBitMask = GravityCategory.Player
     }
@@ -86,9 +85,9 @@ class CofreEnemy:Enemy {
         self.size = CGSize(width: 100, height: 80)
         self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
         self.physicsBody!.isDynamic = true
-        self.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
+        self.physicsBody!.category = [.Enemy]
         self.physicsBody!.affectedByGravity = false
-        self.physicsBody!.collisionBitMask = PhysicsCategory.Player
+      //  self.physicsBody!.collisionBitMask = PhysicsCategory.Player
         self.physicsBody?.allowsRotation = false
         self.physicsBody!.velocity = velocity
         self.physicsBody!.fieldBitMask = GravityCategory.None
@@ -119,23 +118,17 @@ class Dragon:Enemy {
         
         self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
         self.physicsBody!.isDynamic = true
-        self.physicsBody!.categoryBitMask = PhysicsCategory.Imune
+        self.physicsBody!.category = [.Imune]
          
         self.physicsBody!.affectedByGravity = false
-        self.physicsBody!.collisionBitMask = PhysicsCategory.Enemy
-        self.physicsBody!.contactTestBitMask = PhysicsCategory.Enemy
+     //   self.physicsBody!.collisionBitMask = PhysicsCategory.Enemy
+      //  self.physicsBody!.contactTestBitMask = PhysicsCategory.Enemy
         self.physicsBody?.allowsRotation = false
     }
     
 }
 
 class RegularEnemy:Enemy{
-    
-    
-   // private var velocity:CGVector?
-    
-   // var actionsDead:[SKTexture] = SKTextureAtlas().loadAtlas(name: "default_regular_dead", prefix: "puff")
-    
     
     private let minionSize = CGSize(width: screenSize.width*0.95/5, height: screenSize.width*0.95/5)
     
@@ -171,11 +164,12 @@ class RegularEnemy:Enemy{
         enemy_regular_node.maxHp = self.maxHp
         enemy_regular_node.name = "Enemy_Regular"
         enemy_regular_node.size = minionSize
-        enemy_regular_node.physicsBody = SKPhysicsBody(rectangleOf: enemy_regular_node.size)
+        enemy_regular_node.physicsBody = SKPhysicsBody(rectangleOf: enemy_regular_node.size.applying(.init(scaleX: 0.5, y: 1)))
         enemy_regular_node.physicsBody!.isDynamic = true
-        enemy_regular_node.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
+        enemy_regular_node.physicsBody!.category = [.Enemy]
         enemy_regular_node.physicsBody!.affectedByGravity = false
-        enemy_regular_node.physicsBody!.collisionBitMask = 0 | PhysicsCategory.Imune
+    //    enemy_regular_node.physicsBody!.collisionBitMask = PhysicsCategory.Player
+    //    enemy_regular_node.physicsBody!.contactTestBitMask = PhysicsCategory.Player
         enemy_regular_node.physicsBody?.allowsRotation = false
         enemy_regular_node.physicsBody!.velocity =  self.velocity
         enemy_regular_node.physicsBody!.fieldBitMask = GravityCategory.None // Not affect by magnetic
@@ -227,12 +221,10 @@ class RegularEnemy:Enemy{
     }
     
     func defeated(sknode:SKSpriteNode){
-        sknode.physicsBody?.categoryBitMask = PhysicsCategory.None
+        sknode.physicsBody?.category = [.None]
         sknode.position.y -= 50
         sknode.run(.sequence([.removeFromParent()]))
     }
-    
-
 }
 
 class BuitreEnemy:Enemy {
@@ -245,7 +237,7 @@ class BuitreEnemy:Enemy {
         eggs.position = .zero
         eggs.physicsBody = SKPhysicsBody(circleOfRadius: eggs.size.width/2)
         eggs.physicsBody?.affectedByGravity = true
-        eggs.physicsBody?.categoryBitMask = PhysicsCategory.Enemy
+        eggs.physicsBody?.category = [.Enemy]
         eggs.physicsBody?.collisionBitMask = 0
         return eggs
     }()
@@ -283,16 +275,14 @@ class BuitreEnemy:Enemy {
        }
        
      private func initialSetupArmored() {
-         
            
            self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
            self.physicsBody?.isDynamic = true
-           self.physicsBody?.categoryBitMask = PhysicsCategory.Enemy
+           self.physicsBody?.category = [.Enemy]
            self.physicsBody?.affectedByGravity = false
-           self.physicsBody?.collisionBitMask = PhysicsCategory.Player
+         //  self.physicsBody?.collisionBitMask = PhysicsCategory.Player
            self.physicsBody?.fieldBitMask = GravityCategory.Player
        }
-    
 }
 
 

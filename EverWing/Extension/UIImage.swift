@@ -137,3 +137,14 @@ extension UIImage {
     }
 }
 
+
+
+extension CGImage {
+    
+    func cropImage(to:CGRect) -> CGImage {
+        
+        guard  let cgimage = self.cropping(to: to) else { return self }
+      
+        return cgimage
+    }
+}

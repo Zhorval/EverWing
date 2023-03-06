@@ -10,56 +10,42 @@ import SpriteKit
 import GameplayKit
 import SwiftUI
 
-protocol BomberFx{
-  
-    func effectFxBossSpike(scene:SKScene?)
-    func showEffectFxBossAppears(typeBoss:BossType,scene:SKScene?)
-    func getTextureFxBoss(typeBoss:BossType)->SKTexture
+
+
+protocol ProtocolAttackBoss {
+    
+    func attack(node:SKNode)
+    func punch(node:SKNode,parent:SKNode)
+    func getBallAttackHand() -> SKNode
+    func showEffectFX()
+    func effectSpike()
+    
 }
 
 
-class Bomber:Enemy, BomberFx {
-   
-    
-   // private var currency:Currency = Currency(type: .Coin)
+class Bomber:Enemy {
+  
     
     private var typeBoss:BossType?
     
-    private var timer:Timer?
+    private var isActiveBigBall = false
     
-    private var emitter:SKEmitterNode?
-    
-    private var mainScene:SKScene?
-    
-    // Main type ball fire BossType
-    private var mainBallBoster:SKSpriteNode?
-    
-    // Hand type ball fire BossType
-    private var handBallBoster:SKSpriteNode?
-    
-    private var actionsStandBy:[SKTexture] {
-    
-        return  (typeBoss?.getTextures(type:  typeBoss!, prefix: nil))!
-
-    }
-   
-    private var gameToon = GameInfo()
-    
-    convenience init(hp:CGFloat,typeBoss:BossType,scene:SKScene){
+    convenience init(hp:CGFloat,typeBoss:BossType,scene:SKScene,gameInfo:GameInfoDelegate){
 
         self.init()
         
-        self.mainScene = scene
+        self.delegate = gameInfo
         
-        self.typeBoss = typeBoss
-       
-        showEffectFxBossAppears(typeBoss:self.typeBoss!,scene:scene)
+        self.typeBoss =  typeBoss
+        
+        print(typeBoss.rawValue)
 
         self.hp = hp
        
         name = "Enemy_Boss"
-       
-        getAllBallHand()
+        
+        showEffectFX()
+        
         self.addChild(getBossParts())
         
         size = CGSize(width: 180, height: 180)
@@ -75,16 +61,11 @@ class Bomber:Enemy, BomberFx {
         self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
         self.physicsBody!.isDynamic = true
         self.physicsBody!.affectedByGravity = false
-        self.physicsBody!.categoryBitMask = PhysicsCategory.Enemy
-        self.physicsBody!.friction = 0
-        self.physicsBody!.collisionBitMask = PhysicsCategory.Wall
-        self.physicsBody!.contactTestBitMask = PhysicsCategory.Wall
-        self.physicsBody!.restitution = 1
+        self.physicsBody!.category = [.Enemy]
+        self.physicsBody!.collisionBitMask = PhysicsCategory.Wall.rawValue | PhysicsCategory.WallFX.rawValue
+        self.physicsBody!.contactTestBitMask = PhysicsCategory.Wall.rawValue
         self.physicsBody!.allowsRotation = false
-        self.physicsBody!.linearDamping = 1
-        self.physicsBody!.fieldBitMask = GravityCategory.None
-       
-      //  self.initialSetup(category: PhysicsCategory.Enemy)
+    
         run(.group([
             .fadeAlpha(to: 1, duration: 3),
             .moveTo(y:  screenSize.height - 300, duration: 5),
@@ -94,56 +75,15 @@ class Bomber:Enemy, BomberFx {
             }
         ]))
     }
-    
-    deinit {
-        guard let timer = timer else {
-            return
-        }
-        timer.invalidate()
-    }
-    
-    
-    //MARK: GET BALL FIRE BY HAND TYPEBOSS
-    private func getAllBallHand() {
-        
-        switch typeBoss {
-            case .Ice_Queen:
-                self.handBallBoster = SKSpriteNode(imageNamed: "Bubbles")
-            case .Monster_King:
-                self.handBallBoster = SKSpriteNode(imageNamed: "Bubbles")
-                self.mainBallBoster = SKSpriteNode(imageNamed: self.typeBoss!.rawValue + "_Projectile")
-            case .Mildred:
-                self.handBallBoster = SKSpriteNode(imageNamed: "ballMildred")
-            case .Spike:
-                self.handBallBoster = SKSpriteNode(imageNamed: self.typeBoss!.rawValue + "_Projectile_Hand")
-            self.handBallBoster?.name = "Enemy_Ball"
-            default:
-                self.handBallBoster =  SKSpriteNode(imageNamed: "Bubbles")
-        }
-    }
-    
+   
     //MARK: ADD BOSS TO NODE SCREEN
     private func getBossParts() -> SKNode {
+                
+        let node = Mildred()
         
+        node.setScale(1.5)
         
-        if self.typeBoss == .Monster_King {
-            return MonsterKingParts()
-        
-        } else if self.typeBoss == .Mildred {
-            return MildredParts()
-            
-        } else if self.typeBoss == .Ice_Queen {
-            return IceQueenParts()
-            
-        }  else if self.typeBoss == .Spike {
-            return SpikeParts()
-            
-        } else if self.typeBoss == .Monster_Queen {
-            return IceQueenParts()
-            
-        } else {
-            return SKSpriteNode(texture: actionsStandBy.first ??  global.getMainTexture(main: .Boss_1))
-        }
+        return node
     }
     
     // MARK: ANIMATION MONSTERS TYPE
@@ -157,10 +97,11 @@ class Bomber:Enemy, BomberFx {
                 .repeatForever(.sequence([
                 SKAction.move(to: CGPoint(x: 100, y: screenSize.maxY - self.frame.height ), duration: 3),
                 SKAction.move(to: CGPoint(x: screenSize.maxX - (self.frame.width/2), y: screenSize.maxY - self.frame.height), duration: 3),
-                SKAction.move(to: CGPoint(x: screenSize.midX, y: screenSize.midY), duration: 3)
-                ]))]))
-            
-            
+                SKAction.move(to: CGPoint(x: screenSize.midX, y: screenSize.midY), duration: 3),
+                .run {
+                    self.attack(node: self)
+                }
+            ]))]))
     /*    default: break
             
             func randomPoint() -> CGPoint {
@@ -184,701 +125,951 @@ class Bomber:Enemy, BomberFx {
         }
     }
     
-    // MARK: GET EMITTER TYPEBOSS
-    private func getEmitter(nodePosition:SKNode?,name:String = "SpikeArm") -> SKEmitterNode? {
+    //MARK:  JOIN BOSS PART
+    private func Mildred() -> SKNode{
+        
+        let node = SKNode()
+        node.name = "NodeBoss"
+        
+            
+        if let body  = typeBoss?.body  {
+            body.name = "body"
+            node.addChild(body)
+            
+            if let head = typeBoss?.head?[0] {
+                head.name = "head"
+                head.constraints = typeBoss?.headContraint
+                body.addChild(head)
+                
+                if let earL = typeBoss?.ear {
+                    earL.constraints = [SKConstraint.positionX(SKRange(constantValue: -28), y: SKRange(constantValue: 10))]
+                    head.addChild(earL)
+                    let earR = (earL.copy() as! SKSpriteNode).mirrorSprite()
+                        earR.constraints = [SKConstraint.positionX(SKRange(constantValue: 28), y: SKRange(constantValue: 10))]
+                        head.addChild(earR)
+                }
+            }
+            
+            if let helmet = typeBoss?.helmet{
+                helmet.constraints = typeBoss?.helmetContraint
+                body.addChild(helmet)
+                
+                if let diadem = typeBoss?.diadem {
+                    diadem.constraints = typeBoss?.diademContraint
+                    helmet.addChild(diadem)
+                }
+            }
+            
+            if let nose = typeBoss?.nose {
+                nose.constraints = typeBoss?.noseContraint
+                body.addChild(nose)
+            }
+            
+            if let hornL =  typeBoss!.hornL {
+                hornL.constraints =  typeBoss?.hornLContraint
+                node.addChild(hornL)
+                
+                let miniHornR = typeBoss!.miniHorn!
+                miniHornR.xScale = -1
+                miniHornR.constraints = typeBoss?.miniHornRContraint!
+                node.addChild(miniHornR)
+                
+                let hornR =  typeBoss!.hornR!
+                hornR.constraints =  typeBoss?.hornRContraint
+                node.addChild(hornR)
+                
+                let miniHornL =  typeBoss!.miniHorn!
+                miniHornL.constraints = typeBoss?.miniHornLContraint
+                node.addChild(miniHornL)
+            }
+        
+            if let textureEye =  typeBoss?.eye?.first {
+                let eyeL =  SKSpriteNode(texture: textureEye)
+                eyeL.name = "eyeL"
+                eyeL.constraints =  typeBoss?.eyeLContraint
+                eyeL.run(.repeatForever(.animate(with: typeBoss!.eye!, timePerFrame: 0.5)))
+                body.addChild(eyeL)
+                
+                if let eyelidL = typeBoss?.eyelid {
+                    eyelidL.name = "eyelidL"
+                    eyelidL.constraints =  typeBoss?.eyelidLContraint!
+                    body.insertChild(eyelidL, at: 1)
+                }
+                
+                if let eyelashesL =  typeBoss?.eyelashes {
+                    eyelashesL.constraints = [
+                        SKConstraint.zRotation(SKRange(constantValue: CGFloat(10).toRadians())),
+                        SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: 10))]
+                    eyeL.addChild(eyelashesL)
+                }
+                
+               let eyeR = (eyeL.copy() as! SKSpriteNode).mirrorSprite()
+                eyeR.name = "eyeR"
+                eyeR.constraints = typeBoss?.eyeRContraint
+                body.addChild(eyeR)
+              
+            }
+            
+            if let textureMouth =  typeBoss?.mouth {
+                let bgMouth = SKSpriteNode(texture: textureMouth[1])
+                bgMouth.name = "bgMouth"
+                bgMouth.constraints = typeBoss?.bgMouthContraing
+                node.addChild(bgMouth)
+            }
+            
+            if let skirt = typeBoss?.skirt {
+                skirt.name = "skirt"
+                skirt.constraints  = typeBoss?.skirtContraint
+                node.addChild(skirt)
+                
+                if let tail = typeBoss?.tail {
+                    tail.constraints = [SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: -23))]
+                    tail.run(.repeatForever(.sequence([.rotate(byAngle: CGFloat(10).toRadians(), duration: 0.5),
+                                                       .rotate(byAngle: CGFloat(-10).toRadians(), duration: 0.5)])))
+                    skirt.addChild(tail)
+                    
+                    let effectDownMouth = typeBoss!.mouthExtraEffect!
+                        effectDownMouth.constraints = [SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: -45))]
+                        node.addChild(effectDownMouth)
+                }
+            }
+                
+                
+            if let legL = typeBoss!.legL {
+                legL.name = "legL"
+                legL.constraints = typeBoss!.legLContraint
+                node.addChild(legL)
+                if let textFootL =  typeBoss?.footL?.first {
+                    let footL = SKSpriteNode(texture: textFootL).mirrorSprite()
+                    footL.run(.repeatForever(.sequence([.wait(forDuration: 0.5),.animate(with: typeBoss!.footL!, timePerFrame: 0.5)])))
+                        footL.name = "footL"
+                        footL.constraints = typeBoss!.footLContraint
+                        node.addChild(footL)
+                }
+                
+                if let legR = typeBoss!.legR {
+                    legR.name = "legR"
+                    legR.constraints = typeBoss?.legRContraint
+                    node.addChild(legR)
+                    if let textFootR = typeBoss?.footR?.first{
+                        let footR = SKSpriteNode(texture: textFootR)
+                        footR.run(.repeatForever(.sequence([.animate(with: typeBoss!.footR!, timePerFrame: 0.5),.wait(forDuration: 0.5)])))
+                        footR.name = "footR"
+                        footR.constraints = typeBoss!.footRContraint
+                        node.addChild(footR)
+                    }
+                }
+                
+                if let extralegL = typeBoss!.extraLegL {
+                    extralegL.constraints = [SKConstraint.positionX(SKRange(constantValue: -35), y: SKRange(constantValue: -80))]
+                    node.addChild(extralegL)
+                }
+                
+                if let extralegR = typeBoss!.extraLegR {
+                    extralegR.constraints = [SKConstraint.positionX(SKRange(constantValue: 40), y: SKRange(constantValue: -75))]
+                    node.addChild(extralegR)
+                }
+            }
+
+            if let miniArmR = typeBoss!.miniArm {
+                
+                let rotateMini = SKAction.rotate(byAngle:  CGFloat.random(in: 10...20).toRadians(), duration: 1)
+
+                miniArmR.name = "miniArmR"
+                miniArmR.anchorPoint = CGPoint(x: 0, y: 1)
+                miniArmR.zRotation = 0
+                miniArmR.constraints = [SKConstraint.positionX(SKRange(constantValue: 50), y: SKRange(constantValue: -10))]
+                miniArmR.run(.repeatForever(.sequence([rotateMini,rotateMini.reversed()])))
+                
+                let miniHandR = SKSpriteNode(texture: SKTexture(cgImage: typeBoss!.miniHand!))
+                miniHandR.constraints = [SKConstraint.positionX(SKRange(constantValue: 40), y: SKRange(constantValue: -35))]
+                miniArmR.addChild(miniHandR)
+                node.addChild(miniArmR)
+                
+                let miniArmL = miniArmR.copy() as! SKSpriteNode
+                miniArmL.name = "miniArmL"
+                miniArmL.xScale = -1
+                miniArmL.constraints = [SKConstraint.positionX(SKRange(constantValue: -50), y: SKRange(constantValue: 0))]
+                node.addChild(miniArmL)
+            }
+                
+                if  typeBoss?.arm != nil {
+                    let nodeArmL = fullArm(parent:body,side:Direction.Left).mirrorSprite()
+                    nodeArmL.name = "nodeArmL"
+                    
+                    if typeBoss == .Monster_King {
+                        if let lance = nodeArmL.childNode(withName: "upperArm")?.childNode(withName: "lowerArm") {
+                            lance.constraints = [ SKConstraint.zRotation(SKRange(constantValue: .pi)) ,
+                                                  SKConstraint.positionX(SKRange(constantValue: -20), y: SKRange(constantValue: 0)) ]
+                            lance.run(.repeatForever(.sequence([
+                                .run { [unowned self] in
+                                    self.shootLanceMonsterKing(parent: node, lance: lance)
+                                },.wait(forDuration: 5)])))
+                        }
+                    }
+                    
+                    let nodeArmR = fullArm(parent:body,side:Direction.Right)
+                    nodeArmR.name = "nodeArmR"
+                    
+                    node.addChild(nodeArmL)
+                    node.addChild(nodeArmR)
+                    
+                     node.run(.repeatForever(.sequence([
+                     .run { [unowned self] in
+                         if !isActiveBigBall && isEnablePositionShoot()  {
+                             punch(node:node, parent: node)
+                             if typeBoss == .Mildred {
+                                 self.leafMildredAction()
+                             }
+                         }
+                     },SKAction.wait(forDuration: 2)])))
+                    
+                }
+            
+                if let padL = typeBoss?.pad {
+                    padL.constraints = typeBoss?.padLContraint
+                    node.addChild(padL)
+                    
+                    let padR = (padL.copy() as! SKSpriteNode).mirrorSprite()
+                    padR.constraints = typeBoss?.padRContraint
+                    node.addChild(padR)
+                }
+            
+                if let wingL = typeBoss?.wing  {
+                    wingL.constraints = typeBoss?.wingLContraint
+                    wingL.zPosition = body.zPosition-1
+                    wingL.zRotation =  typeBoss == .Spike ? CGFloat(-45).toRadians() : 0
+                    node.insertChild(wingL, at: 1)
+                    
+                    let wingR = wingL.copy() as! SKSpriteNode
+                    wingR.xScale = -1
+                    wingR.constraints = typeBoss?.wingRContraint
+                    node.insertChild(wingR, at: 1)
+                }
+        }
+        
+        return node
+    }
+    
+    
+   
+    // MARK: IS ENABLE BOSS SHOOT
+    private func isEnablePositionShoot(maxHeight:CGFloat = 300) -> Bool {
+        
+        guard let scene = delegate?.getScene() else { return false }
+        
+        if  self.position.y >  screenSize.height - maxHeight && position.y < screenSize.height - frame.height {
+           
+            let alert = SKSpriteNode(color: .red.withAlphaComponent(0.2), size: scene.size)
+                alert.position = CGPoint(x: scene.frame.midX, y: scene.frame.midY)
+                alert.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            
+            scene.addChild(alert)
+            alert.run(.sequence([.playSoundFileNamed("boss_alarm.m4a", waitForCompletion: false), .wait(forDuration: 0.5),.removeFromParent()]))
+            return true
+        }
+        
+        return false
+    }
+   /*
+    // MARK: ANIMATION FOR ICE_QUEEN JOIN PARTS
+    private func MosterQueenAndIceQueen()->SKNode {
+        
+        let node = SKNode()
+        node.name = "NodeBoss"
+        
+        if typeBoss?.body != nil {
+            let body =  typeBoss!.body!
+            body.name = "body"
+            node.addChild(body)
+            if let skirt = typeBoss?.skirt{
+                skirt.constraints = [SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: -body.frame.height*0.9))]
+                body.addChild(skirt)
+            }
+            
+            if  let head =  typeBoss!.head {
+                //  head.constraints = [SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: head.frame.height*0.6))]
+                head.constraints = typeBoss?.headContraint
+                node.addChild(head)
+                
+                if let eyelidL = typeBoss!.eyelid {
+                    eyelidL.constraints = [SKConstraint.positionX(SKRange(constantValue: -15), y: SKRange(constantValue: 0))]
+                    head.addChild(eyelidL)
+                    
+                    let eyelidR = eyelidL.copy() as! SKSpriteNode
+                    eyelidR.xScale = -1
+                    eyelidR.constraints = [SKConstraint.positionX(SKRange(constantValue: 15), y: SKRange(constantValue: 0))]
+                    head.addChild(eyelidR)
+                }
+                
+                if typeBoss?.eye != nil {
+                    let eyeL = SKSpriteNode(texture: typeBoss!.eye?.first!)
+                    eyeL.run(.repeatForever(.animate(with: typeBoss!.eye!, timePerFrame: 0.5)))
+                    eyeL.constraints = [SKConstraint.positionX(SKRange(constantValue: -12), y: SKRange(constantValue: 0))]
+                    head.addChild(eyeL)
+                    
+                    let eyeR = eyeL.copy() as! SKSpriteNode
+                    eyeR.xScale = -1
+                    eyeR.constraints = [SKConstraint.positionX(SKRange(constantValue: 12), y: SKRange(constantValue: 0))]
+                    head.addChild(eyeR)
+                }
+                
+                if typeBoss?.mouth != nil {
+                    let mouth = SKSpriteNode(texture: typeBoss!.mouth?.first!)
+                    mouth.run(.repeatForever(.animate(with: typeBoss!.mouth!, timePerFrame: 0.5)))
+                    mouth.constraints = [SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: -15))]
+                    head.addChild(mouth)
+                }
+                
+                if let helmet = typeBoss!.helmet {
+                    helmet.constraints = [SKConstraint.positionX(SKRange(constantValue: 0), y: SKRange(constantValue: CGFloat(typeBoss!.head!.frame.height/2)))]
+                    head.addChild(helmet)
+                }
+                
+                if typeBoss?.ear != nil {
+                    let earL = SKSpriteNode(texture: typeBoss!.ear!)
+                    earL.constraints = [SKConstraint.positionX(SKRange(constantValue: -CGFloat(typeBoss!.head!.frame.width/2)), y: SKRange(constantValue: 0))]
+                    head.addChild(earL)
+                    
+                    let earR = earL.copy() as! SKSpriteNode
+                    earR.xScale = -1
+                    earR.constraints = [SKConstraint.positionX(SKRange(constantValue: CGFloat(typeBoss!.head!.frame.width/2)), y: SKRange(constantValue: 0))]
+                    head.addChild(earR)
+                }
+            }
+            
+            if typeBoss?.arm != nil {
+                
+                let nodeArmL = fullArm(parent:body,side:Direction.Left)
+                nodeArmL.name = "nodeArmL"
+            //    nodeArmL.zPosition = head.zPosition-1
+                nodeArmL.xScale = -1
+                
+                let nodeArmR = fullArm(parent:body,side:Direction.Right)
+                nodeArmR.name = "nodeArmR"
+             //  nodeArmR.zPosition = head.zPosition-1
+                
+                node.addChild(nodeArmR)
+                node.addChild(nodeArmL)
+                
+                self.run(.repeatForever(.sequence([
+                    .run { [unowned self] in
+                        punch(node:node, parent: node)
+                    },
+                    SKAction.wait(forDuration: 2)
+                ])))
+                
+                
+                if let wingL = typeBoss?.wing  {
+               //     wingL.zPosition = head.zPosition-1
+                    wingL.constraints = [SKConstraint.positionX(SKRange(constantValue: -80), y: SKRange(constantValue: body.frame.height))]
+                    if let subWings =  typeBoss?.wingShort  {
+                        subWings.constraints = [SKConstraint.positionX(SKRange(constantValue: 5), y: SKRange(constantValue: -12))]
+                        wingL.addChild(subWings)
+                    }
+                    node.insertChild(wingL, at: 1)
+                    
+                    let wingR = wingL.copy() as! SKSpriteNode
+                    wingR.xScale = -1
+                    wingR.zPosition = wingL.zPosition-1
+                    wingR.constraints = [SKConstraint.positionX(SKRange(constantValue: 80), y: SKRange(constantValue: body.frame.height))]
+                    node.insertChild(wingR, at: 1)
+                }
+            }
+        }
+            
+        return node
+    }
+     */
+    func fullArm(parent:SKNode,side:Direction) -> SKNode {
+        
+        let nodeArm = SKNode()
+            nodeArm.constraints = (side == .Left ? typeBoss!.armLContraint! :  typeBoss!.armRContraint!)
+        
+        let arm =  typeBoss!.arm!
+            arm.anchorPoint = typeBoss == .Mildred ? CGPoint(x: 0, y: 1) : CGPoint(x: 1, y: 1)
+            arm.zRotation = typeBoss == .Monster_King ? CGFloat(180).toRadians() : 0
+            arm.name = "upperArm"
+        
+            if let pad = typeBoss?.padArm {
+                pad.constraints = typeBoss?.padArmContraint
+                arm.addChild(pad)
+            }
+        
+            if let foreArmL = typeBoss?.forearm {
+                foreArmL.name = "foreArm"
+                foreArmL.constraints =   typeBoss!.forearmLContraint!
+                arm.addChild(foreArmL)
+            }
+          
+        let hand =  typeBoss != .Monster_King ? typeBoss!.handL![0] : side == .Left ? typeBoss!.handL![0] : typeBoss!.handR![0]
+            hand.name = "lowerArm"
+            hand.constraints = typeBoss?.handContraint
+            arm.addChild(hand)
+            nodeArm.addChild(arm)
+        
+        return nodeArm
+        
+    }
+  /*
+    private func fullArmMosterQueenAndIceQueen(parent:SKNode,side:Direction) -> SKNode {
+        
+        let lookContraint = [
+            SKConstraint.orient(to: parent, offset: SKRange(lowerLimit: 0)) ,
+            SKConstraint.positionX(SKRange(constantValue: side == .Left  ? -40 : 40), y: SKRange(constantValue: 30)),
+            SKConstraint.zRotation(side == .Left ?
+                                   SKRange(lowerLimit: 3 * .pi / 4, upperLimit:  4 * .pi / 3) :
+                                   SKRange(lowerLimit: 7 * .pi / 6, upperLimit: 12 * .pi / 6))
+        ]
+        
+        let nodeArmL = SKNode()
+        nodeArmL.constraints = lookContraint
+        
+        let upperArm =  typeBoss!.arm!
+        upperArm.name = "upperArm"
+        upperArm.yScale = -1
+        upperArm.anchorPoint = CGPoint(x: 0.5, y: 1)
+        upperArm.zRotation =   CGFloat(-40).toRadians()
+
+        let midArm = typeBoss!.forearm!
+        midArm.name = "midArm"
+        midArm.anchorPoint = CGPoint(x: 0.5, y: 1)
+        midArm.constraints = [SKConstraint.positionX(SKRange(constantValue: -CGFloat(typeBoss!.forearm!.frame.width)*0.8),
+                                                     y: SKRange(constantValue: -CGFloat(typeBoss!.arm!.frame.height/2))) ]
+        upperArm.addChild(midArm)
+        
+        let lowerArm =  typeBoss!.handL!
+        lowerArm.name = "lowerArm"
+        lowerArm.anchorPoint = CGPoint(x: 0.5, y: 1)
+        lowerArm.position = CGPoint(x: -10, y: -(typeBoss!.forearm!.frame.height - typeBoss!.handL!.frame.height/2))
+        midArm.addChild(lowerArm)
+        
+        nodeArmL.addChild(upperArm)
+        
+        return nodeArmL
+    }
+    */
+    
+    
+    
+    private func getHandSecondTexture(_ index:Int) -> SKTexture?{
+        
+        if typeBoss!.handL!.count > 0 {
+            return typeBoss!.handL![index].texture
+        }
+        return typeBoss!.handL![0].texture
+    }
+        
+    
+    private func actionArm(semaphore:Direction,node:SKNode) {
+        
+        guard let  nodeArm = (node.childNode(withName: semaphore == .Left ? "nodeArmL" : "nodeArmR")!.childNode(withName: "upperArm") as? SKSpriteNode),
+              let hand = nodeArm.childNode(withName: "lowerArm") as? SKSpriteNode else {  return }
+        
+        let head = nodeArm.parent!.parent?.childNode(withName: "body")?.childNode(withName: "head")
+        
+        let rotateArm:[BossType:CGFloat] = [.Monster_Queen:30,.Ice_Queen:30,.Spike:30,.Mildred:160,.Monster_King:160]
+        
+        let actionRotate = { [unowned self] (index:Int) -> SKAction in
+            
+             SKAction.sequence([.rotate(byAngle: semaphore  == .Left ? -rotateArm[self.typeBoss!]!.toRadians(): rotateArm[self.typeBoss!]!.toRadians(), duration: 0.1),
+                                .run { [unowned self] in
+                                   
+                                    hand.texture =  index > 0  && self.typeBoss!.handL!.count > 0 ? self.typeBoss!.handL![1].texture : self.typeBoss!.handL![0].texture
+                                    
+                                    if head != nil && self.typeBoss!.head!.count > 1 {
+                                        head!.run(.animate(with: self.typeBoss!.head![1...1].map { $0.texture! }, timePerFrame: 0.5, resize: true, restore: true))
+                                    }
+                                }])
+        }
+        
+        if let ball = typeBoss!.ballHand {
+            ball.name = "Enemy_Ball_Hand_"
+            nodeArm.parent!.run(.sequence([
+                actionRotate(1),   // Index number index array hands
+                .wait(forDuration: 2),
+                actionRotate(0).reversed(),
+                .run { [unowned self] in
+                    self.shootSmallHandBoss(hand: hand, direction: semaphore, ball: ball)
+                }
+            ]))
+        }
+    }
+    
+    // MARK: PREPARE LANCE MONSTER KING FOR SHOOT BALL GREEN
+    // params @parent:SKNode: main parent sknode
+    //        @lance:SKNode: lance
+    private func shootLanceMonsterKing(parent:SKNode,lance:SKNode) {
+          
+        guard let textureBall = typeBoss?.bigProjectile?.first,
+              let toon = delegate?.getCurrentToonNode() else { return }
+        
+        func setupPhysics(node:SKNode) {
+            node.physicsBody = SKPhysicsBody(circleOfRadius: node.frame.size.width/2)
+            node.physicsBody?.affectedByGravity = false
+            node.physicsBody?.fieldBitMask = GravityCategory.Ball
+            node.physicsBody?.category = [.Enemy]
+            node.physicsBody?.collisionBitMask = PhysicsCategory.Player.rawValue
+        }
+        
+        func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
+            return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+        }
+
+        func CGPointDistance(from: CGPoint, to: CGPoint) -> CGFloat {
+            return sqrt(CGPointDistanceSquared(from: from, to: to))
+        }
+            
+        let effectFX = SKSpriteNode(texture: SKTexture(cgImage: UIImage(named: typeBoss!.pathTextures)!.cgImage!.cropImage(to: CGRect(x: 6, y: 335, width: 57, height: 58))))
+        
+        let effectInside = SKSpriteNode(texture: SKTexture(cgImage: UIImage(named: typeBoss!.pathTextures)!.cgImage!.cropImage(to: CGRect(x: 75, y: 337, width: 54, height: 54))))
+        
+        
+        effectInside.run(.sequence([
+            .rotate(byAngle: 2 * .pi, duration: 1),
+            .run{[unowned self] in
+                for x in 1...5 {
+                    let ball = SKSpriteNode(texture: textureBall)
+                    ball.name = "Enemy_SmallBall_\(UUID().uuidString)"
+                    ball.setScale(1)
+                    setupPhysics(node: ball)
+                    
+                    let side = toon.position.x  > frame.midX ? 1 : -1
+                    
+                    ball.addFields(field: .velocityField(withVector: vector_float3(Float(side), -4, 0)))
+                    
+                    let radius = frame.width/2
+                    
+                    let angle =  -.pi / 5 * CGFloat( x * 2)
+                    
+                    let circleX = radius * cos(angle)
+                    let circleY = radius * sin(angle)
+                    
+                    ball.position =  position
+                    
+                    ball.run(.sequence([
+                        .move(to: CGPoint(x: circleX  + toon.frame.midX, y: (circleY + toon.frame.midY) + 300), duration: 2),
+                        .colorize(with: .green, colorBlendFactor: 2, duration: 0.5),
+                        delegate!.mainAudio.getAction(type: .Mildred_Attack),
+                        .removeFromParent()
+                    ]))
+                    delegate?.addChild(ball)
+                   
+                }
+            }, SKAction.wait(forDuration: 1),.removeFromParent()
+            ]))
+    
+        effectFX.addChild(effectInside)
+    
+        effectFX.constraints = [SKConstraint.positionX(SKRange(constantValue: -12), y: SKRange(constantValue: effectFX.frame.height/2 + effectFX.frame.height/2))]
+        
+        effectFX.run(.repeatForever(.sequence([.fadeAlpha(to: 0.5, duration: 0.5), .fadeAlpha(to: 1, duration: 0.5),.wait(forDuration: 3), .removeFromParent()])))
+                      
+            lance.addChild(effectFX)
+    }
+   
+    // MARK: RUN ACTION COLORIZE EYES MILDRED
+    // params: @parent:SKNode : parent node Mildred
+    private func colorizeEyes(parent:SKNode,nodeArm:SKNode,direction:Direction) {
+    
+        parent.enumerateChildNodes(withName: "eye*") { node, obj in
+            
+            node.run(.sequence([
+                .colorize(with: .green, colorBlendFactor: 2, duration: 1),
+                .wait(forDuration: 2),
+                .colorize(with: .yellow, colorBlendFactor: 2, duration: 1),
+            ]))
+    }
+}
+
+    
+    private  func setupPhysics(node:SKNode,isDinamic:Bool? = true,mass:CGFloat? = 100) {
+        node.physicsBody = SKPhysicsBody(circleOfRadius:  node.frame.size.width/2)
+        node.physicsBody?.isDynamic = isDinamic!
+        node.physicsBody?.restitution = 1
+        node.physicsBody?.mass = mass!
+        node.physicsBody?.allowsRotation = false
+        node.physicsBody?.category = [.BallFX]
+        node.physicsBody?.contactTestBitMask = PhysicsCategory.WallFX.rawValue
+        node.physicsBody?.collisionBitMask = PhysicsCategory.Player.rawValue
+    }
+    
+    private func shootSmallHandBoss(hand:SKNode,direction:Direction?,ball:SKNode) {
+        
+        guard let scene = delegate?.getScene() else { return }
+       
+        isActiveBigBall = !isActiveBigBall
+        
+        if isActiveBigBall {
+            setupPhysics(node: ball)
+            
+            if typeBoss == .Ice_Queen {
+                ball.position = hand.position
+            } else {
+                ball.position = CGPoint(x: direction == .Left ?  self.frame.midX - size.width/2  : self.frame.midX + size.width/2  , y: self.frame.midY)
+            }
+            scene.addChild(ball)
+
+            ball.run(.sequence([
+                directionBallBoss(hand: hand,direction: direction!,ball:ball),
+              //  .spiral(startRadius: 0, endRadius: 2 * .pi, angle: -.pi/2, centerPoint: self.position, duration: 5),
+              //  .applyAngularImpulse(10, duration: 0.5),
+              //  .applyForce(CGVector(dx: circleX, dy: -screenSize.height), at:CGPoint(x: screenSize.midX, y: screenSize.minY), duration: 1),
+            ]))
+            
+            isActiveBigBall = !isActiveBigBall
+            self.run(delegate!.mainAudio.getAction(type: .Mildred_Attack))
+              
+       /*  for i in 0...numberOfCircle {
+            let circle =   ball.copy() as! SKNode // SKEmitterNode(fileNamed: "ballHand") {
+                circle.name = "Enemy_SmallBall_\(i)"
+              /*  circle.particleSize = CGSize(width: 50, height: 50)
+                circle.emissionAngleRange = .pi*/
+                setupPhysics(node: circle)
+                
+           /*     let flame = SKEmitterNode(fileNamed: "ballHand")!
+                    flame.particleSize = CGSize(width: 25, height: 25)
+                    flame.position.y = circle.position.y+24
+                circle.addChild(flame)*/
+                
+                let angle =  -(.pi/2) / Double(numberOfCircle) * Double(i * 2)
+                let circleX = radius  * cos(CGFloat(angle))
+                let circleY = radius * sin(CGFloat(angle))
+                
+               // circle.addFields(field: .velocityField(withVector: vector_float3(direction == .Left ? 1 : 0, -3, 0)))
+                circle.position = CGPoint(x:  circleX + frame.midX , y:circleY + frame.midY )
+                circle.run(.sequence([
+                    directionBallBoss(hand: hand),
+                  //  .spiral(startRadius: 0, endRadius: 2 * .pi, angle: -.pi/2, centerPoint: self.position, duration: 5),
+                  //  .applyAngularImpulse(10, duration: 0.5),
+                   // .applyForce(CGVector(dx: circleX, dy: -screenSize.height), at:CGPoint(x: screenSize.midX, y: screenSize.minY), duration: 1),
+                    .removeFromParent()
+                ]))
+                scene.addChild(circle)
+                
+                if i == numberOfCircle-1 {
+                    isActiveBigBall = !isActiveBigBall
+                    self.run(delegate!.mainAudio.getAction(type: .Mildred_Attack))
+                  
+                }
+            }*/
+        }
+    }
+    
+    private func directionBallBoss(hand:SKNode,direction:Direction,ball:SKNode) -> SKAction {
+        
+        guard let toon = delegate?.getCurrentToonNode().position else { return SKAction()}
+        
         
         switch typeBoss {
-            case .Ice_Queen:
-                emitter =  SKEmitterNode.getBallHandIceQueen
-            case .Monster_King:
-                emitter =  SKEmitterNode().addBallMosterKing(node: nodePosition! as! SKSpriteNode)
-            case .Spike:
-                emitter =  SKEmitterNode(fileNamed: name)!
-            case .Monster_Queen:
-                emitter =  SKEmitterNode(fileNamed: "SpikeArm")!
-            
-            default:
-                emitter =  SKEmitterNode(fileNamed: "SpikeArm")!
-        }
-        emitter?.name = "EmitterBoss"
-        emitter?.targetNode = nodePosition
-        emitter?.run(.sequence([.wait(forDuration: 3),.removeFromParent()]))
-        guard let emitter = emitter else { return nil }
-        return emitter
-    }
-    
-    // MARK: SEQUENCE LEAF ARM MILFRED
-    private func addPhysicsBall(node:[SKSpriteNode],gravity:Bool = true,velocity:CGVector? = nil,category:UInt32 = PhysicsCategory.Enemy, collision:UInt32 = 0) {
-       
-        for x in 0..<node.count {
-            node[x].physicsBody = SKPhysicsBody(circleOfRadius: node[x].size.width/2)
-            node[x].physicsBody!.isDynamic = true
-            node[x].physicsBody!.affectedByGravity = gravity
-            node[x].physicsBody!.categoryBitMask = PhysicsCategory.Enemy
-            node[x].physicsBody!.contactTestBitMask = PhysicsCategory.Player | PhysicsCategory.BossFX
-          //  node[x].physicsBody!.fieldBitMask = GravityCategory.Player
-            node[x].physicsBody!.collisionBitMask =  0 | PhysicsCategory.BossFX
-            node[x].physicsBody?.allowsRotation = false
-           
-            if velocity != nil {
-                node[x].physicsBody?.velocity = velocity!
-            }
-            node[x].run(.sequence([.wait(forDuration: 2),.removeFromParent()]))
-        }
-    }
-    
-    // MARK: SEQUENCE BALL ARM MILFRED AND PATH
-    private func addBallMoster(nodePosition:SKSpriteNode,path:CGPath) ->SKSpriteNode {
-        
-        guard let handBallBoster = handBallBoster else {
-            return SKSpriteNode()
-        }
+        case .Spike:
+            ball.position = CGPoint(x: direction == .Left ?  self.frame.midX - size.width/2  : self.frame.midX + size.width/2  , y: self.frame.midY)
 
-        let copy = handBallBoster.copy() as! SKSpriteNode
-        
-         copy.blendMode = .screen
-         copy.texture = handBallBoster.texture
-         copy.name = "Enemy_Ball_Clone_\(UUID().uuidString)"
-         copy.position.x = nodePosition.position.x - 60
-         copy.position.y = nodePosition.position.y - 5
-         copy.run(SKAction.repeatForever( SKAction.sequence([
-            SKAction.follow(path, duration: 5),
-            SKAction.wait(forDuration: 2),
-            SKAction.removeFromParent()
-         ])))
-        return copy
-    }
-    
-   
-    // MARK: ANIMATION FOR MONSTER_KING JOIN PART
-    private func SpikeParts() ->SKNode {
-        
-        let node = SKNode()
-        node.name = "Node"
-        
-        let atlasIdle = SKTextureAtlas().loadAtlas(name: typeBoss!.rawValue + "_Body_Animation", prefix: nil)
-        let atlasHead = SKTextureAtlas().loadAtlas(name: self.typeBoss!.rawValue + "_Head_Animation", prefix: nil)
-        
-        let body = SKSpriteNode(texture: atlasIdle.first!)
-            body.run(.repeatForever(.animate(with: atlasIdle, timePerFrame: 0.8)))
-            node.addChild(body)
-        
-        let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Wing")
-            wingsL.name = typeBoss!.rawValue + "_WingL"
-            wingsL.position = CGPoint(x: -20, y: body.frame.height/2)
-            wingsL.zPosition = -1
-            wingsL.run(.moveWings)
-            node.addChild(wingsL)
-       
-        let wingsR = wingsL.copy() as! SKSpriteNode
-            wingsR.name = typeBoss!.rawValue + "_WingR"
-            wingsR.xScale = -1
-            wingsR.position = CGPoint(x: 20, y: body.frame.height/2)
-            wingsR.zPosition = -1
-            wingsL.run(.moveWings)
-            node.addChild(wingsR)
-        
-        let armR = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Arm")
-            armR.anchorPoint = CGPoint(x: 0, y: 1)
-            armR.xScale = -1
-            armR.zPosition = -1
-            armR.name = typeBoss!.rawValue + "_ArmR"
-            armR.position = CGPoint(x: -40, y: 50)
-            node.addChild(armR)
-       
-        let armL = armR.copy() as! SKSpriteNode
-            armL.xScale = 1
-            armL.position = CGPoint(x: 40, y: 50)
-            armL.name = typeBoss!.rawValue + "_ArmL"
-            node.addChild(armL)
-        
-        let head = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Head")
-            head.position = CGPoint(x: 0, y: head.frame.height/2.2)
-            node.addChild(head)
-        
-       
-        let actionRotateArm = { (node:SKSpriteNode) -> (SKAction) in
-            
-            let isArmR =  node.name?.contains("_ArmR")
-         
-            let action =
-            SKAction.sequence([
-                .rotate(toAngle: CGFloat(isArmR! ? -Int.random(in: 45...90) : Int.random(in: 45...90)).toRadians(), duration: 0.05, shortestUnitArc: true),
-                .wait(forDuration: 1),
-                .rotate(toAngle: isArmR! ? -CGFloat.random(in: 0...30).toRadians() : CGFloat.random(in: 0...30).toRadians(), duration: 0.05, shortestUnitArc: true),
-                .run {
-                    head.run(.animate(with: atlasHead, timePerFrame: 0.3))
-
-                    node.run(.sequence([
-                        .run {
-                            let copy = self.handBallBoster?.copy() as! SKSpriteNode
-                            copy.name = "Enemy_Ball_Hand_\(UUID().uuidString)"
-                            copy.position.y = -100
-                            copy.physicsBody?.allowsRotation = false
-                            if let emitter = SKEmitterNode(fileNamed: "trail") {
-                                emitter.targetNode = copy
-                                let contraint = SKConstraint.orient(to: copy, offset: SKRange.init(constantValue: 0))
-                                emitter.constraints = [ contraint]
-                                copy.addChild(emitter)
-                            }
-                           
-                            self.addPhysicsBall(node: [copy],gravity: false,velocity: isArmR! ?  CGVector(dx: 400, dy: -500) : CGVector(dx: -400, dy: -500),collision: PhysicsCategory.BossFX)
-                            node.addChild(copy)
-                        }
-                    ]))
-                },
-                GameInfo().mainAudio.getAction(type: .Boss_Tree_Attack),
-                .wait(forDuration: 2)
-            ])
-            
-            return action
-        }
-        
-        // First cry animation
-        
-        armR.run(.sequence([
-            self.gameToon.mainAudio.getAction(type: .Snow_Roar),
-            .wait(forDuration: 2),
-            .run {
-                node.run(.sequence([
-                    .scale(to: 1.3, duration: 0.3)
-                ]))
-            },
-            .rotate(toAngle: CGFloat(-90).toRadians(), duration: 0.1),
-            .run {
-                head.run(.animate(with: atlasHead, timePerFrame: 0.3))
-                body.removeAllActions()
-                body.run(.setTexture(SKTexture(imageNamed: self.typeBoss!.rawValue + "_Body_Crazy")))
-                armL.run(.sequence([
-                    .rotate(toAngle: CGFloat(90).toRadians(), duration: 0.1),
-                    .wait(forDuration: 3),
-                    .rotate(toAngle: CGFloat(-10).toRadians(), duration: 0.5)
-                ]))
-                node.run(.sequence([
-                    .scale(to: 1, duration: 0.3)
-                ]))
-                
-            },
-            .wait(forDuration: 2),
-            .rotate(toAngle: CGFloat(10).toRadians(), duration: 0.5),
-            .run {
-                body.run(.repeatForever(.animate(with: atlasIdle, timePerFrame: 0.8)))
-                self.effectFxBossSpike(scene: self.mainScene)
-            }
-        ]))
-       
-        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { time in
-            switch Int.random(in: 0..<3) {
-             case 0:
-                  armR.run(actionRotateArm(armR))
-                case 1:
-                    armL.run(actionRotateArm(armL))
-                default  :
-                armR.run(actionRotateArm(armR))
-                armL.run(actionRotateArm(armL))
-                
-            }
-        }
-        
-        return node
-    }
-    
-    // MARK: ANIMATION FOR MONSTER_KING JOIN PART
-    private func MonsterKingParts() ->SKNode {
-        
-       
-       /* let pathToFollow = UIBezierPath()
-        pathToFollow.move(to: .zero)
-        pathToFollow.addArc(withCenter: CGPoint(x: 300, y: 0), radius: 300, startAngle: .pi  , endAngle: .pi/180, clockwise: true)*/
-      
-        let node = SKNode()
-        node.name = "Node"
-        
-        let head = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Head")
-        let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Wing")
-            wingsL.name = typeBoss!.rawValue + "_WingL"
-            wingsL.position = CGPoint(x: -head.frame.width/2, y: 0)
-            wingsL.zPosition = -1
-            wingsL.run(.moveWings)
-            head.addChild(wingsL)
-
-       
-        let wingsR = wingsL.copy() as! SKSpriteNode
-            wingsR.name = typeBoss!.rawValue + "_WingR"
-            wingsR.xScale = -1
-            wingsR.position = CGPoint(x: head.frame.width/2, y: 0)
-            wingsR.zPosition = -1
-            head.addChild(wingsR)
-            wingsR.run(.moveWings)
-        
-       
-
-        let mouth = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Mouth")
-            mouth.name = typeBoss!.rawValue + "_Mouth"
-            mouth.alpha = 0
-            head.addChild(mouth)
-        
-        let breathR = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Breath")
-            breathR.name = typeBoss!.rawValue + "_BreathR"
-            breathR.alpha = 0
-            breathR.position.x = -10
-            breathR.run(.sequence([.fadeIn(withDuration: 0.3),.moveBy(x: 0, y: -50, duration: 0.5),.removeFromParent()]))
-       
-        
-        let lance = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Lance")
-            lance.name = typeBoss!.rawValue + "_Lance"
-            lance.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            lance.position = CGPoint(x: -head.frame.width/2, y: 0)
-            lance.zPosition = -1
-            head.addChild(lance)
-
-   
-        let actionLance = SKAction.run {
-                lance.run(SKAction.sequence([
-                    .wait(forDuration: 5),
-                    .run {
-                        let copy =  SKEmitterNode().addBallMosterKing(node: lance).copy() as! SKEmitterNode
-                     //   self.addPhysicsBall(node: copy)
-                        copy.position = CGPoint(x: lance.position.x+25, y: lance.frame.height/2-20)
-                        copy.targetNode = lance
-                        copy.run(.sequence([
-                            .wait(forDuration: 0.5),
-                            .move(by: CGVector(dx: GameInfo.currentPlayerPosition.x, dy: -screenSize.height), duration: 0.8),
-                            .wait(forDuration: 10),
-                             .removeFromParent()]))
-                       
-                        lance.addChild(copy)
-                    }]))}
-            
-        
-        
-        lance.run(.repeatForever(.sequence([
-                actionLance,
-                .wait(forDuration: 3),
-                .run {
-                    let copy =  self.mainBallBoster?.copy() as! SKSpriteNode
-                    copy.position = .zero
-                    mouth.alpha = 1
-                    copy.name = "Enemy_\(UUID().uuidString)"
-                    self.addPhysicsBall(node: [copy])
-                    copy.run(.repeat(.sequence([
-                        .move(by: CGVector(dx: CGFloat.random(in: -screenSize.width/2...screenSize.width/2) ,
-                                           dy: -800), duration: 2),
-                        .wait(forDuration: 5),
-                        .fadeOut(withDuration: 0.5),
-                        .removeFromParent(),
-                    ]),count: 1))
-                            
-                            let breath = breathR.copy() as! SKSpriteNode
-                            let breathL = breath.copy() as! SKSpriteNode
-                                breathL.xScale  = -1
-                                breathL.position.x = breath.position.x + 20
-                                mouth.addChild(breath)
-                                mouth.addChild(breathL)
-                                mouth.addChild(copy)
-                    },
-                GameInfo().mainAudio.getAction(type: .Boss_King_Burp),
-               
-        ])))
-      
-       
-        node.addChild(head)
-        return node
-    }
-    
-    // MARK: ANIMATION FOR MILDRED JOIN PARTS
-    private func MildredParts()->SKNode {
-        
-        guard let handBallBoster = handBallBoster else {
-
-            return SKNode()
-        }
-        
-        let spritNodeLeaf = SKSpriteNode(imageNamed: "leaf")
-
-
-        // MARK: SEQUENCE BALL ARM MILFRED
-        func addBallMoster(nodePosition:SKSpriteNode) ->SKSpriteNode {
-            
-             let copy = handBallBoster.copy() as! SKSpriteNode
-             let valueRotation:Bool = nodePosition.name?.contains("_ArmL") ?? false
-            
-             copy.blendMode = .screen
-             copy.texture = SKTexture(imageNamed: "ballMildred")
-             copy.name = "Enemy_Ball_Clone_\(UUID().uuidString)"
-             copy.position = nodePosition.position
-             copy.run(SKAction.repeatForever( SKAction.sequence([
-                SKAction.follow(pathToFollow(valueRotation), duration: 1),
-                SKAction.wait(forDuration: 2),
-                SKAction.removeFromParent()
-             ])))
-            return copy
-        }
-        
-        // MARK: SEQUENCE LEAF ARM MILFRED
-        func addLeafMoster() ->SKSpriteNode {
-            
-            let emiterLeaf = spritNodeLeaf.copy() as! SKSpriteNode
-                emiterLeaf.position.y = -self.frame.height/2
-                emiterLeaf.run(SKAction.repeatForever( SKAction.sequence([
-                    .rotate(byAngle: CGFloat.random(in: -100...100) > 0 ? .pi : .pi/3, duration: 0.1),
-                    SKAction.move(by: CGVector(dx: -Int.random(in: -300...300), dy: -Int.random(in: 50...500)), duration: 1),
-                         SKAction.removeFromParent()
-                 ])))
-            return emiterLeaf
-        }
-        
-        let node = SKNode()
-            node.name = "Node"
-            node.run(.upDown(10,1))
-        
-        let head = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Body")
-            head.name = typeBoss!.rawValue + "_Body"
-            head.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        
-        let pathToFollow   = { (node:Bool) -> (CGPath) in
-            
-            let path = UIBezierPath(arcCenter: .zero,
-                                    radius: 50,
-                                    startAngle: .pi ,
-                                    endAngle: .pi*2,
-                                    clockwise: node)
-            
-            let transform = CGAffineTransform(scaleX: 1.1, y: 2)
-            path.apply(transform)
-            return path.cgPath
-        }
-        
-        let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Wing")
-            wingsL.anchorPoint = CGPoint(x: 1, y: 0.5)
-            wingsL.name = typeBoss!.rawValue + "_WingL"
-            wingsL.position = CGPoint(x: -head.frame.width/3, y: 0)
-            wingsL.zPosition = -1
-       
-        let wingsR = wingsL.copy() as! SKSpriteNode
-            wingsR.name = typeBoss!.rawValue + "_WingR"
-            wingsR.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            wingsR.xScale = -1
-            wingsR.position = CGPoint(x: head.frame.width/3, y: 0)
-            wingsR.zPosition = -1
-        
-        let legL = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Leg")
-            legL.name = typeBoss!.rawValue + "_LegL"
-            legL.position = CGPoint(x: 10, y: -head.frame.height/2)
-            legL.zPosition = 1
-       
-        let legR = legL.copy() as! SKSpriteNode
-            legR.name = typeBoss!.rawValue + "_LegR"
-            legR.xScale = -1
-            legR.position = CGPoint(x: -30, y: -head.frame.height/2)
-            legR.zPosition = 1
-        
-        let armR = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Arm_R")
-            armR.anchorPoint = CGPoint(x: 0, y: 1)
-            armR.name = typeBoss!.rawValue + "_ArmR"
-            armR.position = CGPoint(x: 25, y: -50)
-            armR.zPosition = 1
-       
-        let armL = armR.copy() as! SKSpriteNode
-            armL.name = typeBoss!.rawValue + "_ArmL"
-            armL.xScale = -1
-            armL.position = CGPoint(x: -50, y: -50)
-            armL.zPosition = 1
-        
-        let handR = SKSpriteNode(imageNamed: typeBoss!.rawValue + "_Hand_R")
-            handR.anchorPoint = CGPoint(x: 1, y: 1)
-            handR.name = typeBoss!.rawValue + "_HandR"
-            handR.position = CGPoint(x: -60, y: -10)
-            handR.zPosition = -1
-            
-       
-        let handL = handR.copy() as! SKSpriteNode
-            handL.name = typeBoss!.rawValue + "_HandL"
-            handL.xScale = -1
-            handL.zPosition = -1
-            handL.position = CGPoint(x: 30, y: 0)
-           
-        
-        wingsL.run(.moveWings)
-        wingsR.run(.moveWings)
-        
-        
-        /* Generate effect FX arms Bosss */
-        let fx =   { (node:SKSpriteNode) -> (SKSpriteNode) in
-            
-            let spriteNode = SKSpriteNode()
-                spriteNode.name = node.name! + "_FX"
-                spriteNode.position = CGPoint(x: (node.name?.contains("ArmL"))! ? -75 : 100, y: -head.frame.height/2)
-                spriteNode.run(.sequence([
-                    GameInfo().mainAudio.getAction(type: .Boss_Tree_Attack),
-                    .fadeOut(withDuration: 1),
-                    .removeFromParent()
-            ]))
-            return spriteNode
-        }
-        
-        let actionRotateArm = { (node:SKSpriteNode) -> (SKAction) in
-            
-            let action =
-            SKAction.repeatForever(.sequence([
-                .rotate(toAngle: (node.name?.contains("_ArmL"))! ? -.pi/2 : .pi/2, duration: 0.5),
-                .run {
-                    handR.run(
-                    SKAction.repeatForever(.sequence([
-                        .rotate(toAngle:  0, duration: 0.75),
-                        .wait(forDuration: 2.5),
-                        .rotate(toAngle:  .pi/2, duration: 0.5),
-                        ])))
-                   
-                    handL.run(
-                    SKAction.repeatForever(.sequence([
-                        .rotate(toAngle:  0, duration: 0.75),
-                        .wait(forDuration: 2.5),
-                        .rotate(toAngle:  -.pi/2, duration: 0.5),
-                        ])))
-                },
-                .wait(forDuration: 1),
-                .rotate(toAngle: (node.name?.contains("_ArmL"))! ? Double.pi/2 : -.pi/2, duration: 0.01),
-                
-                .run {
-                    head.addChild(fx(node))
-
-                    armL.run(SKAction.repeat(SKAction.sequence([
-                        .run {
-                            
-                            let copy = addBallMoster(nodePosition: node)
-                            let emitterLeaf = addLeafMoster()
-                            self.addPhysicsBall(node: [copy])
-                            armR.addChild(copy)
-                            head.addChild(emitterLeaf)
-                        },.wait(forDuration: 0.1)]),count: 5))
-            },
-            .wait(forDuration: 3)]))
-            return action
-        }
-       
-        armR.run(actionRotateArm(armR))
-        armL.run((actionRotateArm(armL)))
-       
-        
-        head.addChild(wingsL)
-        head.addChild(wingsR)
-        head.addChild(legL)
-        head.addChild(legR)
-        head.addChild(armL)
-        head.addChild(armR)
-        head.addChild(handL)
-        head.addChild(handR)
-        node.addChild(head)
-        return node
-    }
-    
-    // MARK: ANIMATION FOR ICE_QUEEN JOIN PARTS
-    private func IceQueenParts()->SKNode {
-       
-      
-        let node = SKNode()
-        node.name = "Node"
-        
-        
-        let head = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Head")
-        node.addChild(head)
-        let eyeAtlas = SKTextureAtlas().loadAtlas(name: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Eye_Animation", prefix: nil)
-        
-        let eyeL = SKSpriteNode(texture: eyeAtlas.first!)
-            eyeL.name = typeBoss!.rawValue + "_EyeL"
-            eyeL.position =  CGPoint(x: -13, y: -20)
-            eyeL.run(.repeatForever(.animate(with: eyeAtlas, timePerFrame: 0.3)))
-            head.addChild(eyeL)
-            
-        let eyeR = eyeL.copy() as! SKSpriteNode
-            eyeR.name = typeBoss!.rawValue + "_EyeR"
-            eyeR.position =  CGPoint(x: 13, y: -20)
-            eyeR.xScale = -1
-            head.addChild(eyeR)
-        
-        let wingsL = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Wing")
-            wingsL.anchorPoint = CGPoint(x: 1, y: 0.5)
-            wingsL.name = typeBoss!.rawValue + "_WingL"
-            wingsL.position = CGPoint(x: -head.frame.width * 0.25, y: head.frame.height*0.4)
-            wingsL.zPosition = -3
-            wingsL.run(.repeatForever(.sequence([
-                .resize(toWidth: wingsL.frame.width * 0.85, duration: 0.8),
-                .resize(toWidth: wingsL.frame.width, duration: 0.8),
-            ])))
-            node.addChild(wingsL)
-        
-        let wingsR = wingsL.copy() as! SKSpriteNode
-            wingsR.name = typeBoss!.rawValue + "_WingR"
-            wingsR.xScale = -1
-            wingsR.position = CGPoint(x: head.frame.width*0.25, y: head.frame.height*0.4)
-            wingsR.zPosition = -1
-            node.addChild(wingsR)
-      
-        
-        let body = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Body")
-            body.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Body"
-            body.position = CGPoint(x: head.position.x, y: -head.frame.height/2)
-            body.zPosition = -1
-            node.addChild(body)
-        
-        let limitLookAt = SKConstraint.zRotation(SKRange(lowerLimit:   -3 * .pi / 4,
-                                                         upperLimit:   2 * .pi / 3))
-        
-        let armR = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Arm")
-            armR.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_ArmR"
-            armR.position = CGPoint(x: -10, y: -25)
-            armR.zPosition = -2
-            armR.anchorPoint = CGPoint(x: 1, y: 1)
-            armR.constraints = [limitLookAt]
-        
-        let hand = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Hand")
-            hand.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_HandR"
-            hand.position.y = -armR.frame.height+10
-            hand.position.x = -armR.frame.width
-            armR.addChild(hand)
-            node.addChild(armR)
-        
-        let actionRotateArm = { (node:SKSpriteNode) -> (SKAction) in
-            
-            let isArmR =  node.name?.contains("_ArmR")
-            
-            let action =
-            SKAction.sequence([
-                
-                .run {
-                    let nodeBallHand = SKNode()
-                     nodeBallHand.name = "nodeBall"
-                     nodeBallHand.name = self.typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_ballHandR"
-                     nodeBallHand.position =  CGPoint(x: hand.position.x ,y: hand.position.y-15)
-                     nodeBallHand.zPosition = -2
-                    if let emitter = self.getEmitter(nodePosition: hand) {
-                        nodeBallHand.addChild(emitter.copy() as! SKEmitterNode)
-                    }
-                     
-                     node.addChild(nodeBallHand)
-                },
-                .rotate(toAngle: CGFloat(isArmR! ? -45 : 45).toRadians(), duration: 0.5, shortestUnitArc: true),
-                .rotate(toAngle: CGFloat(isArmR! ? 10 : -10).toRadians(), duration: 0.1, shortestUnitArc: false),
-                .run {
-              
-                    node.run(SKAction.repeat(SKAction.sequence([
-                    .run {
-                        
-                                                           
-                        let copy = self.addBallMoster(nodePosition: node,
-                                                      path: UIBezierPath.pathMoster(CGPoint(x: screenSize.height*2, y: 0), screenSize.height*2, .pi,
-                                                        .pi / 180, true))
-                        self.addPhysicsBall(node: [copy])
-                        node.addChild(copy)
-                    },
-                    .wait(forDuration: 0.1)]),count: 4))
-                  },
-                GameInfo().mainAudio.getAction(type: .Boss_Tree_Attack),
-                .wait(forDuration: 2)
+            return SKAction.repeat(
+                .sequence([
+                    .move(to: CGPoint(x: direction == .Left ? toon.x + screenSize.width/2 : toon.x - screenSize.width/2, y: toon.y + CGFloat.random(in: -400...200)), duration: 1),
+                    .playSoundFileNamed(AVAudio.SoundType.Mildred_Attack.rawValue, waitForCompletion: false)
                 ])
+                ,count: 1)
             
-            return action
-        }
-        
-        let armL = armR.copy() as! SKSpriteNode
-            armL.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_ArmL"
-            armL.xScale = -1
-            armL.constraints = [limitLookAt]
+        case .Ice_Queen:
+            ball.position = CGPoint(x: direction == .Left ?  self.frame.midX - size.width/2  : self.frame.midX + size.width/2  , y: self.frame.midY)
             
-        
-      
-        
-        let move = SKAction.repeatForever(.sequence([.resize(byWidth: 0, height: 4, duration: 0.5),
-                                                     .rotate(byAngle: 0.05, duration: 0.5),
-                                                     .resize(byWidth: 0, height: -4, duration: 0.5),
-                                                     .rotate(byAngle: -0.05, duration: 0.5)]))
-        
-        let skirt0 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_0")
-            skirt0.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_0"
-            skirt0.position = CGPoint(x: -body.frame.width*0.45, y: -18)
-            skirt0.zPosition = -1
-            skirt0.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt0.run(move)
-            body.addChild(skirt0)
-        
-        let skirt1 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_1")
-            skirt1.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_1"
-            skirt1.position = CGPoint(x: -body.frame.width*0.30, y: -22)
-            skirt1.zPosition = -2
-            skirt1.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt1.run(move)
-            body.addChild(skirt1)
-        
-        let skirt2 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_2")
-            skirt2.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_2"
-            skirt2.position = CGPoint(x: -body.frame.width*0.28, y: -25)
-            skirt2.zPosition = -1
-            skirt2.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt2.run(move)
-            body.addChild(skirt2)
-        
-        let skirt3 = SKSpriteNode(imageNamed: typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_3")
-            skirt3.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_3"
-            skirt3.position = CGPoint(x: -body.frame.width*0.15, y: -25)
-            skirt3.zPosition = -1
-            skirt3.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt3.run(move)
-            body.addChild(skirt3)
-        
-        let skirt4 = skirt3.copy() as! SKSpriteNode
-            skirt4.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_4"
-            skirt4.xScale = -1
-            skirt4.position = CGPoint(x: 0, y: -25)
-            skirt4.zPosition = -1
-            skirt4.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt4.run(move)
-            body.addChild(skirt4)
-        
-        let skirt5 = skirt1.copy() as! SKSpriteNode
-            skirt5.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_5"
-            skirt5.xScale = -1
-            skirt5.position = CGPoint(x: body.frame.width*0.28, y: -25)
-            skirt5.zPosition = -1
-            skirt5.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt5.run(move)
-            body.addChild(skirt5)
-        
-        let skirt6 = skirt2.copy() as! SKSpriteNode
-            skirt6.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_6"
-            skirt6.xScale = -1
-            skirt6.position = CGPoint(x: body.frame.width*0.30, y: -22)
-            skirt6.zPosition = -1
-            skirt6.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt6.run(move)
-            body.addChild(skirt6)
-        
-        let skirt7 = skirt0.copy() as! SKSpriteNode
-            skirt7.name = typeBoss!.rawValue.replacingOccurrences(of: " ", with: "_") + "_Skirt_7"
-            skirt7.xScale = -1
-            skirt7.position = CGPoint(x: body.frame.width*0.40, y: -15)
-            skirt7.zPosition = -1
-            skirt7.anchorPoint = CGPoint(x: 0.5, y: 1)
-            skirt7.run(move)
-            body.addChild(skirt7)
+            var radius:Double  = size.width*0.5
+            
+            return .run { [unowned self] in
+                for x in 0...3 {
+                    let ballCopy = ball.copy() as! SKSpriteNode
+                    ballCopy.name = "Enemy_Ball_Hand_\(x)"
+                    
+                    setupPhysics(node: ballCopy,isDinamic: false,mass:1)
+                    
+                    let angle =  .pi  / 3 * CGFloat(x*10)
 
-       
-        Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { time in
-            switch Int.random(in: 0..<3) {
-                case 0:
-                    armR.run(actionRotateArm(armR))
-                case 1:
-                    armL.run(actionRotateArm(armL))
-                default  :
-                    armR.run(actionRotateArm(armR))
-                    armL.run(actionRotateArm(armL))
+                    radius += ballCopy.size.width*0.1
+                    let X = radius * cos(Double(angle))
+                    let Y = radius * sin(Double(angle))
+                    ballCopy.position =  CGPoint(x: frame.midX + X , y: frame.midY + Y)
+                    
+                    ballCopy.run(.sequence([
+                        .rotate(toAngle: .pi, duration: 1, shortestUnitArc: true),
+                        .move(by: CGVector(dx: direction == .Left ? 100 : -100, dy: -500), duration: 1),.removeFromParent()]
+                    ))
+                    self.delegate!.addChild(ballCopy)
+                }
             }
+        default: return SKAction()
+            
         }
         
-        return node
     }
     
-  
+    private func leafMildredAction() {
+        
+        for _ in 0..<5 {
+            
+            let leaf = self.typeBoss!.leaf!
+            leaf.name = "leaf_" + UUID().uuidString
+            leaf.physicsBody = SKPhysicsBody(circleOfRadius: 15)
+            leaf.physicsBody?.collisionBitMask = PhysicsCategory.None.rawValue
+            leaf.physicsBody?.affectedByGravity = true
+            leaf.physicsBody?.allowsRotation = true
+            leaf.position = .zero
+            leaf.run(.sequence([
+                .applyImpulse(CGVector(dx: CGFloat.random(in: -75...75), dy: CGFloat.random(in: 5...10)), duration: 0.5),
+                .wait(forDuration: 3),
+                .removeFromParent()]))
+            self.addChild(leaf)
+        }
+    }
+    
+    private func shootBigBoss(boss:SKNode) {
+        
+        if typeBoss == .Mildred { return }
+        
+        let bigBall =  SKSpriteNode(texture: typeBoss!.bigProjectile!.first!, size: CGSize(width: 75, height: 75))
+            bigBall.physicsBody = SKPhysicsBody(circleOfRadius: 75)
+            bigBall.physicsBody?.category = [.Enemy]
+          //  bigBall.physicsBody?.contactTestBitMask = PhysicsCategory.Player
+            bigBall.physicsBody?.isDynamic = true
+            bigBall.physicsBody?.affectedByGravity = false
+            bigBall.name = "Enemy_Ball_Hand_\(UUID().uuidString)"
+            bigBall.position = boss.position
+        
+        bigBall.run(.sequence([
+            .animate(with: typeBoss!.bigProjectile!, timePerFrame: 0.1),
+            .wait(forDuration: 2),
+            .applyForce(CGVector(dx: delegate!.getCurrentToonNode().position.x, dy: -1000), duration: 1),
+            .removeFromParent(),
+           ]))
+        boss.addChild(bigBall)
+    }
+        
+}
+
+extension Bomber:ProtocolAttackBoss {
+    
+    // MARK: CREATE LATERAL FX SPRITES
+    internal func showEffectFX() {
+        
+        switch typeBoss {
+            case .Spike: effectSpike()
+            default: return
+        }
+    }
+    
+    func effectSpike() {
+        
+        guard let delegate = delegate else { return }
+       
+        func physicsIce(node:SKNode) {
+            
+            node.physicsBody = SKPhysicsBody(rectangleOf: node.frame.size)
+            node.physicsBody?.category = [.BallFX]
+            node.physicsBody?.affectedByGravity = false
+            node.physicsBody?.isDynamic = false
+            node.physicsBody?.allowsRotation = false
+            node.physicsBody?.contactTestBitMask = PhysicsCategory.Player.rawValue
+        }
+        
+        let iceBerg:SKSpriteNode =  SKSpriteNode(texture: SKTexture(cgImage: UIImage(named: typeBoss!.pathTextures)!.cgImage!.cropImage(to: CGRect(x: 268, y: 214, width: 27, height: 68)))).mirrorSprite(isVertical: true)
+            iceBerg.anchorPoint = CGPoint(x: 0.5, y: 1)
+        
+        let ice = { [unowned self] (time:TimeInterval) -> SKSpriteNode in
+            let ice = SKSpriteNode(texture: SKTexture(cgImage: UIImage(named: typeBoss!.pathTextures)!.cgImage!.cropImage(to: CGRect(x: 158, y: 361, width: 17, height: 47))))
+            ice.name = "Ice_\(UUID().uuidString)"
+            ice.anchorPoint = CGPoint(x: 0.5, y: 1)
+            ice.run(.repeat(.sequence([.rotate(byAngle: CGFloat(2).toRadians(), duration: time),.rotate(byAngle: CGFloat(-2).toRadians(), duration: time)]), count: 10))
+            return ice
+        }
+        
+        let effect:SKSpriteNode =  SKSpriteNode(texture: SKTexture(cgImage: UIImage(named: typeBoss!.pathTextures)!.cgImage!.cropImage(to: CGRect(x: 2, y: 3, width: 79, height: 160))))
+            effect.physicsBody = SKPhysicsBody(rectangleOf: effect.size)
+            effect.physicsBody?.category = [ .WallFX]
+            effect.physicsBody?.contactTestBitMask = PhysicsCategory.BallFX.rawValue
+            effect.physicsBody?.isDynamic = false
+            effect.physicsBody?.restitution = 0.5
+        
+        let totalCount = round(screenSize.height  / effect.size.height)
+        
+        for x in 0...Int(totalCount) {
+            if x == Int(totalCount - 1) {
+                for a in 0...Int(round((screenSize.width/2)/iceBerg.size.width)) {
+                    let iceBerg = iceBerg.copy() as! SKSpriteNode
+                    iceBerg.name = "FX\(x)"
+                    iceBerg.position = CGPoint(x: screenSize.minX + (iceBerg.size.width * CGFloat(a * 2)), y: screenSize.maxY-iceBerg.size.height )
+                    delegate.addChild(iceBerg)
+                    
+                    let ice = ice(TimeInterval(a))
+                    ice.position = CGPoint(x: screenSize.minX + (iceBerg.size.width * CGFloat(a*2))-iceBerg.size.width, y: screenSize.maxY )
+                    physicsIce(node: ice)
+                    ice.run(.sequence([.wait(forDuration: TimeInterval(Int.random(in: 2...8))),.move(to: CGPoint(x: ice.position.x, y: -100), duration: 1.5),.removeFromParent()]))
+                    delegate.addChild(ice)
+                }
+            }
+            
+            let iceL = effect.copy() as! SKSpriteNode
+                iceL.name = "FXL_\(x)"
+                iceL.position = CGPoint(x: -25, y: screenSize.minY + (CGFloat(x) * effect.size.height*0.9))
+                iceL.run(action: .playSoundFileNamed(AVAudio.SoundType.Ice_Appear.rawValue, waitForCompletion: false), optionalCompletion: nil)
+            
+            let iceR = iceL.copy() as! SKSpriteNode
+                iceR.name = "FXR_\(x)"
+                iceR.position = CGPoint(x: screenSize.maxX+25, y: screenSize.minY + (CGFloat(x) * effect.size.height*0.9))
+
+            delegate.addChild(iceL)
+            delegate.addChild(iceR)
+        }
+    }
+    
+    
+    func attack(node:SKNode) {
+        
+        switch typeBoss {
+         
+            case .Spike:
+            
+            let spriteLeg = SKTexture(cgImage: UIImage(named: typeBoss!.pathTextures)!.cgImage!.cropImage(to: CGRect(x: 251, y: 365, width: 41, height: 41)))
+            
+             node.enumerateChildNodes(withName: "*", using: { [unowned self] n, o in
+                    guard  let footL = n.childNode(withName: "footL") as? SKSpriteNode,
+                           let footR = n.childNode(withName: "footR") as? SKSpriteNode,
+                           let mouth = n.childNode(withName: "bgMouth") as? SKSpriteNode,
+                           let armL = n.childNode(withName: "nodeArmL") ,
+                           let armR = n.childNode(withName: "nodeArmR"),
+                           let delegate = delegate else { return }
+                 
+                 footL.texture = spriteLeg
+                 
+                 footR.texture = spriteLeg
+
+                 let spriMount = UIImage(cgImage: mouth.texture!.cgImage())
+                 
+                 let bgmounth  = UIImage(cgImage:  self.typeBoss!.mouth![0].cgImage())
+               
+                 mouth.texture =  spriMount.mergeWith(topImage: bgmounth)
+                 
+                 armL.run(.sequence([.rotate(byAngle: CGFloat(-45).toRadians(), duration: 0.5),.wait(forDuration: 2),.rotate(byAngle: CGFloat(45).toRadians(), duration: 0.5)]))
+                 
+                 armR.run(.sequence([.rotate(byAngle: CGFloat(45).toRadians(), duration: 0.5),.wait(forDuration: 2),.rotate(byAngle: CGFloat(-45).toRadians(), duration: 0.5)]))
+                 
+                 delegate.mainAudio.pause()
+
+                 mouth.run(.sequence([.move(to: CGPoint(x: 2, y: -15), duration: 0.1),
+                                       delegate.mainAudio.getAction(type: .Snow_Roar),
+                                      .wait(forDuration: 1),
+                                      .run { [unowned self] in
+                                          mouth.texture = self.typeBoss!.mouth![1]
+                                          footL.texture = self.typeBoss!.footL![0]
+                                          footR.texture = self.typeBoss!.footR![0]
+                                          delegate.mainAudio.play(type: .Background_Start)
+                                      },
+                                      .move(to: CGPoint(x: 0, y: 0), duration: 0.1),]))
+             })
+        case .Ice_Queen,.Monster_Queen:
+            
+                enumerateChildNodes(withName: "*") { [unowned self] n, o in
+                    if let skirt =  n.childNode(withName: "skirt") {
+                        guard let textures = self.typeBoss?.bigProjectile else { fatalError() }
+                        let ball = SKSpriteNode(texture: textures.first!, color: UIColor().randomColor(), size: textures.first!.size())
+                            setupPhysics(node: ball,isDinamic: true,mass: 100)
+                            ball.physicsBody?.affectedByGravity = false
+                        ball.position =  delegate!.getScene()!.convertPoint(toView: position)
+                        let animate = SKAction.repeatForever(.animate(with: textures, timePerFrame: 0.5))
+                        ball.run(.sequence([animate,.wait(forDuration: 3),.move(to: delegate!.getCurrentToonNode().position, duration: 3),.removeFromParent() ]))
+                            delegate!.addChild(ball)
+                    }
+                }
+            
+            default: break
+        }
+        
+    }
+    
+    func punch(node:SKNode,parent:SKNode) {
+        
+        guard let toon = delegate?.getCurrentToonNode().position else { return }
+      
+        actionArm(semaphore: toon.x > self.position.x ? .Left : .Right,node: node)
+    }
+    
+    func getBallAttackHand() -> SKNode {
+        
+        switch typeBoss {
+            case .Monster_Queen: return typeBoss!.ballHand!
+            default: return SKNode()
+        }
+    }
+}
+
+extension UIImage {
+  func mergeWith(topImage: UIImage) -> SKTexture {
+    
+        let bottomImage = self
+
+        UIGraphicsBeginImageContext(CGSize(width: 63, height: 76))
+
+        let areaSize = CGRect(x: 0, y: 0, width: 63, height: 76)
+      
+        bottomImage.draw(in: areaSize)
+
+        topImage.draw(in: CGRect(x: 2, y: 0, width: topImage.size.width, height: topImage.size.height), blendMode: .normal, alpha: 1.0)
+
+        let mergedImage = UIGraphicsGetImageFromCurrentImageContext()!
+        
+        UIGraphicsEndImageContext()
+        
+        return  SKTexture(image:  mergedImage)
+  }
+}
+
+extension SKNode {
+    
+    func addFields(field:SKFieldNode) {
+        
+        let fieldNode = field
+        fieldNode.name = "fieldNode"
+        fieldNode.strength = 5
+        fieldNode.falloff = 10
+        fieldNode.region = SKRegion(radius: 50)
+        fieldNode.categoryBitMask = GravityCategory.Ball
+        fieldNode.position = self.position
+        fieldNode.minimumRadius = Float(self.frame.midX)
+        fieldNode.isExclusive = true
+        self.addChild(fieldNode)
+       
+    }
+}
+
+extension CGPoint {
+    
+    static func pointOnCircle(angle: CGFloat, radius: CGFloat, center: CGPoint) -> CGPoint {
+        return CGPoint(x: center.x + radius * cos(angle),
+                       y: center.y + radius * sin(angle))
+    }
+
+}
+
+extension SKAction {
+    static func spiral(startRadius: CGFloat, endRadius: CGFloat, angle
+                       totalAngle: CGFloat, centerPoint: CGPoint, duration: TimeInterval) -> SKAction {
+
+        // The distance the node will travel away from/towards the
+        // center point, per revolution.
+        let radiusPerRevolution = (endRadius - startRadius) / totalAngle
+
+        let action = SKAction.customAction(withDuration: duration) { node, time in
+            // The current angle the node is at.
+            let θ = totalAngle * time / CGFloat(duration)
+
+            // The equation, r = a + bθ
+            let radius = startRadius + radiusPerRevolution * θ
+
+            node.position =  CGPoint.pointOnCircle(angle: θ, radius: radius, center: centerPoint)
+        }
+
+        return action
+    }
 }
 
 extension Enemy {
@@ -896,108 +1087,6 @@ extension Enemy {
     }
 }
 
-extension Bomber {
-    
-    //MARK: ANIMATION FX UP SCREEN BOSS
-    func effectFxBossSpike(scene:SKScene?) {
-        
-        guard let mainScene = scene else {
-            return
-        }
-
-        let glaciars:[Enemy] =  [ Enemy(imageNamed: "glaciar"),Enemy(imageNamed: "glaciar1")]
-        let name = "Enemy_FX_Glaciar_\(UUID().uuidString)"
-        let unitX = Int(round(CGFloat(Float(screenSize.width - 50)) / 20))
-        
-        for x in 0...20 {
-            
-            guard let copyGlaciar = Enemy().cloneEnemy(elements: glaciars, anchor: CGPoint(x: 0.5, y: 1), position: CGPoint(x: CGFloat(x * unitX), y: screenSize.height),name:name) else { return }
-        
-            if x %  Int.random(in: 6...9)  == 0 {
-                copyGlaciar.run(.repeatForever(.sequence([
-                    self.gameToon.mainAudio.getAction(type: .Ice_Cracking),
-                    .repeat(.sequence([
-                        .rotate(byAngle: CGFloat(10).toRadians(), duration: 0.5),
-                        .rotate(byAngle: CGFloat(-10).toRadians(), duration: 0.4)
-                    ]), count: 3),
-                    .wait(forDuration: 0.5),
-                    .run{
-                        copyGlaciar.removeAllActions()
-                    },
-                    .wait(forDuration: 5)
-                ])))
-                if let emitter = self.getEmitter(nodePosition: copyGlaciar,name: "trail") {
-                    copyGlaciar.addChild(emitter)
-                    copyGlaciar.Physics(speed: CGVector(dx: 0, dy: -700))
-                }
-            }
-            mainScene.addChild(copyGlaciar)
-            
-            mainScene.run(.sequence([.wait(forDuration: 3),.run {
-                let _ = mainScene.children.map {
-                    if $0.name?.contains(name) == true {
-                        $0.removeFromParent()
-                    }
-                }
-              }
-            ]))
-         }
-      }
-    
-    //MARK: SHOW LATERAL EFFECT FX WHEN APPEAR BOSS
-    func showEffectFxBossAppears(typeBoss:BossType,scene:SKScene?) {
-        
-        guard let mainScene = scene else { return }
-        
-        let texture:SKTexture = getTextureFxBoss(typeBoss: typeBoss)
-        
-        let unitY = Int(round(Float(screenSize.height) / 10))
-       
-        let effectFX = Enemy(texture: texture, size: CGSize(width: 70, height: unitY))
-        effectFX.name = "Enemy_FX_"
-      
-        effectFX.run(typeBoss.audioFX)
-       
-        if typeBoss == .Mildred {
-            effectFX.run(.repeatForever(.sequence([
-                .resize(toWidth: 80, duration: 0.2),
-                .rotate(byAngle: 0.1, duration: 0.2),
-                .resize(toWidth: 70, duration: 0.2),
-                .rotate(byAngle: -0.1, duration: 0.2)
-            ])))
-        }
-        
-        for x in 0...10 {
-            
-            guard let copy = effectFX.copy() as? SKSpriteNode,
-                  let copyR = copy.copy() as? SKSpriteNode else { return }
-          
-            copy.name = effectFX.name! + "L"
-            copy.xScale = -1
-            copy.position = CGPoint(x: Int(screenSize.minX + 2), y: (x * (unitY-20)))
-            mainScene.addChild(copy)
-            
-            copyR.name = effectFX.name! + "R"
-            copyR.position = CGPoint(x: Int(screenSize.maxX - 2), y: (x * (unitY-20)))
-            mainScene.addChild(copyR)
-        }
-    }
-    
-    /// Returns the texture for the side effect of the screen
-     func getTextureFxBoss(typeBoss:BossType) -> SKTexture {
-        
-        switch typeBoss {
-            case .Mildred:
-                 return SKTexture(imageNamed: "plants")
-            case .Spike:
-                return SKTexture(imageNamed:  "Ice")
-            default:
-            return SKTexture(imageNamed:  "orna_\(Int.random(in: 0...8))")
-        }
-    }
-    
-    
-}
 
 extension UIBezierPath {
     

@@ -7,8 +7,9 @@
 //
 import Foundation
 import SpriteKit
+import GameKit
 
-protocol GameInfoDelegate{
+protocol GameInfoDelegate:AnyObject{
     
     var currentBullet:Int { get set }
     var mainAudio:AVAudio {get}
@@ -27,6 +28,7 @@ protocol GameInfoDelegate{
 }
 
 class GameInfo: GameInfoDelegate{
+    
     
     deinit {
         print ("GameInfo Class deinitiated!")
@@ -81,13 +83,14 @@ class GameInfo: GameInfoDelegate{
     var isMapStart: Bool?
     static var currentPlayerPosition:CGPoint = .zero
     
+    
     static var tableInfoBarEggs = CustomCollectionViewEggs(frame: CGRect(x: 10, y: 50, width: screenSize.width/2, height: 60),
                                                            items: Currency.EggsCurrencyType.items, view: nil,
-                                                           isCollection: false) { _ in} handlerDeselect: { _ in} handlerTapAudio: {  }
-
-  
+                                                           typeGridCollection: .eggs) { _ in} handlerDeselect: { _ in} handlerTapAudio: {  }
     
      init(){
+         
+         print("Init GameInfo")
          
         // Models
         fireball_enemy = EnemyModel(type: .Fireball)
@@ -336,7 +339,7 @@ class GameInfo: GameInfoDelegate{
         let border = SKSpriteNode()
         border.name = "Physics_Wall"
         border.physicsBody = SKPhysicsBody(edgeLoopFrom:  mainscene.view!.bounds)
-        border.physicsBody!.categoryBitMask = PhysicsCategory.Wall
+        border.physicsBody!.category = [.Wall]
         border.physicsBody?.isDynamic = false
         mainscene.addChild(border)
         
@@ -381,18 +384,46 @@ class GameInfo: GameInfoDelegate{
         
         switch gamestate {
         case .Start:
-            // Start timer game
-            infobar.addTime()
             
             // Show infobar level bullet
             mainscene.addChild(showInfoBulletScreen(level: currentBullet))
             
-            mainscene.run(.repeatForever(mainAudio.getAction(type: .GameIntro)),withKey: "gameIntro")
-            mainscene.run(.sequence([.wait(forDuration: 2),.run {
-                mainscene.removeAction(forKey: "gameIntro")
-            }]))
+            createCloud {[unowned self]  _ in
+                mainscene.run(.repeatForever(self.mainAudio.getAction(type: .GameIntro)),withKey: "gameIntro")
+                mainscene.run(.sequence([.wait(forDuration: 2),.run {
+                    mainscene.removeAction(forKey: "gameIntro")
+                }]))
+                
+                let moveDownCloud = SKAction.moveTo(y: -screenSize.height*1.5, duration: 1)
+                
+                // Buildings Action
+                let scaleAction = SKAction.scale(to: 0.7, duration: 0.3)
+                let moveAction = SKAction.moveTo(y: screenSize.height/3, duration: 0.3)
+               
+                let buildingsAction = SKAction.sequence([SKAction.run(SKAction.group([scaleAction, moveAction]), onChildWithName: "main_menu_middle_root"), SKAction.wait(forDuration: 1.5), SKAction.run {
+                    self.mainScene?.childNode(withName: "main_menu_middle_root")?.removeFromParent()
+                    self.mainScene?.childNode(withName: Global.Main.Main_Menu_Background_1.rawValue)?.removeFromParent()
+                    self.mainScene?.childNode(withName: Global.Main.Main_Menu_Background_2.rawValue)?.removeFromParent()
+                    self.mainScene?.childNode(withName: Global.Main.Main_Menu_Background_3.rawValue)?.removeFromParent()
+                }])
+                
+                mainscene.run(SKAction.sequence([SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_1.rawValue + "0"), SKAction.wait(forDuration: 0.4), SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_2.rawValue + "1"), SKAction.wait(forDuration: 0.4), SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_1.rawValue + "2"), SKAction.wait(forDuration: 0.4), SKAction.run(moveDownCloud, onChildWithName: Global.Main.StartCloud_2.rawValue + "3")]))
+                
             
+                mainscene.run(SKAction.sequence([
+                    buildingsAction,
+                    SKAction.wait(forDuration: 2),
+                    SKAction.run{
+                        self.changeGameState(.BossEncounter)
+                    },
+                    
+                    SKAction.wait(forDuration: 0.2),
+                    activeShootToon()
+                ]))
+            }
+           
             
+           /*
             
             loadBackground(scene: mainscene,isStartMap: true)
             // Cloud action
@@ -443,19 +474,9 @@ class GameInfo: GameInfoDelegate{
                 },
                 
                 SKAction.wait(forDuration: 0.2),
-                SKAction.run {
-                    MainScene.accountInfo.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
-                    SKAction.run { [self] in
-                      
-                        self.addChild((MainScene.accountInfo.getCurrentToon().getBullet()?.shoot())!)
-                        
-                       /* self.addChild(self.dragon?[0].shoot())
-                        self.addChild(self.dragon?[1].shoot())*/
-                    },
-                    SKAction.wait(forDuration: 0.06)])))
-                }
+                activeShootToon()
             ]),withKey: "shoot")
-            
+            */
         case .WaitingState:
             
             regular_enemies?.increaseDifficulty()
@@ -471,13 +492,16 @@ class GameInfo: GameInfoDelegate{
             guard let mainScene = mainScene else { return  }
 
             timer?.invalidate()
+            timer = nil
             
             for x in mainScene.children {
                 guard let _ = x as? Enemy else { continue}
                 regular_enemies?.enemyModel?.enumerateChildNodes(withName: "Enemy*", using: { node, obj in
+                    node.physicsBody?.node?.speed = 0
                     self.regular_enemies?.explode(sknode: node as? Enemy, scene: mainScene)
                 })
             }
+
     
         case .Spawning:
             
@@ -509,6 +533,20 @@ class GameInfo: GameInfoDelegate{
         default:
             print("Current State: ", gamestate)
         }
+    }
+    
+    
+    func activeShootToon() -> SKAction {
+        
+        SKAction.run(SKAction.run {
+            self.getCurrentToon().getNode().run(SKAction.repeatForever(SKAction.sequence([
+            SKAction.run { [self] in
+              
+                self.addChild((MainScene.accountInfo.getCurrentToon().getBullet()?.shoot())!)
+            
+            },
+            SKAction.wait(forDuration: 0.06)])),withKey: "shoot")
+        }, onChildWithName: "toon")
     }
     
     // Info bar screen level bullet
@@ -555,7 +593,7 @@ class GameInfo: GameInfoDelegate{
         mainScene.childNode(withName: "Boss_Shadow")?.removeFromParent()
         
 
-        let shadow = SKSpriteNode(texture: typeBoss.getTextureShadow(),size: CGSize(width: screenSize.width*0.6, height: screenSize.width*0.62))
+        let shadow = SKSpriteNode(texture: SKTexture(cgImage: typeBoss.shadow) ,size: CGSize(width: screenSize.width*0.6, height: screenSize.width*0.62))
             shadow.name = "Boss_Shadow"
             shadow.position = CGPoint(x: 0.5, y: 1)
             shadow.position = CGPoint(x: screenSize.midX, y: screenSize.height - shadow.size.height)

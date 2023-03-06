@@ -296,7 +296,7 @@ extension GenericTableView {
         
         image.image = UIImage(named: item.picture.rawValue)
          
-        image.transform = CGAffineTransformMakeRotation(-CGFloat(15).toRadians())
+        image.transform = CGAffineTransformMakeRotation(-CGFloat(15.0).toRadians())
 
         view.addSubview(image)
         
