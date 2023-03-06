@@ -54,6 +54,8 @@
 		6E3ADF8927FC8FDC0007C2C4 /* player_death.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8827FC8FD20007C2C4 /* player_death.m4a */; };
 		6E3ADF8B27FC93B50007C2C4 /* result_coin.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E3ADF8A27FC93AE0007C2C4 /* result_coin.m4a */; };
 		6E3B3A5427E5044100D21BED /* userinfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6E3B3A5327E5044100D21BED /* userinfo.plist */; };
+		6E4854EB296F30E60087B13C /* CustomCollectionViewEggs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4854EA296F30E60087B13C /* CustomCollectionViewEggs.swift */; };
+		6E4854ED296F31310087B13C /* Dragons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4854EC296F31310087B13C /* Dragons.swift */; };
 		6E4E870927DA22FB00CF0D38 /* getcoin.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E18F67927D9439F00354BC1 /* getcoin.m4a */; };
 		6E4E870A27DA22FB00CF0D38 /* puff.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E18F67827D9439F00354BC1 /* puff.m4a */; };
 		6E4E870E27DA26AD00CF0D38 /* tictack.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E4E870D27DA269B00CF0D38 /* tictack.m4a */; };
@@ -64,23 +66,22 @@
 		6E53BA0F282C1BD800B13AEA /* meteor_warn.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E53BA0C282C1BAE00B13AEA /* meteor_warn.m4a */; };
 		6E5B246C27F5B19000D7023F /* GoblinModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5B246B27F5B19000D7023F /* GoblinModel.swift */; };
 		6E5D9A8528FC95770091AC59 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5D9A8428FC95770091AC59 /* UILabel.swift */; };
-		6E5ED1652847D85900D5855D /* SpikeArm.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E5ED1642847D85900D5855D /* SpikeArm.sks */; };
 		6E5ED169284801EA00D5855D /* icicle_fall_1.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E5ED168284801BE00D5855D /* icicle_fall_1.m4a */; };
 		6E5F4DFC290315F3004F354A /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5F4DFB290315F3004F354A /* UIButton.swift */; };
 		6E5F4DFE29031649004F354A /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5F4DFD29031649004F354A /* UIView.swift */; };
 		6E63CB6827FF2BC300216A43 /* Death.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E63CB6727FF2BC300216A43 /* Death.sks */; };
 		6E6C83AF2845F92000C29A3A /* ice_walls_appear.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E6C83AE2845F8F200C29A3A /* ice_walls_appear.m4a */; };
 		6E6C83B128461F5F00C29A3A /* item_collect_magnet.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E6C83B028461F2F00C29A3A /* item_collect_magnet.m4a */; };
+		6E754001297FEAD8006A74FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E753FFF297FEAD8006A74FD /* Assets.xcassets */; };
 		6E7D26192838D54600C6444B /* Mouth.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E7D26182838D54600C6444B /* Mouth.sks */; };
-		6E8B0FF9282977C80025BDC6 /* Leaf.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E8B0FF8282977C80025BDC6 /* Leaf.sks */; };
+		6E875E5E29A2A5D5004AD2A2 /* SKSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E875E5D29A2A5D5004AD2A2 /* SKSpriteNode.swift */; };
 		6E93915C27E11D7500911962 /* bulling.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E93915B27E11D7500911962 /* bulling.sks */; };
 		6E955BBC28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E955BBA28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift */; };
 		6E955BBD28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E955BBB28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift */; };
 		6E955BC328F9B70B005DFF67 /* property.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6E955BC228F9B70B005DFF67 /* property.plist */; };
-		6E9793C1282E43FD004EB912 /* ballColorFX.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6E9793C0282E43FD004EB912 /* ballColorFX.sks */; };
+		6E9DF0E129ABEC37004015FE /* SKPhysicsBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9DF0E029ABEC37004015FE /* SKPhysicsBody.swift */; };
 		6EA174FE27E6BAEC000DA2C9 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */; };
 		6EA9DF5628590B51003E5A9E /* flameSword.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EA9DF5528590B51003E5A9E /* flameSword.sks */; };
-		6EA9DF5A285913C0003E5A9E /* AuraFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EA9DF59285913C0003E5A9E /* AuraFire.sks */; };
 		6EAB087528EED3DA006AB933 /* egg_hatch_end_common.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */; };
 		6EAB087628EED3DA006AB933 /* egg_hatch_start.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */; };
 		6EAB087928EED6F3006AB933 /* SKScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAB087828EED6F3006AB933 /* SKScene.swift */; };
@@ -94,8 +95,8 @@
 		6EC2F9F127F8AC20003F906A /* CustomTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC2F9F027F8AC20003F906A /* CustomTableView.swift */; };
 		6EC4483E28E0B5F20042589D /* halcon.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EC4483D28E0B5DE0042589D /* halcon.m4a */; };
 		6ECFF8D328F58D580023907A /* buy_dragonfruit.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */; };
+		6ED4170A2994E34F009EA5D0 /* ballHand.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6ED417092994E34F009EA5D0 /* ballHand.sks */; };
 		6ED7611028A578F900C1CD66 /* vfx_jade_attack_4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EAFE8D027F3A309001ACBB5 /* vfx_jade_attack_4.m4a */; };
-		6ED7611228A596D300C1CD66 /* CustomCollectionViewEggs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7611128A596D300C1CD66 /* CustomCollectionViewEggs.swift */; };
 		6ED7BA2527D263DC0084361E /* SKTextureAtlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7BA2427D263DC0084361E /* SKTextureAtlas.swift */; };
 		6ED7BA2727D263FF0084361E /* SKLabelNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED7BA2627D263FF0084361E /* SKLabelNode.swift */; };
 		6ED7BA2927D285B80084361E /* audioblock.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7BA2827D285B80084361E /* audioblock.mp3 */; };
@@ -106,12 +107,11 @@
 		6ED7D35628456F44004FBE77 /* snow_roar.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7D35528456E0A004FBE77 /* snow_roar.m4a */; };
 		6ED7D35828457274004FBE77 /* gem_collect.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ED7D3572845726B004FBE77 /* gem_collect.m4a */; };
 		6EDE7E062900A36800FBB5A8 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDE7E052900A36800FBB5A8 /* String.swift */; };
-		6EE854ED282A5CD60069E0BF /* ballMilfred.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6EE854EC282A5CD60069E0BF /* ballMilfred.sks */; };
 		6EE854EF282AC3240069E0BF /* boss_tree_attack.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EE854EE282AC30E0069E0BF /* boss_tree_attack.m4a */; };
 		6EF37A712837805B0040FBB0 /* boss_king_burp.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EF37A7028377FBB0040FBB0 /* boss_king_burp.m4a */; };
 		6EFD09C528004EC300B35BD8 /* ice-cracking.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6EFD09C428004EB300B35BD8 /* ice-cracking.m4a */; };
 		6EFD09C628004EC300B35BD8 /* owl.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6E63CB6927FF62F200216A43 /* owl.m4a */; };
-		F112A6F81E0EA2B000A5DEE9 /* EndGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = F112A6F71E0EA2B000A5DEE9 /* EndGame.swift */; };
+		F112A6F81E0EA2B000A5DEE9 /* GameOver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F112A6F71E0EA2B000A5DEE9 /* GameOver.swift */; };
 		F112A70A1E16705300A5DEE9 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F112A7091E16705300A5DEE9 /* Extensions.swift */; };
 		F16A64601E0C96A000BC8255 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16A645F1E0C96A000BC8255 /* AppDelegate.swift */; };
 		F16A64621E0C96A000BC8255 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16A64611E0C96A000BC8255 /* ViewController.swift */; };
@@ -163,11 +163,14 @@
 		6E18F67827D9439F00354BC1 /* puff.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = puff.m4a; sourceTree = "<group>"; };
 		6E18F67927D9439F00354BC1 /* getcoin.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = getcoin.m4a; sourceTree = "<group>"; };
 		6E18F67A27D94AB600354BC1 /* SKEmitterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKEmitterNode.swift; sourceTree = "<group>"; };
+		6E1FF7FD29994A7800346FFC /* egg_hatch_start.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = egg_hatch_start.m4a; path = ../../../../egg_hatch_start.m4a; sourceTree = "<group>"; };
 		6E2B71EC284D4C750090FF19 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6E3ADF8627FC8B8E0007C2C4 /* getClover.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = getClover.m4a; sourceTree = "<group>"; };
 		6E3ADF8827FC8FD20007C2C4 /* player_death.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = player_death.m4a; sourceTree = "<group>"; };
 		6E3ADF8A27FC93AE0007C2C4 /* result_coin.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = result_coin.m4a; sourceTree = "<group>"; };
 		6E3B3A5327E5044100D21BED /* userinfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = userinfo.plist; sourceTree = "<group>"; };
+		6E4854EA296F30E60087B13C /* CustomCollectionViewEggs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewEggs.swift; sourceTree = "<group>"; };
+		6E4854EC296F31310087B13C /* Dragons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dragons.swift; sourceTree = "<group>"; };
 		6E4E870D27DA269B00CF0D38 /* tictack.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = tictack.m4a; sourceTree = "<group>"; };
 		6E4E872727DAA5EC00CF0D38 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		6E4E872927DAAD3C00CF0D38 /* gradient.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = gradient.fsh; sourceTree = "<group>"; };
@@ -176,7 +179,6 @@
 		6E53BA0D282C1BAE00B13AEA /* meteor_flames.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = meteor_flames.m4a; sourceTree = "<group>"; };
 		6E5B246B27F5B19000D7023F /* GoblinModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoblinModel.swift; sourceTree = "<group>"; };
 		6E5D9A8428FC95770091AC59 /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
-		6E5ED1642847D85900D5855D /* SpikeArm.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = SpikeArm.sks; sourceTree = "<group>"; };
 		6E5ED168284801BE00D5855D /* icicle_fall_1.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = icicle_fall_1.m4a; sourceTree = "<group>"; };
 		6E5F4DFB290315F3004F354A /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
 		6E5F4DFD29031649004F354A /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
@@ -184,16 +186,16 @@
 		6E63CB6927FF62F200216A43 /* owl.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = owl.m4a; sourceTree = "<group>"; };
 		6E6C83AE2845F8F200C29A3A /* ice_walls_appear.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = ice_walls_appear.m4a; sourceTree = "<group>"; };
 		6E6C83B028461F2F00C29A3A /* item_collect_magnet.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = item_collect_magnet.m4a; sourceTree = "<group>"; };
+		6E753FFF297FEAD8006A74FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6E7D26182838D54600C6444B /* Mouth.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Mouth.sks; sourceTree = "<group>"; };
-		6E8B0FF8282977C80025BDC6 /* Leaf.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Leaf.sks; sourceTree = "<group>"; };
+		6E875E5D29A2A5D5004AD2A2 /* SKSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKSpriteNode.swift; sourceTree = "<group>"; };
 		6E93915B27E11D7500911962 /* bulling.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = bulling.sks; sourceTree = "<group>"; };
 		6E955BBA28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DragonsDB+CoreDataClass.swift"; sourceTree = "<group>"; };
 		6E955BBB28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DragonsDB+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		6E955BC228F9B70B005DFF67 /* property.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = property.plist; sourceTree = "<group>"; };
-		6E9793C0282E43FD004EB912 /* ballColorFX.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ballColorFX.sks; sourceTree = "<group>"; };
+		6E9DF0E029ABEC37004015FE /* SKPhysicsBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKPhysicsBody.swift; sourceTree = "<group>"; };
 		6EA174FD27E6BAEC000DA2C9 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		6EA9DF5528590B51003E5A9E /* flameSword.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = flameSword.sks; sourceTree = "<group>"; };
-		6EA9DF59285913C0003E5A9E /* AuraFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AuraFire.sks; sourceTree = "<group>"; };
 		6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = egg_hatch_start.m4a; sourceTree = "<group>"; };
 		6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = egg_hatch_end_common.m4a; sourceTree = "<group>"; };
 		6EAB087828EED6F3006AB933 /* SKScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKScene.swift; sourceTree = "<group>"; };
@@ -208,7 +210,7 @@
 		6EC2F9F027F8AC20003F906A /* CustomTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableView.swift; sourceTree = "<group>"; };
 		6EC4483D28E0B5DE0042589D /* halcon.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = halcon.m4a; sourceTree = "<group>"; };
 		6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = buy_dragonfruit.m4a; sourceTree = "<group>"; };
-		6ED7611128A596D300C1CD66 /* CustomCollectionViewEggs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomCollectionViewEggs.swift; path = ../../../../../../../Applications/CustomCollectionViewEggs.swift; sourceTree = "<group>"; };
+		6ED417092994E34F009EA5D0 /* ballHand.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ballHand.sks; sourceTree = "<group>"; };
 		6ED7BA2427D263DC0084361E /* SKTextureAtlas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKTextureAtlas.swift; sourceTree = "<group>"; };
 		6ED7BA2627D263FF0084361E /* SKLabelNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKLabelNode.swift; sourceTree = "<group>"; };
 		6ED7BA2827D285B80084361E /* audioblock.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audioblock.mp3; sourceTree = "<group>"; };
@@ -219,11 +221,10 @@
 		6ED7D35528456E0A004FBE77 /* snow_roar.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = snow_roar.m4a; sourceTree = "<group>"; };
 		6ED7D3572845726B004FBE77 /* gem_collect.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gem_collect.m4a; sourceTree = "<group>"; };
 		6EDE7E052900A36800FBB5A8 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
-		6EE854EC282A5CD60069E0BF /* ballMilfred.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ballMilfred.sks; sourceTree = "<group>"; };
 		6EE854EE282AC30E0069E0BF /* boss_tree_attack.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = boss_tree_attack.m4a; sourceTree = "<group>"; };
 		6EF37A7028377FBB0040FBB0 /* boss_king_burp.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = boss_king_burp.m4a; sourceTree = "<group>"; };
 		6EFD09C428004EB300B35BD8 /* ice-cracking.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ice-cracking.m4a"; sourceTree = "<group>"; };
-		F112A6F71E0EA2B000A5DEE9 /* EndGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EndGame.swift; sourceTree = "<group>"; };
+		F112A6F71E0EA2B000A5DEE9 /* GameOver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOver.swift; sourceTree = "<group>"; };
 		F112A7091E16705300A5DEE9 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F16A645C1E0C96A000BC8255 /* EverWing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EverWing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F16A645F1E0C96A000BC8255 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -246,6 +247,8 @@
 		0C12CD471F0293B9008BA78C /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				6E4854EC296F31310087B13C /* Dragons.swift */,
+				6E4854EA296F30E60087B13C /* CustomCollectionViewEggs.swift */,
 				0C12CD661F029433008BA78C /* Enemy */,
 				0C12CD4E1F0293B9008BA78C /* GameInfo.swift */,
 				0C12CD481F0293B9008BA78C /* AccountInfo.swift */,
@@ -280,7 +283,6 @@
 				0C12CD701F029479008BA78C /* Fireball.swift */,
 				0CD399A01F185C9000B7AC4C /* EnemyModel.swift */,
 				0CB6F24B1F15EBCC00BE6AFD /* Enemy.swift */,
-				6ED7611128A596D300C1CD66 /* CustomCollectionViewEggs.swift */,
 			);
 			path = Enemy;
 			sourceTree = "<group>";
@@ -349,13 +351,9 @@
 				0C12CD851F05367B008BA78C /* selectedChar-Three.sks */,
 				0C363DDC1EF4AA7800CAE82F /* trail.sks */,
 				6E63CB6727FF2BC300216A43 /* Death.sks */,
-				6E8B0FF8282977C80025BDC6 /* Leaf.sks */,
-				6EE854EC282A5CD60069E0BF /* ballMilfred.sks */,
-				6E9793C0282E43FD004EB912 /* ballColorFX.sks */,
 				6E7D26182838D54600C6444B /* Mouth.sks */,
-				6E5ED1642847D85900D5855D /* SpikeArm.sks */,
 				6EA9DF5528590B51003E5A9E /* flameSword.sks */,
-				6EA9DF59285913C0003E5A9E /* AuraFire.sks */,
+				6ED417092994E34F009EA5D0 /* ballHand.sks */,
 			);
 			path = SKS;
 			sourceTree = "<group>";
@@ -363,6 +361,7 @@
 		6E18F67727D942B800354BC1 /* SoundEffects */ = {
 			isa = PBXGroup;
 			children = (
+				6E1FF7FD29994A7800346FFC /* egg_hatch_start.m4a */,
 				6ECFF8D228F58D3C0023907A /* buy_dragonfruit.m4a */,
 				6EAB087428EED3CA006AB933 /* egg_hatch_end_common.m4a */,
 				6EAB087328EED3C9006AB933 /* egg_hatch_start.m4a */,
@@ -407,6 +406,8 @@
 				6EDE7E052900A36800FBB5A8 /* String.swift */,
 				6E5F4DFB290315F3004F354A /* UIButton.swift */,
 				6E5F4DFD29031649004F354A /* UIView.swift */,
+				6E875E5D29A2A5D5004AD2A2 /* SKSpriteNode.swift */,
+				6E9DF0E029ABEC37004015FE /* SKPhysicsBody.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -414,6 +415,7 @@
 		F16A64531E0C969F00BC8255 = {
 			isa = PBXGroup;
 			children = (
+				6E753FFF297FEAD8006A74FD /* Assets.xcassets */,
 				6E955BC228F9B70B005DFF67 /* property.plist */,
 				6E955BBA28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift */,
 				6E955BBB28F99D09005DFF67 /* DragonsDB+CoreDataProperties.swift */,
@@ -452,7 +454,7 @@
 				6E13E7A828EDDF3C00C4844B /* BuyDragon.swift */,
 				0C2520C41EC6AC0A00A03400 /* MainScene.swift */,
 				0C0655D31EE1681D00D38DA3 /* CharacterMenuScene.swift */,
-				F112A6F71E0EA2B000A5DEE9 /* EndGame.swift */,
+				F112A6F71E0EA2B000A5DEE9 /* GameOver.swift */,
 				F16A64611E0C96A000BC8255 /* ViewController.swift */,
 				F112A7091E16705300A5DEE9 /* Extensions.swift */,
 				6ED7BA2427D263DC0084361E /* SKTextureAtlas.swift */,
@@ -527,6 +529,7 @@
 			files = (
 				6ECFF8D328F58D580023907A /* buy_dragonfruit.m4a in Resources */,
 				6EAB087528EED3DA006AB933 /* egg_hatch_end_common.m4a in Resources */,
+				6ED4170A2994E34F009EA5D0 /* ballHand.sks in Resources */,
 				6EAB087628EED3DA006AB933 /* egg_hatch_start.m4a in Resources */,
 				6EC4483E28E0B5F20042589D /* halcon.m4a in Resources */,
 				6ED7611028A578F900C1CD66 /* vfx_jade_attack_4.m4a in Resources */,
@@ -540,7 +543,6 @@
 				6E53BA0E282C1BD800B13AEA /* meteor_flames.m4a in Resources */,
 				6E53BA0F282C1BD800B13AEA /* meteor_warn.m4a in Resources */,
 				6EE854EF282AC3240069E0BF /* boss_tree_attack.m4a in Resources */,
-				6E5ED1652847D85900D5855D /* SpikeArm.sks in Resources */,
 				6EFD09C528004EC300B35BD8 /* ice-cracking.m4a in Resources */,
 				6EFD09C628004EC300B35BD8 /* owl.m4a in Resources */,
 				6E3ADF8B27FC93B50007C2C4 /* result_coin.m4a in Resources */,
@@ -551,14 +553,13 @@
 				6ED7D34B2844B04C004FBE77 /* README.md in Resources */,
 				6E955BC328F9B70B005DFF67 /* property.plist in Resources */,
 				6EB0E3B927F0B47B0013C15E /* changeOptions.m4a in Resources */,
-				6E8B0FF9282977C80025BDC6 /* Leaf.sks in Resources */,
 				6E63CB6827FF2BC300216A43 /* Death.sks in Resources */,
 				6E4E870E27DA26AD00CF0D38 /* tictack.m4a in Resources */,
 				6E4E870927DA22FB00CF0D38 /* getcoin.m4a in Resources */,
 				6E7D26192838D54600C6444B /* Mouth.sks in Resources */,
 				6E4E870A27DA22FB00CF0D38 /* puff.m4a in Resources */,
-				6EA9DF5A285913C0003E5A9E /* AuraFire.sks in Resources */,
 				0C363DC31EF4502C00CAE82F /* CharacterScene.atlas in Resources */,
+				6E754001297FEAD8006A74FD /* Assets.xcassets in Resources */,
 				6E93915C27E11D7500911962 /* bulling.sks in Resources */,
 				6ED7BA2927D285B80084361E /* audioblock.mp3 in Resources */,
 				0C12CD871F05367B008BA78C /* selectedChar-Three.sks in Resources */,
@@ -572,11 +573,9 @@
 				0C12CD881F05367B008BA78C /* selectedChar-Two.sks in Resources */,
 				0C363DC81EF4502C00CAE82F /* mainmenu.atlas in Resources */,
 				6E3B3A5427E5044100D21BED /* userinfo.plist in Resources */,
-				6EE854ED282A5CD60069E0BF /* ballMilfred.sks in Resources */,
 				0C12CD8E1F066CD2008BA78C /* Sansani Fonts - Cartwheel.otf in Resources */,
 				6EA9DF5628590B51003E5A9E /* flameSword.sks in Resources */,
 				0C363DCA1EF4502C00CAE82F /* Player.atlas in Resources */,
-				6E9793C1282E43FD004EB912 /* ballColorFX.sks in Resources */,
 				6ED7D34D2844B84F004FBE77 /* Launch Screen.storyboard in Resources */,
 				6E4E872A27DAAD3C00CF0D38 /* gradient.fsh in Resources */,
 				0C12CD831F052772008BA78C /* selectedChar-One.sks in Resources */,
@@ -598,17 +597,19 @@
 				0C12CD621F0293C4008BA78C /* Currency.swift in Sources */,
 				6E13E79328ED903300C4844B /* Settings+CoreDataProperties.swift in Sources */,
 				6E4E872827DAA5EC00CF0D38 /* UIColor.swift in Sources */,
+				6E4854EB296F30E60087B13C /* CustomCollectionViewEggs.swift in Sources */,
 				6E5F4DFC290315F3004F354A /* UIButton.swift in Sources */,
 				0C12CD6E1F029433008BA78C /* Pinky.swift in Sources */,
-				6ED7611228A596D300C1CD66 /* CustomCollectionViewEggs.swift in Sources */,
 				6E13E78C28ED903300C4844B /* Score+CoreDataClass.swift in Sources */,
 				6E13E78F28ED903300C4844B /* Settings+CoreDataClass.swift in Sources */,
 				0CD399A11F185C9700B7AC4C /* EnemyModel.swift in Sources */,
 				0C2520C51EC6AC0A00A03400 /* MainScene.swift in Sources */,
 				6E18F67B27D94AB600354BC1 /* SKEmitterNode.swift in Sources */,
+				6E875E5E29A2A5D5004AD2A2 /* SKSpriteNode.swift in Sources */,
 				F16A64621E0C96A000BC8255 /* ViewController.swift in Sources */,
 				6EAF669828E78D630009D11B /* PersistentContainer.swift in Sources */,
 				0C12CD631F0293C4008BA78C /* HUD.swift in Sources */,
+				6E9DF0E129ABEC37004015FE /* SKPhysicsBody.swift in Sources */,
 				0C0655D41EE1681D00D38DA3 /* CharacterMenuScene.swift in Sources */,
 				6E955BBC28F99D09005DFF67 /* DragonsDB+CoreDataClass.swift in Sources */,
 				F16A64601E0C96A000BC8255 /* AppDelegate.swift in Sources */,
@@ -619,10 +620,11 @@
 				6EB0E3BF27F1DC560013C15E /* DragonsMenuScene.swift in Sources */,
 				0C12CD5A1F0293B9008BA78C /* Toon.swift in Sources */,
 				0C12CD901F068B00008BA78C /* Infobar.swift in Sources */,
-				F112A6F81E0EA2B000A5DEE9 /* EndGame.swift in Sources */,
+				F112A6F81E0EA2B000A5DEE9 /* GameOver.swift in Sources */,
 				0C12CD581F0293B9008BA78C /* Global.swift in Sources */,
 				6E5F4DFE29031649004F354A /* UIView.swift in Sources */,
 				6E5D9A8528FC95770091AC59 /* UILabel.swift in Sources */,
+				6E4854ED296F31310087B13C /* Dragons.swift in Sources */,
 				0C12CD711F029479008BA78C /* Fireball.swift in Sources */,
 				0C12CD521F0293B9008BA78C /* AccountInfo.swift in Sources */,
 				6EDE7E062900A36800FBB5A8 /* String.swift in Sources */,
@@ -703,7 +705,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -759,7 +761,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -779,7 +781,7 @@
 				INFOPLIST_FILE = EverWing/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "EverWing Arcade";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = pcb.everwings.com;
@@ -803,7 +805,7 @@
 				INFOPLIST_FILE = EverWing/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "EverWing Arcade";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = pcb.everwings.com;

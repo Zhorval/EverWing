@@ -3,41 +3,4 @@
    uuid = "BFA921C0-4CAB-4EBF-8968-B98BA85FA6FD"
    type = "1"
    version = "2.0">
-   <Breakpoints>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.AddressBreakpoint">
-         <BreakpointContent
-            uuid = "C1A39FC4-34EA-4073-B9DC-F53D9AEB59F6"
-            shouldBeEnabled = "No"
-            condition = "UICollectionViewFlowLayoutBreakForInvalidSizes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            symbolName = "*0x10e08e39a">
-            <Actions>
-               <BreakpointActionProxy
-                  ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
-                  <ActionContent>
-                  </ActionContent>
-               </BreakpointActionProxy>
-            </Actions>
-            <Locations>
-               <Location
-                  uuid = "C1A39FC4-34EA-4073-B9DC-F53D9AEB59F6 - 9b6a1d5f153d5f0c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "EverWing.CustomCollectionViewEggs.collectionView(_: __C.UICollectionView, numberOfItemsInSection: Swift.Int) -&gt; Swift.Int"
-                  moduleName = "EverWing"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Applications/CustomCollectionViewEggs.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "127"
-                  endingLineNumber = "127"
-                  offsetFromSymbolStart = "138">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-   </Breakpoints>
 </Bucket>
